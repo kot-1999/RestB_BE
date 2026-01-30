@@ -46,5 +46,11 @@ members.
 
 **Project Team Leader**: Oleksandr Kashytskyi
 
+**Team Members**
+Oleksandr Kashytskyi
+Wassim Khan
+Stephen Lyne
+America Bernal-Hluz
+
 30/01/2026
 
