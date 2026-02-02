@@ -1,2 +1,2 @@
-# RestB_BE - BACK END
+# RestB - BACK END
 Restaurant booking app
