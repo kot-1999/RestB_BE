@@ -130,7 +130,7 @@ All team members confirm their understanding and acceptance of this Code of Cond
 
 Oleksandr Kashytskyi - Date: _________
 
-Wassim Khan - Date: _________
+Muhammad Wasim Khan - Date: _________
 
 Stephen Lyne - Date: _________
 
