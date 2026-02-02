@@ -1,4 +1,4 @@
-Code of Conduct for RestB
+Code of Conduct for RestB - BACK END
 
 Introduction
 This Code of Conduct outlines the standards of expected behaviour and ethical guidelines for all members involved in RestB. We strive to create an environment that fosters respect, inclusivity, and professionalism. All participants must adhere to these rules to ensure a positive and productive experience.
