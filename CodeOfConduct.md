@@ -118,7 +118,7 @@ Project Team Leader: Oleksandr Kashytskyi
 
 Team Members:
 - Oleksandr Kashytskyi
-- Wassim Khan
+- Muhammad Wasim Khan
 - Stephen Lyne
 - America Bernal-Hluz
 - Ravula Bhavya Sree
@@ -130,7 +130,7 @@ All team members confirm their understanding and acceptance of this Code of Cond
 
 Oleksandr Kashytskyi - Date: _________
 
-Muhammad Wasim Khan - Date: _________
+Muhammad Wasim Khan - Date: February 3, 2026
 
 Stephen Lyne - Date: _________
 
