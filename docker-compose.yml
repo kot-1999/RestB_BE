@@ -39,7 +39,7 @@ services:
       file: ./docker-compose.base.yml
       service: postgres
     volumes:
-      - ./docker/local/postgres/pgdata:/var/lib/postgresql/data
+      - ./docker/local/restB/postgres/pgdata:/var/lib/postgresql/data
     profiles:
       - dev
       - localDev
