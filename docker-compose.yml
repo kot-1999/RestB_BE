@@ -1,0 +1,73 @@
+services:
+  dev_app:
+    extends:
+      file: ./docker-compose.base.yml
+      service: app
+    container_name: dev_app
+    profiles:
+      - dev
+    depends_on:
+      - mailhog
+      - redis
+      - dev_postgres
+    command: >
+      sh -c '
+        npm install --legacy-peer-deps &&
+        npm run db:seed &&
+        npm run start;
+      '
+
+  test_app:
+    extends:
+      file: ./docker-compose.base.yml
+      service: app
+    container_name: test_app
+    profiles:
+      - test
+    depends_on:
+      - mailhog
+      - redis
+      - test_postgres
+    command: >
+      sh -c '
+        npm ci;
+        npm run test;
+      '
+
+  dev_postgres:
+    extends:
+      file: ./docker-compose.base.yml
+      service: postgres
+    volumes:
+      - ./docker/local/postgres/pgdata:/var/lib/postgresql/data
+    profiles:
+      - dev
+      - localDev
+
+  test_postgres:
+    extends:
+      file: ./docker-compose.base.yml
+      service: postgres
+    profiles:
+      - test
+      - localTest
+
+  mailhog:
+    extends:
+      file: ./docker-compose.base.yml
+      service: mailhog
+    profiles:
+      - dev
+      - test
+      - localDev
+      - localTest
+
+  redis:
+    extends:
+      file: ./docker-compose.base.yml
+      service: redis
+    profiles:
+      - dev
+      - test
+      - localDev
+      - localTest
