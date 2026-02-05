@@ -132,7 +132,7 @@ Oleksandr Kashytskyi - Date: February 3, 2026
 
 Muhammad Wasim Khan - Date: February 3, 2026
 
-Stephen Lyne - Date: _________
+Stephen Lyne - Date: February 3, 2026
 
 America Bernal-Hluz - Date: February 2, 2026
 
