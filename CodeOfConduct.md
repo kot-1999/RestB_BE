@@ -128,12 +128,12 @@ Date: 30/01/2026
 Signatures:
 All team members confirm their understanding and acceptance of this Code of Conduct.
 
-Oleksandr Kashytskyi - Date: _________
+Oleksandr Kashytskyi - Date: February 3, 2026
 
 Muhammad Wasim Khan - Date: February 3, 2026
 
-Stephen Lyne - Date: _________
+Stephen Lyne - Date: February 3, 2026
 
 America Bernal-Hluz - Date: February 2, 2026
 
-Ravula Bhavya Sree - Date: _________
+Ravula Bhavya Sree - Date: February 5, 2026
