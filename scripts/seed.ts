@@ -1,4 +1,3 @@
-import logger from '../src/services/Logger';
 import prisma from '../src/services/Prisma';
 import AdminGenerator from '../tests/utils/AdminGenerator';
 import UserGenerator from '../tests/utils/UserGenerator';
@@ -9,8 +8,8 @@ async function seed() {
 
     // Generate plain objects
     for (let i = 0; i < 10; i++) {
-        users.push(UserGenerator.generateData());   // must return plain object
-        admins.push(AdminGenerator.generateData()); // must return plain object
+        users.push(UserGenerator.generateData({ password: 'TestUser.123' }));
+        admins.push(AdminGenerator.generateData({ password: 'TestAdmin.123' }));
     }
 
     const promises: Promise<any>[] = [];
