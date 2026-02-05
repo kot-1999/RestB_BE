@@ -93,7 +93,7 @@ export class AuthorizationController extends AbstractController {
                     lastName: body.lastName,
                     email: body.email,
                     emailVerified: false,
-                    password: EncryptionService.hashSHA256(EncryptionService.decryptAES(body.password))
+                    password: EncryptionService.hashSHA256(body.password)
                 }
             })
             req.session.jwt = JwtService.generateToken({
@@ -145,8 +145,7 @@ export class AuthorizationController extends AbstractController {
             }
 
             // Check password
-            const decryptedPassword = EncryptionService.decryptAES(body.password)
-            if (user.password !== EncryptionService.hashSHA256(decryptedPassword)) {
+            if (user.password !== EncryptionService.hashSHA256(body.password)) {
                 throw new IError(401, 'Password or email is incorrect')
             }
 
@@ -269,7 +268,7 @@ export class AuthorizationController extends AbstractController {
 
             const updatedUser = await prisma.user.update({
                 data: {
-                    password: EncryptionService.hashSHA256(EncryptionService.decryptAES(newPassword))
+                    password: EncryptionService.hashSHA256(newPassword)
                 },
                 where: {
                     id: user.id

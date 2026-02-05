@@ -17,7 +17,7 @@ const newUserData = {
     firstName: 'John',
     lastName: 'Doe',
     email: 'john@doe.com',
-    password: EncryptionService.encryptAES('Test123.')
+    password: 'Test123.'
 }
 describe('POST ' + endpoint('/register'), () => {
     it('should register user (200)', async () => {
@@ -95,7 +95,7 @@ describe('POST ' + endpoint('/login'), () => {
             .set('Content-Type', 'application/json')
             .send({
                 email: newUserData.email,
-                password: EncryptionService.encryptAES('Test123.wrong')
+                password: 'Test123.wrong'
             })
 
         expect(res.statusCode).to.equal(401)
@@ -174,7 +174,7 @@ describe('POST ' + endpoint('/reset-password'), () => {
     })
     
     it('should reset password (200)', async () => {
-        const newPassword = EncryptionService.encryptAES('Test123.newPassword')
+        const newPassword = 'Test123.newPassword'
         const res = await supertest(app)
             .post(endpoint('/reset-password'))
             .set('Content-Type', 'application/json')
@@ -194,7 +194,7 @@ describe('POST ' + endpoint('/reset-password'), () => {
     })
 
     it('wrong aud in jwt token (401)', async () => {
-        const newPassword = EncryptionService.encryptAES('Test123.newPassword')
+        const newPassword = 'Test123.newPassword'
         const res = await supertest(app)
             .post(endpoint('/reset-password'))
             .set('Content-Type', 'application/json')
