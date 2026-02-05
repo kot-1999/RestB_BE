@@ -128,7 +128,7 @@ Date: 30/01/2026
 Signatures:
 All team members confirm their understanding and acceptance of this Code of Conduct.
 
-Oleksandr Kashytskyi - Date: _________
+Oleksandr Kashytskyi - Date: February 3, 2026
 
 Muhammad Wasim Khan - Date: February 3, 2026
 
