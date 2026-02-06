@@ -156,6 +156,13 @@ app.get('/', (req, res) => {
     </div>
     
     <div class="box">
+        <strong>📊 UML Diagram .drawio</strong>
+        <p>
+            <a href="https://drive.google.com/file/d/1jBwhy8yuRduCu-nWBWwJf8l_qkBhIvqG/view?usp=sharing" target="_blank"> Google Drive File</a>
+        </p>
+    </div>
+    
+    <div class="box">
         <strong>📊 Monitoring</strong>
         <p>Sentry is enabled for error monitoring and performance tracking.</p>
     </div>
