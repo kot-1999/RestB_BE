@@ -21,7 +21,7 @@ export interface IConfig {
     env: NodeEnv
   }
   database: {
-    postgresURL: string
+    dbURL: string
   }
   googleStrategy: OAuth2StrategyOptionsWithoutRequiredURLs
   cookieSession: SessionOptions & { cookie: NonNullable<SessionOptions['cookie']> }
