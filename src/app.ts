@@ -102,7 +102,73 @@ app.use(errorMiddleware)
 
 // Default route
 app.get('/', (req, res) => {
-    res.status(200).send('Welcome to the BE-Proj-01')
+    const baseUrl = `${req.protocol}://${req.get('host')}`
+    const mailUrl = `${req.protocol}://${req.hostname}`
+    res.status(200).send(`
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>${appConfig.name}</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            max-width: 700px;
+            margin: 60px auto;
+            line-height: 1.6;
+            padding: 0 20px;
+        }
+        h1 { margin-bottom: 5px; }
+        .box {
+            background: #f7f7f7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        a { color: #0b6cff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .tag {
+            display: inline-block;
+            background: #eee;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-left: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>${appConfig.name}</h1>
+    <p>Backend REST API service is running successfully.</p>
+
+    <div class="box">
+        <strong>📚 API Documentation</strong>
+        <p>
+            <a href="${baseUrl}/api/docs" target="_blank">${baseUrl}/api/docs</a>
+        </p>
+    </div>
+
+    <div class="box">
+        <strong>📧 Mail Server UI</strong>
+        <p>Email HTTP server is available for development testing.</p>
+        <a href="${mailUrl}:8025" target="_blank">${mailUrl}:8025</a>
+    </div>
+    
+    <div class="box">
+        <strong>📊 Monitoring</strong>
+        <p>Sentry is enabled for error monitoring and performance tracking.</p>
+    </div>
+    
+    <div class="box">
+        <strong>⚙ Environment</strong>
+         <p style="margin-top:40px; font-size:13px; color:#777;">
+            ${appConfig.name} • Node.js • Express
+        </p>
+    </div>
+</body>
+</html>
+`)
 })
 
 export default app

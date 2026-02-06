@@ -10,6 +10,7 @@ import { NodeEnv } from '../src/utils/enums';
 
 const options: IConfig = {
     app: {
+        name: 'RestBoo',
         port: process.env.PORT as string,
         env: process.env.NODE_ENV as NodeEnv
     },
