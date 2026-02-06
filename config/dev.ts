@@ -11,6 +11,7 @@ const isProd = process.env.NODE_ENV === NodeEnv.Prod
 
 const options: IConfig = {
     app: {
+        name: 'RestBoo',
         port: process.env.PORT as string,
         env: process.env.NODE_ENV as NodeEnv
     },
@@ -82,8 +83,8 @@ const options: IConfig = {
         }
     },
     rateLimiter: {
-        windowMs: 15 * 60 * 1000, // 15 minutes
-        limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+        windowMs: 1 * 60 * 1000, // 1 minutes
+        limit: 45, // Limit each IP to 45 requests per `window` (here, per 1 minutes)
         standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
         legacyHeaders: false // Disable the `X-RateLimit-*` headers
         // NOTE: 'store' option will be defined in app.ts

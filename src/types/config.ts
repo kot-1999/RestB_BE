@@ -16,6 +16,7 @@ interface LoggerCommonConfig {
 
 export interface IConfig {
   app: {
+    name: string
     port: string
     env: NodeEnv
   }
