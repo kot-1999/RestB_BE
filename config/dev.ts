@@ -28,7 +28,7 @@ const options: IConfig = {
         // NOTE: 'store' option will be defined in app.ts
     },
     database: {
-        postgresURL: process.env.POSTGRES_URL as string
+        dbURL: process.env.MYSQL_URL as string
     },
     googleStrategy: {
         clientID: process.env.GOOGLE_CLIENT_ID as string,
