@@ -1,8 +1,8 @@
 {
-  "name": "BE-project-01",
+  "name": "RestBoo",
   "version": "1.0.0",
-  "description": "",
-  "main": "dist/index.js",
+  "description": "RestBoo – Restaurant Booking Overthinking Organizer",
+  "main": "src/index.ts",
   "scripts": {
     "prestart": "npx prisma generate && npx prisma db push && npm run apidoc && npm run db:seed",
     "start": "npm run prestart && cross-env nodemon --watch src -L --verbose --exec \"node --watch -r dotenv/config -r ts-node/register src/index.ts\"",
