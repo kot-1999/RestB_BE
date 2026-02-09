@@ -141,7 +141,7 @@ app.get('/', (req, res) => {
 <body>
     <h1>${appConfig.name}</h1>
     <p>Backend REST API service is running successfully.</p>
-
+    <p>Checkout our frontend app at /index.html</p>
     <div class="box">
         <strong>📚 API Documentation</strong>
         <p>

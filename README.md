@@ -1,4 +1,4 @@
-c# RestB - BACK END
+# RestB - BACK END
 Restaurant booking app
 
 ## Getting started
@@ -32,6 +32,16 @@ This project utilizes Docker Compose profiles to manage different service config
 - `test`: Activates services required for testing and run tests.
 - `localDev`: Activates services for local development.
 - `localTest`: Activates services for local testing.
+
+### Running frontend
+
+To run the frontend clone RestB_FE repo inside you backend https://github.com/kot-1999/RestB_FE
+
+If frontend build is available backend app will automatically serve it
+
+If it's not available run `npm run build:frontend`
+
+In case you use docker -dev profile build will happen automatically
 
 ### Accessing the API
 Access swagger API documentation on `{host}/api/docs`
