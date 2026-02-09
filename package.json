@@ -4,6 +4,7 @@
   "description": "RestBoo – Restaurant Booking Overthinking Organizer",
   "main": "src/index.ts",
   "scripts": {
+    "build:frontend": "[ -d RestB_FE ] && cd RestB_FE && npm install --legacy-peer-deps && npm run clean && npm run build",
     "prestart": "npx prisma generate && npx prisma db push && npm run apidoc && npm run db:seed",
     "start": "npm run prestart && cross-env nodemon --watch src -L --verbose --exec \"node --watch -r dotenv/config -r ts-node/register src/index.ts\"",
     "test": "npm run prestart && npm run db:push && mocha -r dotenv/config -r ts-node/register --config .mocharc.js",
