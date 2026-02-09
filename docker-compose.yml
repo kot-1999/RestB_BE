@@ -11,7 +11,7 @@ services:
     depends_on:
       - mailhog
       - redis
-      - dev_postgres
+      - dev_mysql
     command: >
       sh -c '
         npm install --legacy-peer-deps &&
@@ -30,27 +30,29 @@ services:
     depends_on:
       - mailhog
       - redis
-      - test_postgres
+      - test_mysql
     command: >
       sh -c '
         npm ci;
         npm run test;
       '
 
-  dev_postgres:
+  dev_mysql:
+    container_name: dev_mysql
     extends:
       file: ./docker-compose.base.yml
-      service: postgres
+      service: mysql
     volumes:
-      - ./docker/local/restB/postgres/pgdata:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
     profiles:
       - dev
       - localDev
 
-  test_postgres:
+  test_mysql:
+    container_name: test_mysql
     extends:
       file: ./docker-compose.base.yml
-      service: postgres
+      service: mysql
     profiles:
       - test
       - localTest
@@ -74,3 +76,7 @@ services:
       - test
       - localDev
       - localTest
+
+volumes:
+  mysql_data:
+    driver: local
