@@ -3,6 +3,7 @@ import * as path from 'node:path'
 
 import config from 'config'
 import { RedisStore as RedisSessionStore } from 'connect-redis'
+import cors from 'cors'
 import express from 'express'
 import rateLimit from 'express-rate-limit';
 import session from 'express-session'
@@ -34,7 +35,10 @@ const redisClient = redis.getRedisClient()
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-
+app.use(cors({
+    origin: true,
+    credentials: true
+}))
 // Create and use security policy middleware
 app.use(helmet.contentSecurityPolicy(helmetConfig.contentSecurity))
 
