@@ -22,3 +22,5 @@ yarn-error.log*
 /logs
 # Sentry Config File
 .sentryclirc
+/RestB_FE
+/RestB_FE/.idea/.gitignore
