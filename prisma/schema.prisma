@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("MYSQL_URL")
 }
 
@@ -20,11 +20,11 @@ enum AdminRole {
 }
 
 model User {
-  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id              String    @id @default(uuid()) @db.Char(36)
   firstName       String?   @db.Text
   lastName        String?   @db.Text
   email           String    @db.Text
-  emailVerified   Boolean   @default(false) @db.Boolean
+  emailVerified   Boolean   @default(false)
   password        String?   @db.Text
   type            UserType  @default(Default)
   googleProfileID String?
@@ -36,11 +36,11 @@ model User {
 }
 
 model Admin {
-  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id            String    @id @default(uuid()) @db.Char(36)
   firstName     String    @db.Text
   lastName      String    @db.Text
   email         String    @db.Text
-  emailVerified Boolean   @default(false) @db.Boolean
+  emailVerified Boolean   @default(false)
   password      String    @db.Text
   role          AdminRole @default(Admin)
   createdAt     DateTime  @default(now())
