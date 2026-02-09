@@ -178,7 +178,7 @@ app.get('/', (req, res) => {
 `)
 })
 
-const fePath = path.join(__dirname, '..', 'RestB_FEs', 'dist')
+const fePath = path.join(__dirname, '..', 'RestB_FE', 'dist')
 if (fs.existsSync(fePath)) {
     app.use(express.static(fePath))
     logger.info('Frontend is available at /index.html')
