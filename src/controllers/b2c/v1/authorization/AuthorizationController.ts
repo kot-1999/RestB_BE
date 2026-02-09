@@ -13,7 +13,8 @@ import { IError } from '../../../../utils/IError'
 export class AuthorizationController extends AbstractController {
     private static readonly userSchema = Joi.object({
         user: Joi.object({
-            id: JoiCommon.string.id
+            id: JoiCommon.string.id,
+            token: JoiCommon.string.token.required()
         }).required()
     })
 
@@ -51,13 +52,20 @@ export class AuthorizationController extends AbstractController {
         response: {
             register: AuthorizationController.userSchema.required(),
             login: AuthorizationController.userSchema.required(),
-            logout: AuthorizationController.userSchema.keys({
+            logout: Joi.object({
+                user: Joi.object({
+                    id: JoiCommon.string.id
+                }).required(),
                 message: Joi.string().required()
             }).required(),
             forgotPassword: Joi.object({
                 message: Joi.string().required()
             }).required(),
-            resetPassword: AuthorizationController.userSchema.required()
+            resetPassword: Joi.object({
+                user: Joi.object({
+                    id: JoiCommon.string.id
+                }).required()
+            }).required()
         }
     }
 
@@ -96,10 +104,12 @@ export class AuthorizationController extends AbstractController {
                     password: EncryptionService.hashSHA256(body.password)
                 }
             })
-            req.session.jwt = JwtService.generateToken({
+            const jwt = JwtService.generateToken({
                 id: user.id,
                 aud: JwtAudience.b2c
             })
+
+            req.session.jwt = jwt
 
             if (user) {
                 emailService.sendEmail(EmailType.registered, {
@@ -113,7 +123,8 @@ export class AuthorizationController extends AbstractController {
                 .status(200)
                 .json({
                     user: {
-                        id: user.id
+                        id: user.id,
+                        token: jwt
                     }
                 })
         } catch (err) {
@@ -149,16 +160,19 @@ export class AuthorizationController extends AbstractController {
                 throw new IError(401, 'Password or email is incorrect')
             }
 
-            req.session.jwt = JwtService.generateToken({
+            const jwt = JwtService.generateToken({
                 id: user.id,
                 aud: JwtAudience.b2c
             })
+
+            req.session.jwt = jwt
 
             return res
                 .status(200)
                 .json({
                     user: {
-                        id: user.id
+                        id: user.id,
+                        token: jwt
                     }
                 })
         } catch (err) {
