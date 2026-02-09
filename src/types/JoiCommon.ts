@@ -13,7 +13,8 @@ export class JoiCommon {
             .max(Constants.number.MAX_STRING_LENGTH),
         email: Joi.string().email()
             .trim()
-            .case('lower')
+            .case('lower'),
+        token: Joi.string()
     }
 
     static readonly number = {}
