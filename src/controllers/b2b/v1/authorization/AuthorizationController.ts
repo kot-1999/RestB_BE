@@ -1,3 +1,4 @@
+import { AdminRole } from '@prisma/client';
 import { Request, Response, NextFunction, AuthAdminRequest } from 'express'
 import Joi from 'joi'
 
@@ -14,7 +15,9 @@ export class AuthorizationController extends AbstractController {
     private static readonly adminSchema = Joi.object({
         admin: Joi.object({
             id: JoiCommon.string.id,
-            token: JoiCommon.string.token.required()
+            token: JoiCommon.string.token.required(),
+            role: Joi.string().allow(...Object.values(AdminRole))
+                .required()
         }).required()
     })
 
@@ -26,7 +29,8 @@ export class AuthorizationController extends AbstractController {
                     lastName: JoiCommon.string.name.required(),
                     email: JoiCommon.string.email.required(),
                     password: Joi.string().min(3)
-                        .required()
+                        .required(),
+                    phone: Joi.string().required()
                 }).required()
             }).required(),
 
@@ -92,7 +96,7 @@ export class AuthorizationController extends AbstractController {
             )
 
             if (admin) {
-                throw new IError(409, 'Profile already exists. Try to login again, or use forgot password')
+                throw new IError(409, 'Profile already exists. Go to login, or use forgot password')
             }
 
             admin = await prisma.admin.create({
@@ -101,7 +105,8 @@ export class AuthorizationController extends AbstractController {
                     lastName: body.lastName,
                     email: body.email,
                     emailVerified: false,
-                    password: EncryptionService.hashSHA256(body.password)
+                    password: EncryptionService.hashSHA256(body.password),
+                    phone: body.phone
                 }
             })
             const jwt = JwtService.generateToken({
@@ -124,7 +129,8 @@ export class AuthorizationController extends AbstractController {
                 .json({
                     admin: {
                         id: admin.id,
-                        token: jwt
+                        token: jwt,
+                        role: admin.role
                     }
                 })
         } catch (err) {
@@ -172,7 +178,8 @@ export class AuthorizationController extends AbstractController {
                 .json({
                     admin: {
                         id: admin.id,
-                        token: jwt
+                        token: jwt,
+                        role: admin.role
                     }
                 })
         } catch (err) {

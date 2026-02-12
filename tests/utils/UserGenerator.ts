@@ -6,7 +6,7 @@ import { EncryptionService } from '../../src/services/Encryption'
 import prisma from '../../src/services/Prisma'
 
 export default class UserGenerator {
-    public static generateUser(userData: Partial<User> = {}): Promise<User> {
+    public static createOne(userData: Partial<User> = {}): Promise<User> {
         return prisma.user.createOne(UserGenerator.generateData(userData))
     }
 
@@ -19,6 +19,7 @@ export default class UserGenerator {
             emailVerified: userData.emailVerified ?? false,
             password: userData.password ?? EncryptionService.hashSHA256(faker.internet.password()),
             type: userData.type ?? UserType.Default,
+            phone: userData.phone ?? faker.phone.number({ style: 'international' }),
             googleProfileID: userData.googleProfileID ?? null,
             createdAt: userData.createdAt as Date ?? dayjs().toISOString(),
             updatedAt: userData.updatedAt as Date ?? dayjs().toISOString(),

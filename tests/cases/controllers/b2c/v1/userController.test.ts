@@ -15,7 +15,7 @@ describe('GET ' + endpoint(':userID'), () => {
     let userID: string
 
     it('Wrong JWT token aud (401)', async () => {
-        const user = await UserGenerator.generateUser()
+        const user = await UserGenerator.createOne()
         userID = user.id
         const res = await supertest(app)
             .get(endpoint(user.id))
@@ -46,7 +46,7 @@ describe('GET ' + endpoint(':userID'), () => {
     })
 
     it('Should return another user (200)', async () => {
-        const user = await UserGenerator.generateUser()
+        const user = await UserGenerator.createOne()
         const res = await supertest(app)
             .get(endpoint(userID))
             .set('Content-Type', 'application/json')
@@ -78,7 +78,7 @@ describe('GET ' + endpoint(':userID'), () => {
 
 describe('DELETE ' + endpoint(), () => {
     it('Should delete user (200)', async () => {
-        const user = await UserGenerator.generateUser()
+        const user = await UserGenerator.createOne()
         const res = await supertest(app)
             .delete(endpoint(''))
             .set('Content-Type', 'application/json')

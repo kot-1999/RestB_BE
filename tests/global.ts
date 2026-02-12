@@ -5,19 +5,19 @@ import prisma from '../src/services/Prisma'
 
 // Function to truncate all tables except _prisma_migrations
 export async function clearDatabase() {
-    const tables: { TABLE_NAME: string }[] = await prisma.$queryRaw`
+    const tables: Array<{ TABLE_NAME: string }> = await prisma.$queryRaw`
         SELECT TABLE_NAME
         FROM information_schema.TABLES
         WHERE TABLE_SCHEMA = DATABASE();
     `
 
-    // Disable FK checks (MySQL equivalent of CASCADE)
     await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 0;')
 
     for (const { TABLE_NAME } of tables) {
-        if (TABLE_NAME !== '_prisma_migrations') {
-            await prisma.$executeRawUnsafe(`TRUNCATE TABLE \`${TABLE_NAME}\`;`)
-        }
+        if (TABLE_NAME === '_prisma_migrations') {continue}
+
+        await prisma.$executeRawUnsafe(`DELETE FROM \`${TABLE_NAME}\`;`)
+        await prisma.$executeRawUnsafe(`ALTER TABLE \`${TABLE_NAME}\` AUTO_INCREMENT = 1;`)
     }
 
     await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 1;')

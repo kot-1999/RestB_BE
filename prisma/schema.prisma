@@ -15,22 +15,35 @@ enum UserType {
 
 enum AdminRole {
   Admin
-  EmployeeManager
   Employee
 }
 
+enum BookingStatus {
+  Pending
+  Confirmed
+  Cancelled
+  Completed
+  Deleted
+}
+
 model User {
-  id              String    @id @default(uuid()) @db.Char(36)
-  firstName       String?   @db.Text
-  lastName        String?   @db.Text
-  email           String    @db.Text
-  emailVerified   Boolean   @default(false)
-  password        String?   @db.Text
-  type            UserType  @default(Default)
+  id              String   @id @default(uuid()) @db.Char(36)
+  firstName       String?  @db.Text
+  lastName        String?  @db.Text
+  email           String   @db.Text
+  emailVerified   Boolean  @default(false)
+  password        String?  @db.Text
+  type            UserType @default(Default)
   googleProfileID String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  deletedAt       DateTime?
+  phone           String   @db.Text
+
+  // Foreign Keys
+  bookings Booking[]
+
+  // Metadata
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@map("users")
 }
@@ -43,9 +56,131 @@ model Admin {
   emailVerified Boolean   @default(false)
   password      String    @db.Text
   role          AdminRole @default(Admin)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  deletedAt     DateTime?
+  phone         String    @db.Text
+
+  // Many-to-many with restaurants
+  restaurants RestaurantStaff[]
+  brand       Brand?            @relation(fields: [brandID], references: [id])
+  brandID     String?           @unique
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@map("admins")
+}
+
+model RestaurantStaff {
+  adminID      String @db.Char(36)
+  restaurantID String @db.Char(36)
+
+  admin      Admin      @relation(fields: [adminID], references: [id])
+  restaurant Restaurant @relation(fields: [restaurantID], references: [id])
+
+  @@id([adminID, restaurantID])
+  @@map("restaurant_staff")
+}
+
+model Address {
+  id        String  @id @default(uuid()) @db.Char(36)
+  building  String  @db.Text
+  street    String  @db.Text
+  city      String  @db.Text
+  postcode  String  @db.Text
+  country   String  @db.Text
+  latitude  Decimal @db.Decimal(9, 6)
+  longitude Decimal @db.Decimal(9, 6)
+
+  // Foreign Keys
+  restaurants Restaurant[]
+
+  // Metadata
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("addresses")
+}
+
+model Brand {
+  id      String  @id @default(uuid()) @db.Char(36)
+  name    String  @db.Text
+  logoURL String? @db.Text
+
+  // Foreign Keys
+  restaurants Restaurant[]
+  admin       Admin?
+
+  // Metadata
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("brands")
+}
+
+model Restaurant {
+  id                     String                 @id @default(uuid()) @db.Char(36)
+  name                   String                 @db.Text
+  description            String?                @db.Text
+  bannerURL              String                 @db.Text
+  photosURL              Json? // array of image URLs
+  timeFrom               DateTime               @db.Time
+  timeTO                 DateTime               @db.Time
+  // Foreign Keys
+  brand                  Brand                  @relation(fields: [brandID], references: [id])
+  brandID                String
+  bookings               Booking[]
+  staff                  RestaurantStaff[]
+  address                Address                @relation(fields: [addressID], references: [id])
+  addressID              String
+  bookingsDailySummaries BookingsDailySummary[]
+
+  // Metadata
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("restaurants")
+}
+
+model Booking {
+  id           String        @id @default(uuid()) @db.Char(36)
+  guestsNumber Int           @db.Int
+  bookingTime  DateTime
+  status       BookingStatus @default(Pending)
+  discussion   Json?
+
+  // Foreign Keys
+  user         User?       @relation(fields: [userID], references: [id])
+  userID       String?     @db.Char(36)
+  restaurant   Restaurant? @relation(fields: [restaurantID], references: [id])
+  restaurantID String?     @db.Char(36)
+
+  // Metadata
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("bookings")
+}
+
+model BookingsDailySummary {
+  id                           String @id @default(uuid()) @db.Char(36)
+  totalApprovedBookings        Int    @default(0) @db.Int
+  totalPendingBookings         Int    @default(0) @db.Int
+  totalCanceledByUserBookings  Int    @default(0) @db.Int
+  totalCanceledByAdminBookings Int    @default(0) @db.Int
+  totalGuests                  Int    @default(0) @db.Int
+
+  //Foreign Keys
+  restaurant   Restaurant @relation(fields: [restaurantID], references: [id])
+  restaurantID String
+
+  // Metadata
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("bookings_daily_summary")
 }
