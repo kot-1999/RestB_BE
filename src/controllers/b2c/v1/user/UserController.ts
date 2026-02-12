@@ -14,6 +14,7 @@ export class UsersController extends AbstractController {
         lastName: JoiCommon.string.name.allow(null),
         email: JoiCommon.string.email,
         emailVerified: Joi.boolean().required(),
+        phone: Joi.string().required(),
         type: Joi.string().valid(...Object.values(UserType))
             .required(),
         createdAt: Joi.date().iso()
@@ -86,7 +87,8 @@ export class UsersController extends AbstractController {
                     emailVerified: user.emailVerified,
                     type: user.type,
                     createdAt: user.createdAt,
-                    updatedAt: user.updatedAt
+                    updatedAt: user.updatedAt,
+                    phone: user.phone
                 }
             } else {
                 resultUser = await prisma.user.findOne({
@@ -97,7 +99,8 @@ export class UsersController extends AbstractController {
                     emailVerified: true,
                     type: true,
                     createdAt: true,
-                    updatedAt: true
+                    updatedAt: true,
+                    phone: true
                 }, {
                     id: {
                         equals: userID

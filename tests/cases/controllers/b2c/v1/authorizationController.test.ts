@@ -5,7 +5,6 @@ import supertest from 'supertest'
 
 import app from '../../../../../src/app'
 import { AuthorizationController } from '../../../../../src/controllers/b2c/v1/authorization/AuthorizationController'
-import { EncryptionService } from '../../../../../src/services/Encryption'
 import { JwtService } from '../../../../../src/services/Jwt'
 import prisma from '../../../../../src/services/Prisma'
 import { IConfig } from '../../../../../src/types/config'
@@ -17,7 +16,8 @@ const newUserData = {
     firstName: 'John',
     lastName: 'Doe',
     email: 'john@doe.com',
-    password: 'Test123.'
+    password: 'Test123.',
+    phone: '+4482382312'
 }
 describe('POST ' + endpoint('/register'), () => {
     it('should register user (200)', async () => {
@@ -25,6 +25,7 @@ describe('POST ' + endpoint('/register'), () => {
         const res = await supertest(app).post(endpoint('/register'))
             .set('Content-Type', 'application/json')
             .send(newUserData)
+
         expect(res.statusCode).to.equal(200)
         expect(res.type).to.eq('application/json')
         expect(res.body.user.id).to.be.an('string')

@@ -16,6 +16,7 @@ export class AdminController extends AbstractController {
         emailVerified: Joi.boolean().required(),
         role: Joi.string().valid(...Object.values(AdminRole))
             .required(),
+        phone: Joi.string().required(),
         createdAt: Joi.date().iso()
             .required(),
         updatedAt: Joi.date().iso()
@@ -69,7 +70,8 @@ export class AdminController extends AbstractController {
                     emailVerified: admin.emailVerified,
                     role: admin.role,
                     createdAt: admin.createdAt,
-                    updatedAt: admin.updatedAt
+                    updatedAt: admin.updatedAt,
+                    phone: admin.phone
                 }
             } else {
                 resultAdmin = await prisma.admin.findOne({
@@ -80,7 +82,8 @@ export class AdminController extends AbstractController {
                     emailVerified: true,
                     role: true,
                     createdAt: true,
-                    updatedAt: true
+                    updatedAt: true,
+                    phone: true
                 }, {
                     id: {
                         equals: adminID
