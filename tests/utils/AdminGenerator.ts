@@ -18,6 +18,7 @@ export default class AdminGenerator {
             email: adminData.email ?? faker.internet.email(),
             emailVerified: adminData.emailVerified ?? false,
             brandID: adminData.brandID ?? null,
+            phone: adminData.phone ?? faker.phone.number({ style: 'international' }),
             password: adminData.password ?? EncryptionService.hashSHA256(faker.internet.password()),
             role: adminData.role ?? AdminRole.Admin,
             createdAt: adminData.createdAt as Date ?? dayjs().toISOString(),
