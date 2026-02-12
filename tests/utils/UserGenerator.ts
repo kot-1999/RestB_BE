@@ -6,7 +6,7 @@ import { EncryptionService } from '../../src/services/Encryption'
 import prisma from '../../src/services/Prisma'
 
 export default class UserGenerator {
-    public static generateUser(userData: Partial<User> = {}): Promise<User> {
+    public static createOne(userData: Partial<User> = {}): Promise<User> {
         return prisma.user.createOne(UserGenerator.generateData(userData))
     }
 
