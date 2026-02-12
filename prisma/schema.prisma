@@ -35,6 +35,7 @@ model User {
   password        String?  @db.Text
   type            UserType @default(Default)
   googleProfileID String?
+  phone           String   @db.Text
 
   // Foreign Keys
   bookings Booking[]
@@ -55,6 +56,7 @@ model Admin {
   emailVerified Boolean   @default(false)
   password      String    @db.Text
   role          AdminRole @default(Admin)
+  phone         String    @db.Text
 
   // Many-to-many with restaurants
   restaurants RestaurantStaff[]
@@ -101,10 +103,9 @@ model Address {
 }
 
 model Brand {
-  id          String  @id @default(uuid()) @db.Char(36)
-  name        String  @db.Text
-  description String? @db.Text
-  logoURL     String? @db.Text
+  id      String  @id @default(uuid()) @db.Char(36)
+  name    String  @db.Text
+  logoURL String? @db.Text
 
   // Foreign Keys
   restaurants Restaurant[]
@@ -119,13 +120,13 @@ model Brand {
 }
 
 model Restaurant {
-  id          String  @id @default(uuid()) @db.Char(36)
-  name        String  @db.Text
-  phone       String? @db.Text
-  description String? @db.Text
-  bannerURL   String  @db.Text
-  photosURL   Json? // array of image URLs
-
+  id                     String                 @id @default(uuid()) @db.Char(36)
+  name                   String                 @db.Text
+  description            String?                @db.Text
+  bannerURL              String                 @db.Text
+  photosURL              Json? // array of image URLs
+  timeFrom               DateTime               @db.Time
+  timeTO                 DateTime               @db.Time
   // Foreign Keys
   brand                  Brand                  @relation(fields: [brandID], references: [id])
   brandID                String

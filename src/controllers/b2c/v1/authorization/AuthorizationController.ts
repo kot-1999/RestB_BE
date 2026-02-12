@@ -26,7 +26,8 @@ export class AuthorizationController extends AbstractController {
                     lastName: JoiCommon.string.name.required(),
                     email: JoiCommon.string.email.required(),
                     password: Joi.string().min(3)
-                        .required()
+                        .required(),
+                    phone: Joi.string().required()
                 }).required()
             }).required(),
 
@@ -92,7 +93,7 @@ export class AuthorizationController extends AbstractController {
             )
 
             if (user) {
-                throw new IError(409, 'User already exists. Try to login again, or use forgot password')
+                throw new IError(409, 'Profile already exists. Go to login, or use forgot password')
             }
 
             user = await prisma.user.create({
@@ -101,7 +102,8 @@ export class AuthorizationController extends AbstractController {
                     lastName: body.lastName,
                     email: body.email,
                     emailVerified: false,
-                    password: EncryptionService.hashSHA256(body.password)
+                    password: EncryptionService.hashSHA256(body.password),
+                    phone: body.phone
                 }
             })
             const jwt = JwtService.generateToken({
