@@ -75,10 +75,10 @@ const options: IConfig = {
             useDefaults: false,
             directives: {
                 defaultSrc: ["'self'"], // Allow resources to be loaded
-                scriptSrc: ["'self'", 'apis.google.com'], // Allows JavaScript to be loaded
-                styleSrc: ["'self'", 'fonts.googleapis.com'], // Allows CSS stylesheets to be loaded
+                scriptSrc: ["'self'", 'apis.google.com', 'code.jquery.com', 'cdn.jsdelivr.net'], // Allows JavaScript to be loaded
+                styleSrc: ["'self'", 'fonts.googleapis.com', "'unsafe-inline'"], // Allows CSS stylesheets to be loaded
                 fontSrc: ["'self'", 'fonts.gstatic.com'], // Allows font files to be loaded
-                imgSrc: ["'self'", 'lh3.googleusercontent.com'] // Allows images to be loaded
+                imgSrc: ["'self'", 'lh3.googleusercontent.com', 'data'] // Allows images to be loaded
             }
         }
     },
