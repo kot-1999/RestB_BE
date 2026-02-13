@@ -126,7 +126,7 @@ model Restaurant {
   bannerURL              String                 @db.Text
   photosURL              Json? // array of image URLs
   timeFrom               DateTime               @db.Time
-  timeTO                 DateTime               @db.Time
+  timeTo                 DateTime               @db.Time
   // Foreign Keys
   brand                  Brand                  @relation(fields: [brandID], references: [id])
   brandID                String
