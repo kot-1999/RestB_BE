@@ -18,7 +18,8 @@ export class AuthorizationController extends AbstractController {
             token: JoiCommon.string.token.required(),
             role: Joi.string().allow(...Object.values(AdminRole))
                 .required()
-        }).required()
+        }).required(),
+        message: Joi.string().required()
     })
 
     public static readonly schemas = {
@@ -68,7 +69,8 @@ export class AuthorizationController extends AbstractController {
             resetPassword: Joi.object({
                 admin: Joi.object({
                     id: JoiCommon.string.id.required()
-                })
+                }),
+                message: Joi.string().required()
             }).required()
         }
     }
@@ -131,7 +133,8 @@ export class AuthorizationController extends AbstractController {
                         id: admin.id,
                         token: jwt,
                         role: admin.role
-                    }
+                    },
+                    message: 'Registration was successful'
                 })
         } catch (err) {
             return next(err)
@@ -180,7 +183,8 @@ export class AuthorizationController extends AbstractController {
                         id: admin.id,
                         token: jwt,
                         role: admin.role
-                    }
+                    },
+                    message: 'Logged in successfully'
                 })
         } catch (err) {
             return next(err)
@@ -290,7 +294,8 @@ export class AuthorizationController extends AbstractController {
             res.status(200).json({
                 admin: {
                     id: updatedUser.id
-                }
+                },
+                message: 'Password was successfully reset'
             })
         } catch (err) {
             return next(err)
