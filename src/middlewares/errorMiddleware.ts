@@ -13,7 +13,9 @@ export default function errorMiddleware(err: Error, req: Request, res: Response,
         code = err.statusCode
 
         if (err.isJoi) {
-            messages = err.validationErrorItems
+            messages = err.validationErrorItems.map((validationError) => {
+                return validationError.message
+            })
         } else {
             messages.push(err.message)
         }
