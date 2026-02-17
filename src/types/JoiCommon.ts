@@ -145,6 +145,24 @@ export class JoiCommon {
                 .integer()
                 .min(0)
                 .required()
+        }),
+
+        pagination: Joi.object({
+            page: Joi.number()
+                .integer()
+                .min(1)
+                .required(),
+
+            limit: Joi.number()
+                .integer()
+                .min(1)
+                .max(100)
+                .required(),
+
+            total: Joi.number()
+                .integer()
+                .min(0)
+                .required()
         })
     }
 }
