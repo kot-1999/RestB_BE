@@ -7,12 +7,16 @@ import { JoiCommon } from '../../../../types/JoiCommon'
 export class BookingController extends AbstractController {
     public static readonly schemas = {
         request: {
-            getBooking: JoiCommon.object.request.keys({})
+            getBooking: JoiCommon.object.request.keys({}),
+            getBookingList: undefined,
+            postBooking: undefined
         },
         response: {
             getBooking: Joi.object({
 
-            })
+            }),
+            getBookingList: undefined,
+            postBooking: undefined
         }
     }
 
@@ -33,5 +37,13 @@ export class BookingController extends AbstractController {
         } catch (err) {
             return next(err)
         }
+    }
+
+    getBookingList() {
+
+    }
+
+    postBooking() {
+
     }
 }

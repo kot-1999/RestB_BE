@@ -7,7 +7,7 @@ import validationMiddleware from '../../middlewares/validationMiddleware'
 const router = Router()
 const restaurantController = new RestaurantController()
 
-export default function RestaurantRouter() {
+export default function restaurantRouter() {
     // List endpoints
     router.get(
         /*
