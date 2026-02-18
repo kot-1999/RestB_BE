@@ -2,11 +2,11 @@ import { Router } from 'express'
 
 import adminAuthorizationRouter from './b2b/AdminAuthorizationRouter'
 import adminRouter from './b2b/AdminRouter'
+import bookingRouter from './b2c/BookingRouter';
 import restaurantRouter from './b2c/RestaurantRouter';
 import userAuthorizationRouter from './b2c/UserAuthorizationRouter'
 import userRouter from './b2c/UserRouter'
 import logger from '../services/Logger'
-import bookingRouter from "./b2c/BookingRouter";
 
 const router = Router()
 
