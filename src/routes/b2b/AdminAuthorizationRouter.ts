@@ -57,7 +57,7 @@ export default function adminAuthorizationRouter() {
             }
         */
         '/logout',
-        authorizationMiddleware([PassportStrategy.jwtB2c, PassportStrategy.google]),
+        authorizationMiddleware([PassportStrategy.jwtB2b, PassportStrategy.google]),
         authorizationController.logout
     )
 
