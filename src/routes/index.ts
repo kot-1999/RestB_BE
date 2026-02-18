@@ -19,8 +19,8 @@ export default function authorizeRouters() {
     // B2C
     router.use('/b2c/v1/authorization',userAuthorizationRouter())
     router.use('/b2c/v1/user', userRouter())
-    router.use('b2c/v1/restaurant', restaurantRouter())
-    router.use('b2c/v1/booking', bookingRouter())
+    router.use('/b2c/v1/restaurant', restaurantRouter())
+    router.use('/b2c/v1/booking', bookingRouter())
 
     return router
 }

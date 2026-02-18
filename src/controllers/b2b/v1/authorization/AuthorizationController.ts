@@ -198,7 +198,7 @@ export class AuthorizationController extends AbstractController {
         next: NextFunction
     ) {
         try {
-            const userID = req.admin.id
+            const userID = req.user.id
             // Wrap req.logout() in a Promise
             await new Promise<void>((resolve) => {
                 req.logout((err) => {
@@ -277,14 +277,14 @@ export class AuthorizationController extends AbstractController {
         next: NextFunction
     ) {
         try {
-            const { body: { newPassword }, admin } = req
+            const { body: { newPassword }, user } = req
 
-            const updatedUser = await prisma.user.update({
+            const updatedUser = await prisma.admin.update({
                 data: {
                     password: EncryptionService.hashSHA256(newPassword)
                 },
                 where: {
-                    id: admin.id
+                    id: user.id
                 },
                 select: {
                     id: true
