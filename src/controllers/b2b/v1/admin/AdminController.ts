@@ -60,7 +60,9 @@ export class AdminController extends AbstractController {
     ) {
         try {
             let resultAdmin: typeof this.GetAdminResType['admin'] | null = null
-            const { admin, params: { adminID } } = req
+            const { user, params: { adminID } } = req
+
+            const admin = user
             if (admin.id === adminID) {
                 resultAdmin = {
                     id: admin.id,
@@ -109,13 +111,13 @@ export class AdminController extends AbstractController {
         next: NextFunction
     ) {
         try {
-            const { admin } = req
+            const { user } = req
 
-            await prisma.admin.softDelete(admin.id)
+            await prisma.admin.softDelete(user.id)
 
             return res.status(200).json({
                 admin: {
-                    id: admin.id
+                    id: user.id
                 },
                 message: 'Admin was deleted successfully.'
             })
