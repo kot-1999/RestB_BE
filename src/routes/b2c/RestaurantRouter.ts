@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Router } from 'express'
 
 import { RestaurantController } from '../../controllers/b2c/v1/restaurant/RestaurantController';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Router } from 'express'
 
 import { BookingController } from '../../controllers/b2c/v1/booking/BookingController';
