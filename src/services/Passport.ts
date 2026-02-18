@@ -54,7 +54,7 @@ class PassportSetup {
 
         passport.use(PassportStrategy.jwtB2b, new JwtStrategy(
             {
-                jwtFromRequest: ExtractJwt.fromExtractors([this.passportConfig.jwtFromCookie]),
+                jwtFromRequest: ExtractJwt.fromExtractors([this.passportConfig.jwtFromRequestHeader, this.passportConfig.jwtFromCookie]),
                 secretOrKey: this.jwtConfig.secret
             },
             this.b2bJwtStrategy
@@ -62,7 +62,7 @@ class PassportSetup {
 
         passport.use(PassportStrategy.jwtB2bForgotPassword, new JwtStrategy(
             {
-                jwtFromRequest: ExtractJwt.fromExtractors([this.passportConfig.jwtFromRequestHeader]),
+                jwtFromRequest: ExtractJwt.fromExtractors([this.passportConfig.jwtFromRequestHeader, this.passportConfig.jwtFromCookie]),
                 secretOrKey: this.jwtConfig.secret
             },
             this.b2bJwtForgotPasswordStrategy
