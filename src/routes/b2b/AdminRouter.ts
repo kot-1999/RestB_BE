@@ -35,10 +35,10 @@ export default function adminRouter() {
             #swagger.description = 'Delete admin. Admin can delete only himself.',
             #swagger.parameters['body'] = {
                 in: 'body',
-                schema: { $ref: '#/definitions/b2cV1DeleteUserReqBody' }
+                schema: { $ref: '#/definitions/b2bcV1DeleteUserReqBody' }
             }
             #swagger.responses[200] = {
-                schema: { "$ref": "#/definitions/b2cV1DeleteUserRes" },
+                schema: { "$ref": "#/definitions/b2bV1DeleteUserRes" },
             }
         */
         '/:adminID',
