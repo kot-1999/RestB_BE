@@ -51,7 +51,7 @@ const schemas: {[key: string]: {[key: string]: any}} = {
             resetPassword: b2bAuthorizationController.schemas,
             // User
             getAdmin: AdminController.schemas,
-            deleteAdmin: AdminController.schemas,
+            deleteAdmin: AdminController.schemas
 
         }
     }
@@ -189,7 +189,7 @@ Object.keys(schemas).forEach((platform) => {
         })
     })
 })
-console.log(definitions)
+
 const doc = {
     info: {
         title: 'My API',
