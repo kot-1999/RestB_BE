@@ -2,9 +2,11 @@ import { Router } from 'express'
 
 import adminAuthorizationRouter from './b2b/AdminAuthorizationRouter'
 import adminRouter from './b2b/AdminRouter'
+import restaurantRouter from './b2c/RestaurantRouter';
 import userAuthorizationRouter from './b2c/UserAuthorizationRouter'
 import userRouter from './b2c/UserRouter'
 import logger from '../services/Logger'
+import bookingRouter from "./b2c/BookingRouter";
 
 const router = Router()
 
@@ -17,6 +19,8 @@ export default function authorizeRouters() {
     // B2C
     router.use('/b2c/v1/authorization',userAuthorizationRouter())
     router.use('/b2c/v1/user', userRouter())
+    router.use('b2c/v1/restaurant', restaurantRouter())
+    router.use('b2c/v1/booking', bookingRouter())
 
     return router
 }

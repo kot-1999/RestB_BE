@@ -10,6 +10,8 @@ import {
     AuthorizationController as b2bAuthorizationController
 } from '../src/controllers/b2b/v1/authorization/AuthorizationController';
 import { AuthorizationController as UserAuthorizationController } from '../src/controllers/b2c/v1/authorization/AuthorizationController';
+import { BookingController as UserBookingController } from '../src/controllers/b2c/v1/booking/BookingController';
+import { RestaurantController as UserRestaurantController } from '../src/controllers/b2c/v1/restaurant/RestaurantController';
 import { UsersController } from '../src/controllers/b2c/v1/user/UserController';
 
 /**
@@ -30,7 +32,13 @@ const schemas: {[key: string]: {[key: string]: any}} = {
             resetPassword: UserAuthorizationController.schemas,
             // Admin
             getUser: UsersController.schemas,
-            deleteUser: UsersController.schemas
+            deleteUser: UsersController.schemas,
+            // Restaurant
+            getRestaurant: UserRestaurantController.schemas,
+            getRestaurantList: UserRestaurantController.schemas,
+            // Booking
+            getBookingList: UserBookingController.schemas,
+            postBooking: UserBookingController.schemas
         }
     },
     b2b: {
@@ -43,7 +51,8 @@ const schemas: {[key: string]: {[key: string]: any}} = {
             resetPassword: b2bAuthorizationController.schemas,
             // User
             getAdmin: AdminController.schemas,
-            deleteAdmin: AdminController.schemas
+            deleteAdmin: AdminController.schemas,
+
         }
     }
 }
@@ -175,12 +184,12 @@ Object.keys(schemas).forEach((platform) => {
                 throw new Error('Is not a response schema: ' + platform + version +endpoint)
             }
 
-            definitions[`${reference}ReqBody`] = joiToCustomSwagger(j2s(reqSchema).swagger?.properties?.body)
+            definitions[`${reference}ReqBody`] = joiToCustomSwagger(j2s(reqSchema).swagger?.properties)
             definitions[`${reference}Res`] = joiToCustomSwagger(j2s(resSchema).swagger?.properties)
         })
     })
 })
-
+console.log(definitions)
 const doc = {
     info: {
         title: 'My API',
