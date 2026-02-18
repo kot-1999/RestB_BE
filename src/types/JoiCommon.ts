@@ -1,12 +1,13 @@
 import Joi from 'joi'
 
+import { UserType } from './enums';
 import { Constants } from '../utils/Constants'
 
 const discussionItem = Joi.object({
     authorID: Joi.string().required(),
 
     authorType: Joi.string()
-        .valid('user', 'admin')
+        .valid(...Object.values(UserType))
         .required(),
 
     message: Joi.string().trim()
