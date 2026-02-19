@@ -13,7 +13,7 @@ export default function restaurantRouter() {
     router.get(
         /*
             #swagger.tags = ['b2c-v1-Restaurant']
-            #swagger.description = 'Get Restaurant details',
+            #swagger.description = '(Not Implemented) Get Restaurant details',
             #swagger.parameters['body'] = {
                 in: 'body',
                 schema: { $ref: '#/definitions/b2cV1GetRestaurantReqBody' }
@@ -30,7 +30,7 @@ export default function restaurantRouter() {
     router.get(
         /*
             #swagger.tags = ['b2c-v1-Restaurant']
-            #swagger.description = 'Get RestaurantList details',
+            #swagger.description = '(Not Implemented) Get RestaurantList details',
             #swagger.parameters['body'] = {
                 in: 'body',
                 schema: { $ref: '#/definitions/b2cV1GetRestaurantListReqBody' }
