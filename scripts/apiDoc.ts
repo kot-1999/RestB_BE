@@ -1,18 +1,21 @@
-import * as fs from 'node:fs';
-import * as path from 'node:path';
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 
-import Joi from 'joi';
+import Joi from 'joi'
 import j2s from 'joi-to-swagger'
-import swaggerAutogen from 'swagger-autogen';
+import swaggerAutogen from 'swagger-autogen'
 
-import { AdminController } from '../src/controllers/b2b/v1/admin/AdminController';
+import { AdminController } from '../src/controllers/b2b/v1/admin/AdminController'
 import {
     AuthorizationController as b2bAuthorizationController
-} from '../src/controllers/b2b/v1/authorization/AuthorizationController';
-import { AuthorizationController as UserAuthorizationController } from '../src/controllers/b2c/v1/authorization/AuthorizationController';
-import { BookingController as UserBookingController } from '../src/controllers/b2c/v1/booking/BookingController';
-import { RestaurantController as UserRestaurantController } from '../src/controllers/b2c/v1/restaurant/RestaurantController';
-import { UsersController } from '../src/controllers/b2c/v1/user/UserController';
+} from '../src/controllers/b2b/v1/authorization/AuthorizationController'
+import { BookingController as AdminBookingController } from '../src/controllers/b2b/v1/booking/BookingController'
+import { DashboardController } from '../src/controllers/b2b/v1/dashboard/DashboardController'
+import { RestaurantController as AdminRestaurantController } from '../src/controllers/b2b/v1/restaurant/RestaurantController'
+import { AuthorizationController as UserAuthorizationController } from '../src/controllers/b2c/v1/authorization/AuthorizationController'
+import { BookingController as UserBookingController } from '../src/controllers/b2c/v1/booking/BookingController'
+import { RestaurantController as UserRestaurantController } from '../src/controllers/b2c/v1/restaurant/RestaurantController'
+import { UsersController } from '../src/controllers/b2c/v1/user/UserController'
 
 /**
  * Link all endpoints to their schemas
@@ -30,8 +33,9 @@ const schemas: {[key: string]: {[key: string]: any}} = {
             forgotPassword: UserAuthorizationController.schemas,
             logout: UserAuthorizationController.schemas,
             resetPassword: UserAuthorizationController.schemas,
-            // Admin
+            // User
             getUser: UsersController.schemas,
+            updateUser: UsersController.schemas,
             deleteUser: UsersController.schemas,
             // Restaurant
             getRestaurant: UserRestaurantController.schemas,
@@ -49,10 +53,21 @@ const schemas: {[key: string]: {[key: string]: any}} = {
             forgotPassword: b2bAuthorizationController.schemas,
             logout: b2bAuthorizationController.schemas,
             resetPassword: b2bAuthorizationController.schemas,
+            inviteAdmin: b2bAuthorizationController.schemas,
+            registerEmployee: b2bAuthorizationController.schemas,
             // User
             getAdmin: AdminController.schemas,
-            deleteAdmin: AdminController.schemas
-
+            updateAdmin: AdminController.schemas,
+            deleteAdmin: AdminController.schemas,
+            // Restaurant
+            getRestaurantList: AdminRestaurantController.schemas,
+            postRestaurant: AdminRestaurantController.schemas,
+            // Booking
+            getBookingList: AdminBookingController.schemas,
+            getBookingDetails: AdminBookingController.schemas,
+            updateBooking: AdminBookingController.schemas,
+            // Dashboard
+            getDashboard: DashboardController.schemas
         }
     }
 }
