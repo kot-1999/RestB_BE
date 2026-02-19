@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { RestaurantCategories } from '@prisma/client';
 import { Response, NextFunction } from 'express'
 import Joi from 'joi'
 
@@ -20,9 +21,12 @@ export class RestaurantController extends AbstractController {
                     radius: Joi.number().integer()
                         .min(1)
                         .max(100)
-                        .default(10),
+                        .default(20),
                     brandID: JoiCommon.string.id.optional(),
                     date: Joi.date().default(() => new Date().toISOString()),
+                    categories: Joi.array().items(Joi.string().valid(...Object.values(RestaurantCategories))
+                        .required())
+                        .default([]),
                     page: Joi.number().positive()
                         .default(1),
                     limit: Joi.number().positive()

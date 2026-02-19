@@ -1,3 +1,4 @@
+import { RestaurantCategories } from '@prisma/client';
 import Joi from 'joi'
 
 import { UserType } from './enums';
@@ -60,7 +61,8 @@ export class JoiCommon {
                 .required(),
             timeFrom: Joi.date().required(),
             timeTo: Joi.date().greater(Joi.ref('timeFrom'))
-                .required()
+                .required(),
+            categories: Joi.string().valid(...Object.values(RestaurantCategories))
         }),
 
         brand: Joi.object({
