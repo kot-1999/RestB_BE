@@ -29,6 +29,24 @@ export default function adminRouter() {
         adminController.getAdmin
     )
 
+    router.patch(
+        /*
+            #swagger.tags = ['b2b-v1-Admin']
+            #swagger.description = '(Not implemented) Update admin details',
+            #swagger.parameters['body'] = {
+                in: 'body',
+                schema: { $ref: '#/definitions/b2bV1UpdateAdminReqBody' }
+            }
+            #swagger.responses[200] = {
+                schema: { "$ref": "#/definitions/b2bV1UpdateAdminRes" },
+            }
+        */
+        '/',
+        validationMiddleware(AdminController.schemas.request.updateAdmin),
+        authorizationMiddleware([PassportStrategy.jwtB2b]),
+        adminController.updateAdmin
+    )
+
     router.delete(
         /*
             #swagger.tags = ['b2b-v1-Admin']

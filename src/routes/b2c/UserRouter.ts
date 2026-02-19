@@ -29,6 +29,24 @@ export default function authorizationRouter() {
         userController.getUser
     )
 
+    router.patch(
+        /*
+            #swagger.tags = ['b2c-v1-User']
+            #swagger.description = '(Not implemented) Update user details',
+            #swagger.parameters['body'] = {
+                in: 'body',
+                schema: { $ref: '#/definitions/b2cV1UpdateUserReqBody' }
+            }
+            #swagger.responses[200] = {
+                schema: { "$ref": "#/definitions/b2cV1UpdateUserRes" },
+            }
+        */
+        '/',
+        validationMiddleware(UsersController.schemas.request.updateUser),
+        authorizationMiddleware([PassportStrategy.jwtB2c, PassportStrategy.google]),
+        userController.updateUser
+    )
+
     router.delete(
         /*
             #swagger.tags = ['b2c-v1-User']

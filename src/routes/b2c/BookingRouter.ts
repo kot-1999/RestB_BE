@@ -16,7 +16,7 @@ export default function bookingRouter() {
     router.get(
         /*
             #swagger.tags = ['b2c-v1-Booking']
-            #swagger.description = 'Get BookingList details',
+            #swagger.description = '(Not Implemented) Get BookingList details',
             #swagger.parameters['body'] = {
                 in: 'body',
                 schema: { $ref: '#/definitions/b2cV1GetBookingListReqBody' }
@@ -34,7 +34,7 @@ export default function bookingRouter() {
     router.post(
         /*
             #swagger.tags = ['b2c-v1-Booking']
-            #swagger.description = 'Post Booking',
+            #swagger.description = '(Not Implemented) Post Booking',
             #swagger.parameters['body'] = {
                 in: 'body',
                 schema: { $ref: '#/definitions/b2cV1PostBookingReqBody' }
