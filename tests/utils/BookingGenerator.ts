@@ -28,8 +28,12 @@ export default class BookingGenerator {
     ): Booking {
         return {
             id: bookingData.id ?? faker.string.uuid(),
-            guestsNumber: bookingData.guestsNumber ?? faker.number.int({ min: 1, max: 20 }),
-            bookingTime: bookingData.bookingTime ?? new Date(dayjs().add(1, 'day').toISOString()),
+            guestsNumber: bookingData.guestsNumber ?? faker.number.int({
+                min: 1,
+                max: 20 
+            }),
+            bookingTime: bookingData.bookingTime ?? new Date(dayjs().add(1, 'day')
+                .toISOString()),
             status: bookingData.status ?? BookingStatus.Pending,
             discussion: bookingData.discussion ?? null,
             userID: userID ?? null,
