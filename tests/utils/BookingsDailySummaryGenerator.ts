@@ -25,11 +25,26 @@ export default class BookingsDailySummaryGenerator {
     ): BookingsDailySummary {
         return {
             id: summaryData.id ?? faker.string.uuid(),
-            totalApprovedBookings: summaryData.totalApprovedBookings ?? faker.number.int({ min: 0, max: 50 }),
-            totalPendingBookings: summaryData.totalPendingBookings ?? faker.number.int({ min: 0, max: 30 }),
-            totalCanceledByUserBookings: summaryData.totalCanceledByUserBookings ?? faker.number.int({ min: 0, max: 10 }),
-            totalCanceledByAdminBookings: summaryData.totalCanceledByAdminBookings ?? faker.number.int({ min: 0, max: 10 }),
-            totalGuests: summaryData.totalGuests ?? faker.number.int({ min: 0, max: 200 }),
+            totalApprovedBookings: summaryData.totalApprovedBookings ?? faker.number.int({
+                min: 0,
+                max: 50 
+            }),
+            totalPendingBookings: summaryData.totalPendingBookings ?? faker.number.int({
+                min: 0,
+                max: 30 
+            }),
+            totalCanceledByUserBookings: summaryData.totalCanceledByUserBookings ?? faker.number.int({
+                min: 0,
+                max: 10 
+            }),
+            totalCanceledByAdminBookings: summaryData.totalCanceledByAdminBookings ?? faker.number.int({
+                min: 0,
+                max: 10 
+            }),
+            totalGuests: summaryData.totalGuests ?? faker.number.int({
+                min: 0,
+                max: 200 
+            }),
             restaurantID: restaurantID,
             createdAt: summaryData.createdAt as Date ?? new Date(dayjs().toISOString()),
             updatedAt: summaryData.updatedAt as Date ?? new Date(dayjs().toISOString()),
