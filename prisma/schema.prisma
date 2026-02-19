@@ -26,6 +26,79 @@ enum BookingStatus {
   Deleted
 }
 
+enum RestaurantCategories {
+  FastFood
+  Pizza
+  Drinks
+  Family
+  Party
+  Romantic
+  Pub
+
+  // Cuisine focused
+  Italian
+  American
+  Asian
+  Chinese
+  Japanese
+  Indian
+  Mexican
+  Mediterranean
+  European
+  Polish
+  French
+  Turkish
+  Thai
+  Vegan
+  Vegetarian
+  Seafood
+  Steakhouse
+  BBQ
+
+  // Experience focused
+  FineDining
+  CasualDining
+  Cafe
+  Bakery
+  Buffet
+  StreetFood
+  FoodCourt
+
+  // Social / atmosphere
+  Bar
+  CocktailBar
+  WineBar
+  SportsBar
+  LiveMusic
+  Rooftop
+  Lounge
+
+  // Occasion based
+  Business
+  DateNight
+  Birthday
+  Wedding
+  KidsFriendly
+  PetFriendly
+  OutdoorDining
+
+  // Service style
+  Takeaway
+  Delivery
+  AllYouCanEat
+  SelfService
+  DriveThru
+
+  // Special concepts
+  Fusion
+  LocalCuisine
+  Healthy
+  Organic
+  Breakfast
+  Brunch
+  Dessert
+}
+
 model User {
   id              String   @id @default(uuid()) @db.Char(36)
   firstName       String?  @db.Text
@@ -127,6 +200,7 @@ model Restaurant {
   photosURL              Json? // array of image URLs
   timeFrom               DateTime               @db.Time
   timeTo                 DateTime               @db.Time
+  categories             Json
   // Foreign Keys
   brand                  Brand                  @relation(fields: [brandID], references: [id])
   brandID                String
