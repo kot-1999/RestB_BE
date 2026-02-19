@@ -109,6 +109,7 @@ model User {
   type            UserType @default(Default)
   googleProfileID String?
   phone           String   @db.Text
+  avatarURL       String?  @db.Text
 
   // Foreign Keys
   bookings Booking[]
@@ -130,6 +131,7 @@ model Admin {
   password      String    @db.Text
   role          AdminRole @default(Admin)
   phone         String    @db.Text
+  avatarURL     String?   @db.Text
 
   // Many-to-many with restaurants
   restaurants RestaurantStaff[]
@@ -193,22 +195,23 @@ model Brand {
 }
 
 model Restaurant {
-  id                     String                 @id @default(uuid()) @db.Char(36)
-  name                   String                 @db.Text
-  description            String?                @db.Text
-  bannerURL              String                 @db.Text
-  photosURL              Json? // array of image URLs
-  timeFrom               DateTime               @db.Time
-  timeTo                 DateTime               @db.Time
-  categories             Json
+  id                      String                 @id @default(uuid()) @db.Char(36)
+  name                    String                 @db.Text
+  description             String?                @db.Text
+  autoApprovedBookingsNum Int                    @default(0) @db.Int
+  bannerURL               String                 @db.Text
+  photosURL               Json? // array of image URLs
+  timeFrom                DateTime               @db.Time
+  timeTo                  DateTime               @db.Time
+  categories              Json
   // Foreign Keys
-  brand                  Brand                  @relation(fields: [brandID], references: [id])
-  brandID                String
-  bookings               Booking[]
-  staff                  RestaurantStaff[]
-  address                Address                @relation(fields: [addressID], references: [id])
-  addressID              String
-  bookingsDailySummaries BookingsDailySummary[]
+  brand                   Brand                  @relation(fields: [brandID], references: [id])
+  brandID                 String
+  bookings                Booking[]
+  staff                   RestaurantStaff[]
+  address                 Address                @relation(fields: [addressID], references: [id])
+  addressID               String
+  bookingsDailySummaries  BookingsDailySummary[]
 
   // Metadata
   createdAt DateTime  @default(now())
