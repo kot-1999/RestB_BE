@@ -16,6 +16,9 @@ export class AdminController extends AbstractController {
         emailVerified: Joi.boolean().required(),
         role: Joi.string().valid(...Object.values(AdminRole))
             .required(),
+        avatarURL: Joi.string().uri()
+            .allow(null)
+            .optional(),
         phone: Joi.string().required(),
         createdAt: Joi.date().iso()
             .required(),
@@ -31,13 +34,28 @@ export class AdminController extends AbstractController {
                 }).required()
             }).required(),
 
-            deleteAdmin: JoiCommon.object.request.required()
+            deleteAdmin: JoiCommon.object.request.required(),
+            updateAdmin: JoiCommon.object.request.keys({
+                body: Joi.object({
+                    firstName: JoiCommon.string.name.optional(),
+                    lastName: JoiCommon.string.name.optional(),
+                    email: JoiCommon.string.email.optional(),
+                    phone: Joi.string().optional(),
+                    avatarURL: Joi.string().uri()
+                        .optional()
+                }).required()
+            }).required()
         },
         response: {
             getAdmin: Joi.object({
                 admin: this.adminSchema.required()
             }),
-
+            updateAdmin: Joi.object({
+                admin: Joi.object({
+                    id: JoiCommon.string.id
+                }),
+                message: Joi.string().required()
+            }).required(),
             deleteAdmin: Joi.object({
                 admin: Joi.object({
                     id: JoiCommon.string.id
@@ -73,7 +91,8 @@ export class AdminController extends AbstractController {
                     role: admin.role,
                     createdAt: admin.createdAt,
                     updatedAt: admin.updatedAt,
-                    phone: admin.phone
+                    phone: admin.phone,
+                    avatarURL: admin.avatarURL
                 }
             } else {
                 resultAdmin = await prisma.admin.findOne({
@@ -85,7 +104,8 @@ export class AdminController extends AbstractController {
                     role: true,
                     createdAt: true,
                     updatedAt: true,
-                    phone: true
+                    phone: true,
+                    avatarURL: true
                 }, {
                     id: {
                         equals: adminID
@@ -120,6 +140,27 @@ export class AdminController extends AbstractController {
                     id: user.id
                 },
                 message: 'Admin was deleted successfully.'
+            })
+        } catch (err) {
+            return next(err)
+        }
+    }
+
+    private UpdateAdminReqType: Joi.extractType<typeof AdminController.schemas.request.updateAdmin>
+    private UpdateAdminResType: Joi.extractType<typeof AdminController.schemas.response.updateAdmin>
+    public async updateAdmin(
+        req: AuthAdminRequest & typeof this.UpdateAdminReqType,
+        res: Response<typeof this.UpdateAdminResType>,
+        next: NextFunction
+    ) {
+        try {
+            const { user } = req
+        
+            return res.status(200).json({
+                admin: {
+                    id: user.id
+                },
+                message: 'Admin was updated successfully.'
             })
         } catch (err) {
             return next(err)

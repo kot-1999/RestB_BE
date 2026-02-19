@@ -1,5 +1,5 @@
 import { AdminRole } from '@prisma/client';
-import { Request, Response, NextFunction, AuthAdminRequest } from 'express'
+import { Request, Response, NextFunction, AuthAdminRequest, EmployeeRegisterRequest } from 'express'
 import Joi from 'joi'
 
 import emailService from '../../../../services/Email'
@@ -52,7 +52,21 @@ export class AuthorizationController extends AbstractController {
                 body: Joi.object({
                     newPassword: Joi.string().required()
                 }).required()
-            })
+            }),
+            inviteAdmin: JoiCommon.object.request.keys({
+                body: Joi.object({
+                    email: JoiCommon.string.email.required()
+                }).required()
+            }),
+            registerEmployee: JoiCommon.object.request.keys({
+                body: Joi.object({
+                    firstName: JoiCommon.string.name.required(),
+                    lastName: JoiCommon.string.name.required(),
+                    password: Joi.string().min(3)
+                        .required(),
+                    phone: Joi.string().required()
+                }).required()
+            }).required()
         },
         response: {
             register: AuthorizationController.adminSchema.required(),
@@ -71,7 +85,11 @@ export class AuthorizationController extends AbstractController {
                     id: JoiCommon.string.id.required()
                 }),
                 message: Joi.string().required()
-            }).required()
+            }).required(),
+            inviteAdmin: Joi.object({
+                message: Joi.string().required()
+            }).required(),
+            registerEmployee: AuthorizationController.adminSchema.required()
         }
     }
 
@@ -301,5 +319,43 @@ export class AuthorizationController extends AbstractController {
             return next(err)
         }
 
+    }
+
+    private InviteAdminReqType: Joi.extractType<typeof AuthorizationController.schemas.request.inviteAdmin>
+    private InviteAdminResType: Joi.extractType<typeof AuthorizationController.schemas.response.inviteAdmin>
+    public async inviteAdmin(
+        req: AuthAdminRequest & typeof this.InviteAdminReqType,
+        res: Response<typeof this.InviteAdminResType>,
+        next: NextFunction
+    ) {
+        try {
+
+            res.status(200).json({
+                message: 'Response from backend template'
+            })
+        } catch (err) {
+            return next(err)
+        }
+    }
+
+    private RegisterEmployeeReqType: Joi.extractType<typeof AuthorizationController.schemas.request.registerEmployee>
+    private RegisterEmployeeResType: Joi.extractType<typeof AuthorizationController.schemas.response.registerEmployee>
+    public async registerEmployee(
+        req: EmployeeRegisterRequest & typeof this.RegisterEmployeeReqType,
+        res: Response<typeof this.RegisterEmployeeResType>,
+        next: NextFunction
+    ) {
+        try {
+            res.status(200).json({
+                admin: {
+                    id: 'asdasdasd',
+                    role: 'asdsad',
+                    token: 'asdsad'
+                },
+                message: 'Response from backend template'
+            })
+        } catch (err) {
+            return next(err)
+        }
     }
 }

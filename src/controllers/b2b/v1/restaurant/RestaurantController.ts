@@ -1,5 +1,5 @@
-// @ts-nocheck
-import { Response, NextFunction } from 'express'
+import { AdminRole, RestaurantCategories } from '@prisma/client';
+import { Response, NextFunction, AuthAdminRequest } from 'express'
 import Joi from 'joi'
 
 import { AbstractController } from '../../../../types/AbstractController'
@@ -8,53 +8,84 @@ import { JoiCommon } from '../../../../types/JoiCommon'
 export class RestaurantController extends AbstractController {
     public static readonly schemas = {
         request: {
-            getRestaurant: JoiCommon.object.request.keys({
-                params: Joi.object({
-                    restaurantID: JoiCommon.string.id
-                }).required()
-            }),
             getRestaurantList: JoiCommon.object.request.keys({
                 query: Joi.object({
-                    search: Joi.string().min(2)
-                        .optional(),
-                    radius: Joi.number().integer()
-                        .min(1)
-                        .max(100)
-                        .default(10),
                     brandID: JoiCommon.string.id.optional(),
-                    date: Joi.date().default(() => new Date().toISOString()),
                     page: Joi.number().positive()
                         .default(1),
                     limit: Joi.number().positive()
                         .default(20)
                 }).required()
+            }),
+            postRestaurant: JoiCommon.object.request.keys({
+                body: Joi.object({
+                    name: JoiCommon.string.name.required(),
+
+                    description: Joi.string()
+                        .min(20)
+                        .optional(),
+
+                    bannerURL: Joi.string()
+                        .uri()
+                        .required(),
+
+                    photosURL: Joi.array()
+                        .items(Joi.string().uri()
+                            .required())
+                        .required(),
+
+                    categories: Joi.array()
+                        .items(Joi.string()
+                            .valid(...Object.values(RestaurantCategories))
+                            .required())
+                        .min(1)
+                        .max(5)
+                        .required(),
+                    autoApprovedBookingsNum: Joi.number().integer()
+                        .default(0),
+                    timeFrom: Joi.date().required(),
+
+                    timeTo: Joi.date()
+                        .greater(Joi.ref('timeFrom'))
+                        .required(),
+
+                    address: JoiCommon.object.address.required()
+                }).required()
             })
         },
         response: {
-            getRestaurant: JoiCommon.object.restaurant.keys({
-                brand: JoiCommon.object.brand.required(),
-                address: JoiCommon.object.address.required(),
-                availability: Joi.object({
-                    date: Joi.date().iso()
-                        .required(),
-                    autoConfirmGuestsLimit: Joi.number().integer()
-                        .required() // How many more gusts can be confirmed automatically
-                }).required()
-            }).required(),
             getRestaurantList: Joi.object({
-                restaurants: Joi.array().items(JoiCommon.object.restaurant.keys({
-                    brand: JoiCommon.object.brand.required(),
-                    address: JoiCommon.object.address.required(),
-                    availability: Joi.object({
-                        date: Joi.date().iso()
+                brand: JoiCommon.object.brand.required(),
+
+                restaurants: Joi.array()
+                    .items(JoiCommon.object.restaurant.keys({
+                        autoApprovedBookingsNum: Joi.number().integer()
                             .required(),
-                        autoConfirmGuestsLimit: Joi.number().integer()
-                            .required() // How many more gusts can be confirmed automatically
-                    }).required()
-                }).required())
+                        address: JoiCommon.object.address.required(),
+                        staff: Joi.array()
+                            .items(Joi.object({
+                                id: JoiCommon.string.id,
+                                firstName: JoiCommon.string.name.required(),
+                                lastName: JoiCommon.string.name.required(),
+                                email: JoiCommon.string.email.required(),
+
+                                role: Joi.string()
+                                    .valid(...Object.values(AdminRole))
+                                    .required()
+                            }).required())
+                            .min(0)
+                            .required()
+                    }).required())
                     .min(0)
                     .required(),
+
                 pagination: JoiCommon.object.pagination.required()
+            }).required(),
+            postRestaurant: Joi.object({
+                restaurant: Joi.object({
+                    id: JoiCommon.string.id
+                }).required(),
+                message: Joi.string().required()
             }).required()
         }
     }
@@ -63,44 +94,46 @@ export class RestaurantController extends AbstractController {
         super()
     }
 
-    private GetRestaurantReqType: Joi.extractType<typeof RestaurantController.schemas.request.getRestaurant>
-    private GetRestaurantResType: Joi.extractType<typeof RestaurantController.schemas.response.getRestaurant>
-    async getRestaurant(
-        req: Request & typeof this.GetRestaurantReqType,
-        res: Response<typeof this.GetRestaurantResType>,
-        next: NextFunction
-    ) {
-        try {
-            return res.status(200).json({
-                // @ts-expect-error
-                address: {},
-                availability: undefined,
-                bannerURL: '',
-                brand: undefined,
-                description: '',
-                id: '',
-                name: '',
-                photosURL: [],
-                timeFrom: undefined,
-                timeTo: undefined
-            })
-        } catch (err) {
-            return next(err)
-        }
-    }
-
     private GetRestaurantListReqType: Joi.extractType<typeof RestaurantController.schemas.request.getRestaurantList>
     private GetRestaurantListResType: Joi.extractType<typeof RestaurantController.schemas.response.getRestaurantList>
-    getRestaurantList(
-        req: Request & typeof this.GetRestaurantListReqType,
+    public async getRestaurantList(
+        req: AuthAdminRequest & typeof this.GetRestaurantListReqType,
         res: Response<typeof this.GetRestaurantListResType>,
         next: NextFunction
     ) {
         try {
 
             return res.status(200).json({
+                brand: {
+                    id: 'asdasd',
+                    name: 'asdasd'
+                },
                 restaurants: [],
-                pagination: undefined
+                pagination: {
+                    page: 1,
+                    limit: 20,
+                    total: 0
+                }
+            })
+        } catch (err) {
+            return next(err)
+        }
+    }
+
+    private PostRestaurantReqType: Joi.extractType<typeof RestaurantController.schemas.request.postRestaurant>
+    private PostRestaurantResType: Joi.extractType<typeof RestaurantController.schemas.response.postRestaurant>
+    public async postRestaurant(
+        req: AuthAdminRequest & typeof this.PostRestaurantReqType,
+        res: Response<typeof this.PostRestaurantResType>,
+        next: NextFunction
+    ) {
+        try {
+
+            return res.status(200).json({
+                restaurant: {
+                    id: 'asd'
+                },
+                message: 'asd'
             })
         } catch (err) {
             return next(err)

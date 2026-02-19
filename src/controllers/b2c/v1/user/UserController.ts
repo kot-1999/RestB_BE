@@ -31,30 +31,28 @@ export class UsersController extends AbstractController {
                 }).required()
             }).required(),
 
-            getUsers: JoiCommon.object.request.keys({
+            deleteUser: JoiCommon.object.request.required(),
+            updateUser: JoiCommon.object.request.keys({
                 body: Joi.object({
-                    email: JoiCommon.string.email.required(),
-                    password: Joi.string().required()
-                })
-            }),
-
-            deleteUser: JoiCommon.object.request.required()
+                    firstName: JoiCommon.string.name.optional(),
+                    lastName: JoiCommon.string.name.optional(),
+                    email: JoiCommon.string.email.optional(),
+                    phone: Joi.string().optional(),
+                    avatarURL: Joi.string().uri()
+                        .optional()
+                }).required()
+            }).required()
         },
         response: {
             getUser: Joi.object({
                 user: this.userSchema.required()
             }),
-
-            getUsers: Joi.object({
-                users: Joi.array().items(this.userSchema.required())
-                    .required(),
-                pagination: Joi.object({
-                    page: Joi.number().required(),
-                    limit: Joi.number().required(),
-                    totalCount: Joi.number().required()
-                })
-            }),
-
+            updateUser: Joi.object({
+                user: Joi.object({
+                    id: JoiCommon.string.id
+                }),
+                message: Joi.string().required()
+            }).required(),
             deleteUser: Joi.object({
                 user: Joi.object({
                     id: JoiCommon.string.id
@@ -117,28 +115,6 @@ export class UsersController extends AbstractController {
             return next(err)
         }
     }
-    
-    private GetUsersReqType: Joi.extractType<typeof UsersController.schemas.request.getUsers>
-    private GetUsersResType: Joi.extractType<typeof UsersController.schemas.response.getUsers>
-    async getUsers(
-        req: AuthUserRequest & typeof this.GetUsersReqType,
-        res: Response<typeof this.GetUsersResType>,
-        next: NextFunction
-    ) {
-        try {
-
-            return res.status(200).json({
-                users: [],
-                pagination: {
-                    page: 1,
-                    limit: 20,
-                    totalCount: 0
-                }
-            })
-        } catch (err) {
-            return next(err)
-        }
-    }
 
     private DeleteUserReqType: Joi.extractType<typeof UsersController.schemas.request.deleteUser>
     private DeleteUserResType: Joi.extractType<typeof UsersController.schemas.response.deleteUser>
@@ -157,6 +133,27 @@ export class UsersController extends AbstractController {
                     id: user.id
                 },
                 message: 'User was deleted successfully.'
+            })
+        } catch (err) {
+            return next(err)
+        }
+    }
+
+    private UpdateUserReqType: Joi.extractType<typeof UsersController.schemas.request.updateUser>
+    private UpdateUserResType: Joi.extractType<typeof UsersController.schemas.response.updateUser>
+    public async updateUser(
+        req: AuthUserRequest & typeof this.UpdateUserReqType,
+        res: Response<typeof this.UpdateUserResType>,
+        next: NextFunction
+    ) {
+        try {
+            const { user } = req
+
+            return res.status(200).json({
+                user: {
+                    id: user.id
+                },
+                message: 'User was updated successfully.'
             })
         } catch (err) {
             return next(err)
