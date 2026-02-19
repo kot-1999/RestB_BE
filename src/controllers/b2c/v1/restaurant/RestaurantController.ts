@@ -69,7 +69,7 @@ export class RestaurantController extends AbstractController {
 
     private GetRestaurantReqType: Joi.extractType<typeof RestaurantController.schemas.request.getRestaurant>
     private GetRestaurantResType: Joi.extractType<typeof RestaurantController.schemas.response.getRestaurant>
-    async getRestaurant(
+    public async getRestaurant(
         req: Request & typeof this.GetRestaurantReqType,
         res: Response<typeof this.GetRestaurantResType>,
         next: NextFunction
@@ -95,7 +95,7 @@ export class RestaurantController extends AbstractController {
 
     private GetRestaurantListReqType: Joi.extractType<typeof RestaurantController.schemas.request.getRestaurantList>
     private GetRestaurantListResType: Joi.extractType<typeof RestaurantController.schemas.response.getRestaurantList>
-    getRestaurantList(
+    public async getRestaurantList(
         req: Request & typeof this.GetRestaurantListReqType,
         res: Response<typeof this.GetRestaurantListResType>,
         next: NextFunction

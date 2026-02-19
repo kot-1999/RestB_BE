@@ -95,5 +95,47 @@ export default function adminAuthorizationRouter() {
         authorizationMiddleware([PassportStrategy.jwtB2bForgotPassword, PassportStrategy.google]),
         authorizationController.resetPassword
     )
+
+    router.post(
+        /*
+            #swagger.tags = ['b2b-v1-AdminAuthorization']
+            #swagger.description = '(Not Implemented) Send invitation to a new admin.',
+            #swagger.security = [{
+                "bearerAuth": []
+            }]
+            #swagger.parameters['body'] = {
+                in: 'body',
+                schema: { $ref: '#/definitions/b2bV1InviteAdminReqBody' }
+            }
+            #swagger.responses[200] = {
+                schema: { "$ref": "#/definitions/b2bV1InviteAdminRes" },
+            }
+        */
+        '/auth/invite',
+        validationMiddleware(AuthorizationController.schemas.request.inviteAdmin),
+        authorizationMiddleware([PassportStrategy.jwtB2b]),
+        authorizationController.inviteAdmin
+    )
+
+    router.post(
+        /*
+            #swagger.tags = ['b2b-v1-AdminAuthorization']
+            #swagger.description = '(Not Implemented) Register new employee (admin account).',
+            #swagger.security = [{
+                "bearerAuth": []
+            }]
+            #swagger.parameters['body'] = {
+                in: 'body',
+                schema: { $ref: '#/definitions/b2bV1RegisterEmployeeReqBody' }
+            }
+            #swagger.responses[200] = {
+                schema: { "$ref": "#/definitions/b2bV1RegisterEmployeeRes" },
+            }
+        */
+        '/auth/employee/register',
+        validationMiddleware(AuthorizationController.schemas.request.registerEmployee),
+        authorizationMiddleware([PassportStrategy.jwtB2bInvite]),
+        authorizationController.registerEmployee
+    )
     return router
 }

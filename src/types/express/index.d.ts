@@ -15,4 +15,11 @@ declare module 'express' {
     interface AuthAdminRequest extends Request {
         user: Admin
     }
+
+    interface EmployeeRegisterRequest extends Request {
+        user: {
+            restaurantID: string
+            email: string
+        }
+    }
 }

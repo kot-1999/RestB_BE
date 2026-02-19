@@ -18,6 +18,7 @@ export default class UserGenerator {
             email: userData.email ?? faker.internet.email(),
             emailVerified: userData.emailVerified ?? false,
             password: userData.password ?? EncryptionService.hashSHA256(faker.internet.password()),
+            avatarURL: userData.avatarURL ?? faker.image.url(),
             type: userData.type ?? UserType.Default,
             phone: userData.phone ?? faker.phone.number({ style: 'international' }),
             googleProfileID: userData.googleProfileID ?? null,

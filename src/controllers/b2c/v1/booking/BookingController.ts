@@ -79,7 +79,7 @@ export class BookingController extends AbstractController {
 
     private GetBookingListReqType: Joi.extractType<typeof BookingController.schemas.request.getBookingList>
     private GetBookingListResType: Joi.extractType<typeof BookingController.schemas.response.getBookingList>
-    getBookingList(
+    public async getBookingList(
         req: AuthUserRequest & typeof this.GetBookingListReqType,
         res: Response<typeof this.GetBookingListResType>,
         next: NextFunction
@@ -94,7 +94,7 @@ export class BookingController extends AbstractController {
 
     private PostBookingReqType: Joi.extractType<typeof BookingController.schemas.request.postBooking>
     private PostBookingResType: Joi.extractType<typeof BookingController.schemas.response.postBooking>
-    postBooking(
+    public async postBooking(
         req: AuthUserRequest & typeof this.PostBookingReqType,
         res: Response<typeof this.PostBookingResType>,
         next: NextFunction
