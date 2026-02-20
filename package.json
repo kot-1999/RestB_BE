@@ -29,6 +29,8 @@
   },
   "private": true,
   "dependencies": {
+    "@aws-sdk/client-s3": "3.994.0",
+    "@aws-sdk/s3-request-presigner": "3.994.0",
     "@goodrequest/joi-type-extract": "0.0.4",
     "@prisma/client": "6.1.0",
     "@sentry/cli": "2.41.1",
