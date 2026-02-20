@@ -12,6 +12,7 @@ services:
       - mailhog
       - redis
       - dev_mysql
+      - rustfs_dev
     command: >
       sh -c '
         npm install --legacy-peer-deps &&
@@ -32,6 +33,7 @@ services:
       - mailhog
       - redis
       - test_mysql
+      - rustfs_test
     command: >
       sh -c '
         npm ci;
@@ -78,6 +80,27 @@ services:
       - localDev
       - localTest
 
+  rustfs_dev:
+    container_name: rustfs_dev
+    extends:
+      file: ./docker-compose.base.yml
+      service: rustfs
+    profiles:
+      - dev
+      - localDev
+    volumes:
+      - rustfs_data:/data
+
+  rustfs_test:
+    container_name: rustfs_test
+    extends:
+      file: ./docker-compose.base.yml
+      service: rustfs
+    profiles:
+      - test
+      - localTest
+
 volumes:
   mysql_data:
     driver: local
+  rustfs_data:
