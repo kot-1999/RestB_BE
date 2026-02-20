@@ -18,7 +18,7 @@ import authorizeRouters from './routes'
 // Initialize services
 import './services/Passport'
 import './services/Prisma'
-
+import './services/AwsS3'
 import logger from './services/Logger'
 import redis from './services/Redis'
 import { IConfig } from './types/config'

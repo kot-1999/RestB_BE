@@ -61,5 +61,17 @@ export interface IConfig {
     profilesSampleRate: number,
     release: string
     debug: boolean
-  }) | null
+  }) | null,
+  s3: {
+    region: string,
+
+    endpoint: string,
+
+    credentials: {
+      accessKeyId: string,
+      secretAccessKey: string
+    },
+
+    forcePathStyle: boolean
+  }
 }
