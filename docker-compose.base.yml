@@ -6,26 +6,6 @@ services:
     volumes:
       - ./:/usr/src/app
     working_dir: /usr/src/app
-    environment:
-      - NODE_ENV=${NODE_ENV}
-      - PORT=${PORT}
-      - MYSQL_URL=${MYSQL_URL}
-      - MYSQL_PORT=${MYSQL_PORT}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_DB=${MYSQL_DB}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - COOKIE_SECRET_KEY=${COOKIE_SECRET_KEY}
-      - EMAIL_SMTP_PORT=${EMAIL_SMTP_PORT}
-      - EMAIL_USER=${EMAIL_USER}
-      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
-      - EMAIL_FROM_ADDRESS=${EMAIL_FROM_ADDRESS}
-      - EMAIL_HOST=${EMAIL_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - SENTRY_DNS=${SENTRY_DNS}
 
   mysql:
     image: mysql:8.4
@@ -60,3 +40,15 @@ services:
       --port ${REDIS_PORT}
       --maxmemory 256mb
     restart: always
+
+  rustfs:
+    image: rustfs/rustfs:latest
+    ports:
+      - "${S3_PORT}:${S3_PORT}"
+      - "${S3_INTERFACE_PORT}:${S3_INTERFACE_PORT}"
+    environment:
+      RUSTFS_ADDRESS: ":${S3_PORT}"
+      RUSTFS_CONSOLE_ADDRESS: ":${S3_INTERFACE_PORT}"
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_ACCESS_KEY: ${S3_ACCESS_KEY_ID}
+      RUSTFS_SECRET_KEY: ${S3_SECRET_ACCESS_KEY}
