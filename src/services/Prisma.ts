@@ -1,8 +1,8 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 
 import logger from './Logger';
-import AdminQueries from '../controllers/b2b/v1/admin/AdminQueries';
-import UserQueries from '../controllers/b2c/v1/user/UserQueries'
+import AdminQueries from '../database/queries/AdminQueries';
+import UserQueries from '../database/queries/UserQueries'
 
 interface Queries { user: UserQueries, admin: AdminQueries }
 

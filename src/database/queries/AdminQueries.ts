@@ -1,6 +1,6 @@
 import { Prisma, Admin, PrismaClient } from '@prisma/client'
 
-import { BaseQueries } from '../../../../utils/BaseQueries';
+import { BaseQueries } from './BaseQueries';
 
 export default class AdminQueries extends BaseQueries<
     Admin,
