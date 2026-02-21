@@ -16,6 +16,7 @@ import { AuthorizationController as UserAuthorizationController } from '../src/c
 import { BookingController as UserBookingController } from '../src/controllers/b2c/v1/booking/BookingController'
 import { RestaurantController as UserRestaurantController } from '../src/controllers/b2c/v1/restaurant/RestaurantController'
 import { UsersController } from '../src/controllers/b2c/v1/user/UserController'
+import { FileUpload } from '../src/controllers/FileUpload';
 
 /**
  * Link all endpoints to their schemas
@@ -67,7 +68,9 @@ const schemas: {[key: string]: {[key: string]: any}} = {
             getBookingDetails: AdminBookingController.schemas,
             updateBooking: AdminBookingController.schemas,
             // Dashboard
-            getDashboard: DashboardController.schemas
+            getDashboard: DashboardController.schemas,
+            // File Upload
+            putFile: FileUpload.schemas
         }
     }
 }
