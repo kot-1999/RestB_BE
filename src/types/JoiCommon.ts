@@ -51,12 +51,11 @@ export class JoiCommon {
             name: JoiCommon.string.name.required(),
             description: Joi.string().min(20)
                 .optional(),
-            bannerURL: Joi.string().uri()
+            bannerURL: Joi.string()
                 .required(),
             photosURL: Joi.array()
                 .items(Joi
                     .string()
-                    .uri()
                     .required())
                 .required(),
             timeFrom: Joi.date().required(),
@@ -68,8 +67,7 @@ export class JoiCommon {
         brand: Joi.object({
             id: JoiCommon.string.id,
             name: JoiCommon.string.name.required(),
-            logoURL: Joi.string().uri()
-                .optional()
+            logoURL: Joi.string().optional()
         }),
 
         address: Joi.object({

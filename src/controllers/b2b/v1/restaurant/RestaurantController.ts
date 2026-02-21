@@ -26,11 +26,10 @@ export class RestaurantController extends AbstractController {
                         .optional(),
 
                     bannerURL: Joi.string()
-                        .uri()
                         .required(),
 
                     photosURL: Joi.array()
-                        .items(Joi.string().uri()
+                        .items(Joi.string()
                             .required())
                         .required(),
 
