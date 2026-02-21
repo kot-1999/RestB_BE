@@ -38,7 +38,7 @@ export class UsersController extends AbstractController {
                     lastName: JoiCommon.string.name.optional(),
                     email: JoiCommon.string.email.optional(),
                     phone: Joi.string().optional(),
-                    avatarURL: Joi.string().uri()
+                    avatarURL: Joi.string()
                         .optional()
                 }).required()
             }).required()

@@ -17,7 +17,6 @@ export class BrandController extends AbstractController {
 
                     logoURL: Joi.string()
                         .allow(null, undefined)
-                        .uri()
                         .optional()
                 })
                     .min(1) // at least one field must be updated
