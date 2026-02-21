@@ -70,11 +70,9 @@ class AwsS3 {
             Key: key
         })
 
-        const url = await getSignedUrl(this.s3ForPresign, command, {
-            expiresIn: 60 * 30 // 30 minutes
+        return  await getSignedUrl(this.s3ForPresign, command, {
+            expiresIn: 60 * 60 * 7 // 7 days
         })
-
-        return url
     }
 }
 
