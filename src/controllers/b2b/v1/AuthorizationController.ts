@@ -2,14 +2,14 @@ import { AdminRole } from '@prisma/client';
 import { Request, Response, NextFunction, AuthAdminRequest, EmployeeRegisterRequest } from 'express'
 import Joi from 'joi'
 
-import emailService from '../../../../services/Email'
-import { EncryptionService } from '../../../../services/Encryption'
-import { JwtService } from '../../../../services/Jwt'
-import prisma from '../../../../services/Prisma'
-import { AbstractController } from '../../../../types/AbstractController'
-import { JoiCommon } from '../../../../types/JoiCommon'
-import { EmailType, JwtAudience } from '../../../../utils/enums'
-import { IError } from '../../../../utils/IError'
+import emailService from '../../../services/Email'
+import { EncryptionService } from '../../../services/Encryption'
+import { JwtService } from '../../../services/Jwt'
+import prisma from '../../../services/Prisma'
+import { AbstractController } from '../../../types/AbstractController'
+import { JoiCommon } from '../../../types/JoiCommon'
+import { EmailType, JwtAudience } from '../../../utils/enums'
+import { IError } from '../../../utils/IError'
 
 export class AuthorizationController extends AbstractController {
     private static readonly adminSchema = Joi.object({

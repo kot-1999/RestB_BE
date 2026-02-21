@@ -4,7 +4,7 @@ import config from 'config'
 import supertest from 'supertest'
 
 import app from '../../../../../src/app'
-import { AuthorizationController } from '../../../../../src/controllers/b2c/v1/authorization/AuthorizationController'
+import { AuthorizationController } from '../../../../../src/controllers/b2c/v1/AuthorizationController'
 import { JwtService } from '../../../../../src/services/Jwt'
 import prisma from '../../../../../src/services/Prisma'
 import { IConfig } from '../../../../../src/types/config'
