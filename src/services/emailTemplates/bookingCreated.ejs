@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Booking Confirmation</title>
+</head>
+<body>
+    <h1>Booking Confirmation, <%= firstName %> <%= lastName %>!</h1>
+    <p>Thank you for choosing <%= restaurantName %>. Your booking has been successfully created!</p>
+    
+    <h3>Booking Details</h3>
+    <p><strong>Booking ID:</strong> <%= bookingId %></p>
+    <p><strong>Restaurant:</strong> <%= restaurantName %></p>
+    <p><strong>Date:</strong> <%= bookingDate %></p>
+    <p><strong>Time:</strong> <%= bookingTime %></p>
+    <p><strong>Number of Guests:</strong> <%= guestsNumber %></p>
+    <p><strong>Status:</strong> <%= status %></p>
+    
+    <% if (status === 'Pending') { %>
+    <p><strong>Please note:</strong> Your booking is currently pending confirmation by the restaurant staff. You will receive another email once your booking is confirmed.</p>
+    <% } else if (status === 'Confirmed') { %>
+    <p><strong>Your booking is confirmed!</strong> We look forward to welcoming you to <%= restaurantName %>.</p>
+    <% } %>
+    
+    <% if (specialRequests) { %>
+    <h3>Special Requests</h3>
+    <p><%= specialRequests %></p>
+    <% } %>
+    
+    <p>If you need to make any changes to your booking, please contact us or visit your profile page.</p>
+</body>
+</html>
