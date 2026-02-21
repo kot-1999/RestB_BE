@@ -1,6 +1,6 @@
 import { Prisma, User, PrismaClient } from '@prisma/client'
 
-import { BaseQueries } from '../../../../utils/BaseQueries';
+import { BaseQueries } from './BaseQueries';
 
 export default class UserQueries extends BaseQueries<
     User,

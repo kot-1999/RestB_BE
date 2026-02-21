@@ -5,17 +5,18 @@ import Joi from 'joi'
 import j2s from 'joi-to-swagger'
 import swaggerAutogen from 'swagger-autogen'
 
-import { AdminController } from '../src/controllers/b2b/v1/admin/AdminController'
+import { AdminController } from '../src/controllers/b2b/v1/AdminController'
 import {
     AuthorizationController as b2bAuthorizationController
-} from '../src/controllers/b2b/v1/authorization/AuthorizationController'
-import { BookingController as AdminBookingController } from '../src/controllers/b2b/v1/booking/BookingController'
-import { DashboardController } from '../src/controllers/b2b/v1/dashboard/DashboardController'
-import { RestaurantController as AdminRestaurantController } from '../src/controllers/b2b/v1/restaurant/RestaurantController'
-import { AuthorizationController as UserAuthorizationController } from '../src/controllers/b2c/v1/authorization/AuthorizationController'
-import { BookingController as UserBookingController } from '../src/controllers/b2c/v1/booking/BookingController'
-import { RestaurantController as UserRestaurantController } from '../src/controllers/b2c/v1/restaurant/RestaurantController'
-import { UsersController } from '../src/controllers/b2c/v1/user/UserController'
+} from '../src/controllers/b2b/v1/AuthorizationController'
+import { BookingController as AdminBookingController } from '../src/controllers/b2b/v1/BookingController'
+import { DashboardController } from '../src/controllers/b2b/v1/DashboardController'
+import { RestaurantController as AdminRestaurantController } from '../src/controllers/b2b/v1/RestaurantController'
+import { AuthorizationController as UserAuthorizationController } from '../src/controllers/b2c/v1/AuthorizationController'
+import { BookingController as UserBookingController } from '../src/controllers/b2c/v1/BookingController'
+import { RestaurantController as UserRestaurantController } from '../src/controllers/b2c/v1/RestaurantController'
+import { UsersController } from '../src/controllers/b2c/v1/UserController'
+import { FileUpload } from '../src/controllers/FileUpload';
 
 /**
  * Link all endpoints to their schemas
@@ -67,7 +68,9 @@ const schemas: {[key: string]: {[key: string]: any}} = {
             getBookingDetails: AdminBookingController.schemas,
             updateBooking: AdminBookingController.schemas,
             // Dashboard
-            getDashboard: DashboardController.schemas
+            getDashboard: DashboardController.schemas,
+            // File Upload
+            putFile: FileUpload.schemas
         }
     }
 }

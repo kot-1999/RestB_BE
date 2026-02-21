@@ -2,10 +2,14 @@ import { AdminRole } from '@prisma/client'
 import { Response, NextFunction, AuthAdminRequest } from 'express'
 import Joi from 'joi'
 
-import prisma from '../../../../services/Prisma'
-import { AbstractController } from '../../../../types/AbstractController'
-import { JoiCommon } from '../../../../types/JoiCommon'
-import { IError } from '../../../../utils/IError'
+import AdminQueries from '../../../database/queries/AdminQueries';
+import s3Service from '../../../services/AwsS3';
+import prisma from '../../../services/Prisma'
+import { AbstractController } from '../../../types/AbstractController'
+import { JoiCommon } from '../../../types/JoiCommon'
+import { IError } from '../../../utils/IError'
+
+const adminQueries = new AdminQueries(prisma)
 
 export class AdminController extends AbstractController {
     private static readonly adminSchema = Joi.object({
@@ -41,7 +45,7 @@ export class AdminController extends AbstractController {
                     lastName: JoiCommon.string.name.optional(),
                     email: JoiCommon.string.email.optional(),
                     phone: Joi.string().optional(),
-                    avatarURL: Joi.string().uri()
+                    avatarURL: Joi.string()
                         .optional()
                 }).required()
             }).required()
@@ -117,7 +121,12 @@ export class AdminController extends AbstractController {
                 throw new IError(404, 'Admin was not found')
             }
 
-            return res.status(200).json({ admin: resultAdmin })
+            return res.status(200).json({
+                admin: {
+                    ...resultAdmin,
+                    avatarURL: resultAdmin.avatarURL ? await s3Service.getPublicUrl(resultAdmin.avatarURL) : null
+                }
+            })
         } catch (err) {
             return next(err)
         }
@@ -154,8 +163,16 @@ export class AdminController extends AbstractController {
         next: NextFunction
     ) {
         try {
-            const { user } = req
-        
+            const { user, body } = req
+
+            await adminQueries.updateOne(
+                user.id,
+                {
+                    ...body,
+                    deletedAt: null
+                }
+            )
+
             return res.status(200).json({
                 admin: {
                     id: user.id

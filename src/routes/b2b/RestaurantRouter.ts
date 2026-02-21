@@ -1,6 +1,6 @@
 import { Router } from 'express'
 
-import { RestaurantController } from '../../controllers/b2b/v1/restaurant/RestaurantController';
+import { RestaurantController } from '../../controllers/b2b/v1/RestaurantController';
 import authorizationMiddleware from '../../middlewares/authorizationMiddleware'
 import validationMiddleware from '../../middlewares/validationMiddleware';
 import { PassportStrategy } from '../../utils/enums'

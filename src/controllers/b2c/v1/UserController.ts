@@ -1,11 +1,14 @@
-import { UserType } from '@prisma/client'
 import { Response, NextFunction, AuthUserRequest } from 'express'
 import Joi from 'joi'
 
-import prisma from '../../../../services/Prisma'
-import { AbstractController } from '../../../../types/AbstractController'
-import { JoiCommon } from '../../../../types/JoiCommon'
-import { IError } from '../../../../utils/IError'
+import UserQueries from '../../../database/queries/UserQueries';
+import s3Service from '../../../services/AwsS3';
+import prisma from '../../../services/Prisma'
+import { AbstractController } from '../../../types/AbstractController'
+import { JoiCommon } from '../../../types/JoiCommon'
+import { IError } from '../../../utils/IError'
+
+const userQueries = new UserQueries(prisma)
 
 export class UsersController extends AbstractController {
     private static readonly userSchema = Joi.object({
@@ -14,9 +17,10 @@ export class UsersController extends AbstractController {
         lastName: JoiCommon.string.name.allow(null),
         email: JoiCommon.string.email,
         emailVerified: Joi.boolean().required(),
+        avatarURL: Joi.string().uri()
+            .allow(null)
+            .optional(),
         phone: Joi.string().required(),
-        type: Joi.string().valid(...Object.values(UserType))
-            .required(),
         createdAt: Joi.date().iso()
             .required(),
         updatedAt: Joi.date().iso()
@@ -38,7 +42,7 @@ export class UsersController extends AbstractController {
                     lastName: JoiCommon.string.name.optional(),
                     email: JoiCommon.string.email.optional(),
                     phone: Joi.string().optional(),
-                    avatarURL: Joi.string().uri()
+                    avatarURL: Joi.string()
                         .optional()
                 }).required()
             }).required()
@@ -83,7 +87,7 @@ export class UsersController extends AbstractController {
                     lastName: user.lastName,
                     email: user.email,
                     emailVerified: user.emailVerified,
-                    type: user.type,
+                    avatarURL: user.avatarURL,
                     createdAt: user.createdAt,
                     updatedAt: user.updatedAt,
                     phone: user.phone
@@ -95,7 +99,7 @@ export class UsersController extends AbstractController {
                     lastName: true,
                     email: true,
                     emailVerified: true,
-                    type: true,
+                    avatarURL: true,
                     createdAt: true,
                     updatedAt: true,
                     phone: true
@@ -110,7 +114,12 @@ export class UsersController extends AbstractController {
                 throw new IError(404, 'User was not found')
             }
 
-            return res.status(200).json({ user: resultUser })
+            return res.status(200).json({
+                user: {
+                    ...resultUser,
+                    avatarURL: resultUser.avatarURL ? await s3Service.getPublicUrl(resultUser.avatarURL) : null
+                }
+            })
         } catch (err) {
             return next(err)
         }
@@ -147,7 +156,15 @@ export class UsersController extends AbstractController {
         next: NextFunction
     ) {
         try {
-            const { user } = req
+            const { user, body } = req
+
+            await userQueries.updateOne(
+                user.id,
+                {
+                    ...body,
+                    deletedAt: null 
+                }
+            )
 
             return res.status(200).json({
                 user: {

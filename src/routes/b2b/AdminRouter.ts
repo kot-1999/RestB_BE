@@ -1,7 +1,6 @@
-// Init router and controller
 import express from 'express'
 
-import { AdminController } from '../../controllers/b2b/v1/admin/AdminController'
+import { AdminController } from '../../controllers/b2b/v1/AdminController'
 import authorizationMiddleware from '../../middlewares/authorizationMiddleware'
 import validationMiddleware from '../../middlewares/validationMiddleware'
 import { PassportStrategy } from '../../utils/enums'
@@ -32,7 +31,7 @@ export default function adminRouter() {
     router.patch(
         /*
             #swagger.tags = ['b2b-v1-Admin']
-            #swagger.description = '(Not implemented) Update admin details',
+            #swagger.description = 'Update admin details',
             #swagger.parameters['body'] = {
                 in: 'body',
                 schema: { $ref: '#/definitions/b2bV1UpdateAdminReqBody' }

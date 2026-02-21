@@ -1,6 +1,6 @@
 import { Prisma, Restaurant, PrismaClient } from '@prisma/client'
 
-import { BaseQueries } from '../../../../utils/BaseQueries';
+import { BaseQueries } from './BaseQueries';
 
 export default class RestaurantQueries extends BaseQueries<
     Restaurant,

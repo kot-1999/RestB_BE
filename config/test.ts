@@ -14,6 +14,18 @@ const options: IConfig = {
         port: process.env.PORT as string,
         env: process.env.NODE_ENV as NodeEnv
     },
+    s3: {
+        region: process.env.S3_REGION as string,
+
+        endpoint: process.env.S3_ENDPOINT as string,
+
+        credentials: {
+            accessKeyId: process.env.S3_ACCESS_KEY_ID as string,
+            secretAccessKey: process.env.S3_SECRET_ACCESS_KEY as string
+        },
+
+        forcePathStyle: true
+    },
     cookieSession: {
         name: 'session',
         secret: [process.env.COOKIE_SECRET_KEY as string],
@@ -102,19 +114,7 @@ const options: IConfig = {
             isLoggedToConsole: true
         }
     },
-    sentry: null,
-    s3: {
-        region: process.env.S3_REGION as string,
-
-        endpoint: process.env.S3_ENDPOINT as string,
-
-        credentials: {
-            accessKeyId: process.env.S3_ACCESS_KEY_ID as string,
-            secretAccessKey: process.env.S3_SECRET_ACCESS_KEY as string
-        },
-
-        forcePathStyle: true
-    }
+    sentry: null
 }
 
 export default options

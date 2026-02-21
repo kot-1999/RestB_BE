@@ -2,7 +2,7 @@ import 'dotenv'
 
 import seed from '../scripts/seed';
 import prisma from '../src/services/Prisma'
-import '../src/services/AwsS3'
+
 // Function to truncate all tables except _prisma_migrations
 export async function clearDatabase() {
     const tables: Array<{ TABLE_NAME: string }> = await prisma.$queryRaw`
