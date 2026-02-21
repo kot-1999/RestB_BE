@@ -2,8 +2,8 @@ import { AdminRole, RestaurantCategories } from '@prisma/client';
 import { Response, NextFunction, AuthAdminRequest } from 'express'
 import Joi from 'joi'
 
-import { AbstractController } from '../../../../types/AbstractController'
-import { JoiCommon } from '../../../../types/JoiCommon'
+import { AbstractController } from '../../../types/AbstractController'
+import { JoiCommon } from '../../../types/JoiCommon'
 
 export class RestaurantController extends AbstractController {
     public static readonly schemas = {

@@ -1,8 +1,8 @@
 import { Response, NextFunction, AuthAdminRequest } from 'express'
 import Joi from 'joi'
 
-import { AbstractController } from '../../../../types/AbstractController'
-import { JoiCommon } from '../../../../types/JoiCommon'
+import { AbstractController } from '../../../types/AbstractController'
+import { JoiCommon } from '../../../types/JoiCommon'
 
 export class BrandController extends AbstractController {
     public static readonly schemas = {

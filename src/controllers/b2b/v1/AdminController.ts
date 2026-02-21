@@ -2,12 +2,12 @@ import { AdminRole } from '@prisma/client'
 import { Response, NextFunction, AuthAdminRequest } from 'express'
 import Joi from 'joi'
 
-import AdminQueries from '../../../../database/queries/AdminQueries';
-import s3Service from '../../../../services/AwsS3';
-import prisma from '../../../../services/Prisma'
-import { AbstractController } from '../../../../types/AbstractController'
-import { JoiCommon } from '../../../../types/JoiCommon'
-import { IError } from '../../../../utils/IError'
+import AdminQueries from '../../../database/queries/AdminQueries';
+import s3Service from '../../../services/AwsS3';
+import prisma from '../../../services/Prisma'
+import { AbstractController } from '../../../types/AbstractController'
+import { JoiCommon } from '../../../types/JoiCommon'
+import { IError } from '../../../utils/IError'
 
 const adminQueries = new AdminQueries(prisma)
 

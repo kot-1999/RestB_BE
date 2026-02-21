@@ -4,8 +4,8 @@ import { BookingStatus } from '@prisma/client';
 import { Response, NextFunction, AuthUserRequest } from 'express'
 import Joi from 'joi'
 
-import { AbstractController } from '../../../../types/AbstractController'
-import { JoiCommon } from '../../../../types/JoiCommon'
+import { AbstractController } from '../../../types/AbstractController'
+import { JoiCommon } from '../../../types/JoiCommon'
 
 export class BookingController extends AbstractController {
     public static readonly schemas = {

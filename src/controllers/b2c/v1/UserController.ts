@@ -2,12 +2,12 @@ import { UserType } from '@prisma/client'
 import { Response, NextFunction, AuthUserRequest } from 'express'
 import Joi from 'joi'
 
-import UserQueries from '../../../../database/queries/UserQueries';
-import s3Service from '../../../../services/AwsS3';
-import prisma from '../../../../services/Prisma'
-import { AbstractController } from '../../../../types/AbstractController'
-import { JoiCommon } from '../../../../types/JoiCommon'
-import { IError } from '../../../../utils/IError'
+import UserQueries from '../../../database/queries/UserQueries';
+import s3Service from '../../../services/AwsS3';
+import prisma from '../../../services/Prisma'
+import { AbstractController } from '../../../types/AbstractController'
+import { JoiCommon } from '../../../types/JoiCommon'
+import { IError } from '../../../utils/IError'
 
 const userQueries = new UserQueries(prisma)
 
