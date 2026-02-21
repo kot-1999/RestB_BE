@@ -47,23 +47,24 @@ export class BookingController extends AbstractController {
             })
         },
         response: {
-            getBookingList: Joi.array().items(JoiCommon.object.booking.keys({
-                restaurant: Joi.object({
-                    id: JoiCommon.string.id,
-                    name: JoiCommon.string.name.required(),
-                    description: Joi.string().min(20)
-                        .optional(),
-                    bannerURL: Joi.string().uri()
+            getBookingList: Joi.object({
+                bookings: Joi.array().items(JoiCommon.object.booking.keys({
+                    restaurant: Joi.object({
+                        id: JoiCommon.string.id,
+                        name: JoiCommon.string.name.required(),
+                        description: Joi.string().min(20)
+                            .optional(),
+                        bannerURL: Joi.string().uri()
+                            .required(),
+                        brand: JoiCommon.object.brand.required()
+                    }).required(),
+                    createdAt: Joi.date().iso()
                         .required(),
-                    brand: JoiCommon.object.brand.required()
-                }).required(),
-                createdAt: Joi.date().iso()
-                    .required(),
-                updatedAt: Joi.date().iso()
-                    .allow(null)
+                    updatedAt: Joi.date().iso()
+                        .allow(null)
+                }).required())
                     .required()
-            }).required())
-                .required(),
+            }).required(),
             postBooking: Joi.object({
                 booking: Joi.object({
                     id: JoiCommon.string.id

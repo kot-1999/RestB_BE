@@ -1,4 +1,3 @@
-// Init router and controller
 import express from 'express'
 
 import { AdminController } from '../../controllers/b2b/v1/AdminController'

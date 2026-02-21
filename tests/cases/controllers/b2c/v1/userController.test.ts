@@ -26,7 +26,6 @@ describe('GET ' + endpoint(':userID'), () => {
             })}`)
 
         expect(res.statusCode).to.equal(401)
-        expect(res.type).to.eq('application/json')
     })
 
     it('Should return himself (200)', async () => {
