@@ -125,14 +125,14 @@ class PassportSetup {
             }
 
             return done(null, user)
-        } catch (err) {
-            return done(err, false)
+        } catch {
+            return done(null, false)
         }
     }
 
     private async b2cJwtStrategy(payload: JwtPayload, done: VerifyCallback) {
         try {
-            if (payload.aud !== 'b2c') {
+            if (payload.aud !== JwtAudience.b2c) {
                 throw new IError(401, 'Not authorized (JwtStrategy)')
             }
 
@@ -144,8 +144,8 @@ class PassportSetup {
                 throw new IError(401, 'Not authorized (JwtStrategy)')
             }
             return done(null, user)
-        } catch (err) {
-            return done(err, false)
+        } catch {
+            return done(null, false)
         }
     }
 
@@ -166,14 +166,14 @@ class PassportSetup {
                 throw new IError(401, 'Not authorized (JwtForgotPasswordStrategy)')
             }
             return done(null, user)
-        } catch (err) {
-            return done(err, false)
+        } catch {
+            return done(null, false)
         }
     }
 
     private async b2bJwtStrategy(payload: JwtPayload, done: VerifyCallback) {
         try {
-            if (payload.aud !== 'b2b') {
+            if (payload.aud !== JwtAudience.b2b) {
                 throw new IError(401, 'Not authorized (JwtStrategy)')
             }
 
@@ -185,8 +185,8 @@ class PassportSetup {
                 throw new IError(401, 'Not authorized (JwtStrategy)')
             }
             return done(null, admin)
-        } catch (err) {
-            return done(err, false)
+        } catch {
+            return done(null, false)
         }
     }
 
@@ -207,8 +207,8 @@ class PassportSetup {
                 throw new IError(401, 'Not authorized (JwtForgotPasswordStrategy)')
             }
             return done(null, admin)
-        } catch (err) {
-            return done(err, false)
+        } catch {
+            return done(null, false)
         }
     }
 
