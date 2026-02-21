@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Booking Update</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Booking Update, <%= firstName %> <%= lastName %>!</h1>
     <p>Your booking at <%= restaurantName %> has been updated.</p>
     
@@ -24,18 +24,6 @@
     <p><strong>Great news!</strong> Your booking has been confirmed. We look forward to welcoming you to <%= restaurantName %> on <%= bookingDate %> at <%= bookingTime %>.</p>
     <% } else if (newStatus === 'Cancelled') { %>
     <p><strong>Your booking has been cancelled.</strong> If you did not request this cancellation, please contact our support team immediately.</p>
-    <% } else if (newStatus === 'Pending') { %>
-    <p><strong>Your booking is pending confirmation.</strong> The restaurant staff is reviewing your request and will confirm shortly.</p>
-    <% } else if (newStatus === 'Completed') { %>
-    <p><strong>Thank you for dining with us!</strong> We hope you enjoyed your experience at <%= restaurantName %>. Please consider leaving a review.</p>
-    <% } %>
-    
-    <% if (proposedTimeChange) { %>
-    <h3>Proposed Time Change</h3>
-    <p><strong>Proposed Date:</strong> <%= proposedTimeChange.date %></p>
-    <p><strong>Proposed Time:</strong> <%= proposedTimeChange.time %></p>
-    <p><strong>Reason:</strong> <%= proposedTimeChange.reason %></p>
-    <p>Please log in to your account to accept or reject this proposed change.</p>
     <% } %>
     
     <% if (message) { %>
@@ -44,5 +32,5 @@
     <% } %>
     
     <p>If you have any questions or need further assistance, please don't hesitate to contact us.</p>
-</body>
+  </body>
 </html>
