@@ -32,7 +32,7 @@ export default function adminRouter() {
     router.patch(
         /*
             #swagger.tags = ['b2b-v1-Admin']
-            #swagger.description = '(Not implemented) Update admin details',
+            #swagger.description = 'Update admin details',
             #swagger.parameters['body'] = {
                 in: 'body',
                 schema: { $ref: '#/definitions/b2bV1UpdateAdminReqBody' }
