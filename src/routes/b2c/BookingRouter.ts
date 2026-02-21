@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { Router } from 'express'
 
-import { BookingController } from '../../controllers/b2c/v1/booking/BookingController';
+import { BookingController } from '../../controllers/b2c/v1/BookingController';
 import authorizationMiddleware from '../../middlewares/authorizationMiddleware'
 import validationMiddleware from '../../middlewares/validationMiddleware'
 import { PassportStrategy } from '../../utils/enums'

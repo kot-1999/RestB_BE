@@ -1,6 +1,6 @@
 import { Prisma, Booking, PrismaClient } from '@prisma/client'
 
-import { BaseQueries } from '../../../../utils/BaseQueries';
+import { BaseQueries } from './BaseQueries';
 
 export default class BookingQueries extends BaseQueries<
     Booking,

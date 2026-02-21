@@ -1,6 +1,6 @@
 import { Router } from 'express'
 
-import { UsersController } from '../../controllers/b2c/v1/user/UserController'
+import { UsersController } from '../../controllers/b2c/v1/UserController'
 import authorizationMiddleware from '../../middlewares/authorizationMiddleware'
 import validationMiddleware from '../../middlewares/validationMiddleware'
 import { PassportStrategy } from '../../utils/enums'
@@ -32,7 +32,7 @@ export default function authorizationRouter() {
     router.patch(
         /*
             #swagger.tags = ['b2c-v1-User']
-            #swagger.description = '(Not implemented) Update user details',
+            #swagger.description = 'Update user details',
             #swagger.parameters['body'] = {
                 in: 'body',
                 schema: { $ref: '#/definitions/b2cV1UpdateUserReqBody' }
