@@ -1,4 +1,3 @@
-import { UserType } from '@prisma/client'
 import { Response, NextFunction, AuthUserRequest } from 'express'
 import Joi from 'joi'
 
@@ -22,8 +21,6 @@ export class UsersController extends AbstractController {
             .allow(null)
             .optional(),
         phone: Joi.string().required(),
-        type: Joi.string().valid(...Object.values(UserType))
-            .required(),
         createdAt: Joi.date().iso()
             .required(),
         updatedAt: Joi.date().iso()
@@ -90,7 +87,6 @@ export class UsersController extends AbstractController {
                     lastName: user.lastName,
                     email: user.email,
                     emailVerified: user.emailVerified,
-                    type: user.type,
                     avatarURL: user.avatarURL,
                     createdAt: user.createdAt,
                     updatedAt: user.updatedAt,

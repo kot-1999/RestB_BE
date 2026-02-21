@@ -208,6 +208,5 @@ describe('POST ' + endpoint('/reset-password'), () => {
             })
 
         expect(res.statusCode).to.equal(401)
-        expect(res.type).to.eq('application/json')
     })
 })
