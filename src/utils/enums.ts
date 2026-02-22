@@ -9,7 +9,9 @@ export enum PassportStrategy {
 
 export enum EmailType {
     forgotPassword = 'forgotPassword',
-    registered = 'registered'
+    registered = 'registered',
+    bookingUpdated = 'bookingUpdated',
+    employeeInvite = 'employeeInvite'
 }
 
 export enum JwtAudience {
