@@ -10,7 +10,8 @@ export type EmailDataType<T extends EmailType> =
         id: string,
         email: string,
         firstName: string | null,
-        lastName: string | null
+        lastName: string | null,
+        link: string
     } :
     T extends typeof EmailType.bookingUpdated ? {
         email: string,
