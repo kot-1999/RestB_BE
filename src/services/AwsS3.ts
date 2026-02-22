@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto'
 import {
     S3Client,
     CreateBucketCommand,
-    HeadBucketCommand, PutObjectCommand, GetObjectCommand
+    HeadBucketCommand, PutObjectCommand, GetObjectCommand, PutBucketCorsCommand
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import config from 'config';
@@ -31,6 +31,23 @@ class AwsS3 {
 
     public async init() {
         await this.ensureBucketExists()
+
+        // Update cors policy for the bucket
+        const command = new PutBucketCorsCommand({
+            Bucket: this.bucketName,
+            CORSConfiguration: {
+                CORSRules: [
+                    {
+                        AllowedOrigins: ['*'],
+                        AllowedMethods: ['GET', 'PUT', 'POST', 'HEAD'],
+                        AllowedHeaders: ['*'],
+                        ExposeHeaders: ['ETag']
+                    }
+                ]
+            }
+        })
+
+        await this.s3.send(command)
     }
 
     private async ensureBucketExists() {
