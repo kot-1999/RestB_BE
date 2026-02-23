@@ -1,13 +1,20 @@
+import dayjs from 'dayjs';
+
 import prisma from '../src/services/Prisma';
 import AdminGenerator from '../tests/utils/AdminGenerator';
 import UserGenerator from '../tests/utils/UserGenerator';
+
+const timeFrom = dayjs().subtract(20, 'days')
+const timeTo = dayjs().add(20, 'days')
+
+const seedGrain = 10
 
 async function seed() {
     const users = [];
     const admins = [];
 
     // Generate plain objects
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < seedGrain; i++) {
         users.push(UserGenerator.generateData({ password: 'TestUser.123' }));
         admins.push(AdminGenerator.generateData({ password: 'TestAdmin.123' }));
     }
@@ -30,7 +37,7 @@ async function seed() {
         }));
         seededTables.push('admins');
     }
-
+    
     await Promise.all(promises);
 
     // eslint-disable-next-line
