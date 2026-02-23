@@ -41,14 +41,29 @@ services:
       --maxmemory 256mb
     restart: always
 
+#   RUSTFS DOCKER CONTAINER. POOR SUPPORT OF AWS PROGRAMMATIC COMMANDS.
+#   rustfs:
+#    image: rustfs/rustfs:latest
+#    ports:
+#      - "${S3_PORT}:${S3_PORT}"
+#      - "${S3_INTERFACE_PORT}:${S3_INTERFACE_PORT}"
+#    environment:
+#      RUSTFS_ADDRESS: ":${S3_PORT}"
+#      RUSTFS_CONSOLE_ADDRESS: ":${S3_INTERFACE_PORT}"
+#      RUSTFS_CONSOLE_ENABLE: "true"
+#      RUSTFS_ACCESS_KEY: ${S3_ACCESS_KEY_ID}
+#      RUSTFS_SECRET_KEY: ${S3_SECRET_ACCESS_KEY}
+
+# TODO: Change container name
+#  LOCALSTACK CONTAINER
   rustfs:
-    image: rustfs/rustfs:latest
+    image: localstack/localstack:latest
     ports:
       - "${S3_PORT}:${S3_PORT}"
-      - "${S3_INTERFACE_PORT}:${S3_INTERFACE_PORT}"
     environment:
-      RUSTFS_ADDRESS: ":${S3_PORT}"
-      RUSTFS_CONSOLE_ADDRESS: ":${S3_INTERFACE_PORT}"
-      RUSTFS_CONSOLE_ENABLE: "true"
-      RUSTFS_ACCESS_KEY: ${S3_ACCESS_KEY_ID}
-      RUSTFS_SECRET_KEY: ${S3_SECRET_ACCESS_KEY}
+      SERVICES: s3
+      GATEWAY_LISTEN: "0.0.0.0:${S3_PORT}"
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
+      DEBUG: "1"
+      DATA_DIR: /data
