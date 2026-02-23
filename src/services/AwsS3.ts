@@ -13,6 +13,8 @@ import { IConfig } from '../types/config';
 
 class AwsS3 {
     private s3
+    // TODO: For production usage, remove s3FroPresign and keep only s3.
+    // NOTE: It is used to make images available outside of docker container
     private s3ForPresign
 
     private bucketName = 'rest-images'
@@ -98,6 +100,6 @@ const s3Service = new AwsS3(s3Config)
 
 s3Service.init()
     .then(() =>  logger.info('S3 bucket was initialized'))
-    .catch((err) => logger.error('S3 bucket initialization failed: ' + err.message))
+    .catch((err) => logger.error('S3 bucket initialization failed: ', err))
 
 export default s3Service
