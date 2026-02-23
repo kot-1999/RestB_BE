@@ -66,12 +66,11 @@ class AwsS3 {
         const command = new PutObjectCommand({
             Bucket: this.bucketName,
             Key: key,
-            ContentType: contentType
+            ContentType: contentType,
+            ACL: 'public-read'  // make the object publicly readable
         })
 
-        const uploadUrl = await getSignedUrl(this.s3ForPresign, command, {
-            expiresIn: 60 * 30 // 30 minutes
-        })
+        const uploadUrl = await getSignedUrl(this.s3ForPresign, command)
 
         // Generate presigned GET URL for frontend
         const publicUrl = await this.getPublicUrl(key)
@@ -84,14 +83,7 @@ class AwsS3 {
     }
 
     public async getPublicUrl(key: string) {
-        const command = new GetObjectCommand({
-            Bucket: this.bucketName,
-            Key: key
-        })
-
-        return  await getSignedUrl(this.s3ForPresign, command, {
-            expiresIn: 60 * 60 * 7 // 7 days
-        })
+        return `${this.s3Config.endpoint.replace('rustfs_dev', 'localhost')}/${this.bucketName}/${key}`
     }
 }
 
