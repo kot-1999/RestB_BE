@@ -3,7 +3,6 @@ import { Response, NextFunction, AuthAdminRequest } from 'express'
 import Joi from 'joi'
 
 import AdminQueries from '../../../database/queries/AdminQueries';
-import s3Service from '../../../services/AwsS3';
 import prisma from '../../../services/Prisma'
 import { AbstractController } from '../../../types/AbstractController'
 import { JoiCommon } from '../../../types/JoiCommon'
@@ -122,10 +121,7 @@ export class AdminController extends AbstractController {
             }
 
             return res.status(200).json({
-                admin: {
-                    ...resultAdmin,
-                    avatarURL: resultAdmin.avatarURL ? await s3Service.getPublicUrl(resultAdmin.avatarURL) : null
-                }
+                admin: resultAdmin
             })
         } catch (err) {
             return next(err)

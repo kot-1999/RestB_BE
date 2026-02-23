@@ -2,7 +2,6 @@ import { Response, NextFunction, AuthUserRequest } from 'express'
 import Joi from 'joi'
 
 import UserQueries from '../../../database/queries/UserQueries';
-import s3Service from '../../../services/AwsS3';
 import prisma from '../../../services/Prisma'
 import { AbstractController } from '../../../types/AbstractController'
 import { JoiCommon } from '../../../types/JoiCommon'
@@ -115,10 +114,7 @@ export class UsersController extends AbstractController {
             }
 
             return res.status(200).json({
-                user: {
-                    ...resultUser,
-                    avatarURL: resultUser.avatarURL ? await s3Service.getPublicUrl(resultUser.avatarURL) : null
-                }
+                user: resultUser
             })
         } catch (err) {
             return next(err)
