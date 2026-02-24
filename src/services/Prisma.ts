@@ -2,9 +2,20 @@ import { Prisma, PrismaClient } from '@prisma/client'
 
 import logger from './Logger';
 import AdminQueries from '../database/queries/AdminQueries';
+import BookingQueries from '../database/queries/BookingQueries';
+import BrandQueries from '../database/queries/BrandQueries';
+import DashboardQueries from '../database/queries/DashboardQueries';
+import RestaurantQueries from '../database/queries/RestaurantQueries';
 import UserQueries from '../database/queries/UserQueries'
 
-interface Queries { user: UserQueries, admin: AdminQueries }
+interface Queries {
+    user: UserQueries,
+    admin: AdminQueries,
+    booking: BookingQueries,
+    brand: BrandQueries,
+    restaurant: RestaurantQueries,
+    dashboard: DashboardQueries
+}
 
 class PrismaService {
     private client: any
@@ -55,7 +66,32 @@ class PrismaService {
                     findByID: queries.admin.findByID,
                     createOne: queries.admin.createOne,
                     updateOne: queries.admin.updateOne
+                },
+                booking: {
+                    findOne: queries.booking.findOne,
+                    softDelete: queries.booking.softDelete,
+                    findByID: queries.booking.findByID,
+                    createOne: queries.booking.createOne,
+                    updateOne: queries.booking.updateOne
+                },
+                brand: {
+                    findOne: queries.brand.findOne,
+                    softDelete: queries.brand.softDelete,
+                    findByID: queries.brand.findByID,
+                    createOne: queries.brand.createOne,
+                    updateOne: queries.brand.updateOne
+                },
+                restaurant: {
+                    findOne: queries.restaurant.findOne,
+                    softDelete: queries.restaurant.softDelete,
+                    findByID: queries.restaurant.findByID,
+                    createOne: queries.restaurant.createOne,
+                    updateOne: queries.restaurant.updateOne
+                },
+                dashboard: {
+
                 }
+
             }
         })
     }
@@ -71,7 +107,11 @@ const baseClient = prismaService.getPrismaClient()
 
 prismaService.attachQueries({
     user: new UserQueries(baseClient),
-    admin: new AdminQueries(baseClient)
+    admin: new AdminQueries(baseClient),
+    booking: new BookingQueries(baseClient),
+    brand: new BrandQueries(baseClient),
+    dashboard: new DashboardQueries(),
+    restaurant: new RestaurantQueries(baseClient)
 })
 
 const prisma = prismaService.getPrismaClient()
