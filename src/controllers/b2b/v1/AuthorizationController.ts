@@ -35,7 +35,10 @@ export class AuthorizationController extends AbstractController {
                     email: JoiCommon.string.email.required(),
                     password: Joi.string().min(3)
                         .required(),
-                    phone: Joi.string().required()
+                    phone: Joi.string().required(),
+                    brandName: Joi.string().min(3)
+                        .max(255)
+                        .required()
                 }).required()
             }).required(),
 
@@ -123,16 +126,31 @@ export class AuthorizationController extends AbstractController {
                 throw new IError(409, 'Profile already exists. Go to login, or use forgot password')
             }
 
-            admin = await prisma.admin.create({
-                data: {
-                    firstName: body.firstName,
-                    lastName: body.lastName,
-                    email: body.email,
-                    emailVerified: false,
-                    password: EncryptionService.hashSHA256(body.password),
-                    phone: body.phone
-                }
-            })
+            const result = await prisma.$transaction(async (tx: any) => {
+                const brand = await tx.brand.create({
+                    data: { name: body.brandName }
+                });
+
+                admin = await tx.admin.create({
+                    data: {
+                        firstName: body.firstName,
+                        lastName: body.lastName,
+                        email: body.email,
+                        brandID: brand.id,
+                        emailVerified: false,
+                        password: EncryptionService.hashSHA256(body.password),
+                        phone: body.phone
+                    }
+                });
+
+                return {
+                    brand,
+                    admin 
+                };
+            });
+
+            admin = result.admin;
+
             const jwt = JwtService.generateToken({
                 id: admin.id,
                 aud: JwtAudience.b2b
