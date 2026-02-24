@@ -13,7 +13,8 @@ const options: IConfig = {
     app: {
         name: 'RestBoo',
         port: process.env.PORT as string,
-        env: process.env.NODE_ENV as NodeEnv
+        env: process.env.NODE_ENV as NodeEnv,
+        frontendUrl: process.env.FRONTEND_URL ?? 'http://localhost:3055'
     },
     cookieSession: {
         name: 'session',
@@ -74,17 +75,17 @@ const options: IConfig = {
         contentSecurity: {
             useDefaults: false,
             directives: {
-                defaultSrc: ["'self'"], // Allow resources to be loaded
-                scriptSrc: ["'self'", 'apis.google.com', 'code.jquery.com', 'cdn.jsdelivr.net'], // Allows JavaScript to be loaded
-                styleSrc: ["'self'", 'fonts.googleapis.com', "'unsafe-inline'"], // Allows CSS stylesheets to be loaded
-                fontSrc: ["'self'", 'fonts.gstatic.com'], // Allows font files to be loaded
-                imgSrc: ["'self'", 'lh3.googleusercontent.com', 'data'] // Allows images to be loaded
+                defaultSrc: ["'self'"],
+                scriptSrc: ["'self'", 'apis.google.com', 'code.jquery.com', 'cdn.jsdelivr.net'],
+                styleSrc: ["'self'", 'fonts.googleapis.com', "'unsafe-inline'"],
+                fontSrc: ["'self'", 'fonts.gstatic.com'],
+                imgSrc: ["'self'", 'lh3.googleusercontent.com', 'https://fastly.picsum.photos', 'https://picsum.photos']
             }
         }
     },
     rateLimiter: {
         windowMs: 1 * 60 * 1000, // 1 minutes
-        limit: 500, // Limit each IP to 45 requests per `window` (here, per 1 minutes)
+        limit: 50000, // Limit each IP to 45 requests per `window` (here, per 1 minutes)
         standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
         legacyHeaders: false // Disable the `X-RateLimit-*` headers
         // NOTE: 'store' option will be defined in app.ts

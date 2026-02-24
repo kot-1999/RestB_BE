@@ -19,6 +19,7 @@ export interface IConfig {
     name: string
     port: string
     env: NodeEnv
+    frontendUrl: string
   }
   database: {
     dbURL: string
