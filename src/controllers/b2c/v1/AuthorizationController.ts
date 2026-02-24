@@ -1,3 +1,4 @@
+import config from 'config';
 import { Request, Response, NextFunction, AuthUserRequest } from 'express'
 import Joi from 'joi'
 
@@ -6,9 +7,12 @@ import { EncryptionService } from '../../../services/Encryption'
 import { JwtService } from '../../../services/Jwt'
 import prisma from '../../../services/Prisma'
 import { AbstractController } from '../../../types/AbstractController'
+import { IConfig } from '../../../types/config';
 import { JoiCommon } from '../../../types/JoiCommon'
 import { EmailType, JwtAudience } from '../../../utils/enums'
 import { IError } from '../../../utils/IError'
+
+const appConfig = config.get<IConfig['app']>('app')
 
 export class AuthorizationController extends AbstractController {
     private static readonly userSchema = Joi.object({
@@ -265,7 +269,11 @@ export class AuthorizationController extends AbstractController {
                     id: user.id,
                     firstName: user.firstName,
                     lastName: user.lastName,
-                    email: user.email
+                    email: user.email,
+                    link: appConfig.frontendUrl + '/#reset-password' + `?userType=b2c&token=${JwtService.generateToken({
+                        id: user.id,
+                        aud: JwtAudience.b2cForgotPassword
+                    })}`
                 })
             }
 

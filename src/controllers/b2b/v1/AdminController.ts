@@ -2,13 +2,10 @@ import { AdminRole } from '@prisma/client'
 import { Response, NextFunction, AuthAdminRequest } from 'express'
 import Joi from 'joi'
 
-import AdminQueries from '../../../database/queries/AdminQueries';
 import prisma from '../../../services/Prisma'
 import { AbstractController } from '../../../types/AbstractController'
 import { JoiCommon } from '../../../types/JoiCommon'
 import { IError } from '../../../utils/IError'
-
-const adminQueries = new AdminQueries(prisma)
 
 export class AdminController extends AbstractController {
     private static readonly adminSchema = Joi.object({
@@ -161,7 +158,7 @@ export class AdminController extends AbstractController {
         try {
             const { user, body } = req
 
-            await adminQueries.updateOne(
+            await prisma.admin.updateOne(
                 user.id,
                 {
                     ...body,
