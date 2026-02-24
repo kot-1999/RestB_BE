@@ -11,7 +11,7 @@ export type EmailDataType<T extends EmailType> =
         email: string,
         firstName: string | null,
         lastName: string | null,
-        // link: string
+        link: string
     } :
     T extends typeof EmailType.bookingUpdated ? {
         email: string,

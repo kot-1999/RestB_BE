@@ -6,11 +6,10 @@ import { compile, compiledFunction } from 'html-to-text'
 import nodemailer from 'nodemailer'
 import Mail from 'nodemailer/lib/mailer'
 
-import { JwtService } from './Jwt'
 import logger from './Logger';
 import { IConfig } from '../types/config'
 import { EmailDataType } from '../types/types'
-import { EmailType, JwtAudience } from '../utils/enums'
+import { EmailType } from '../utils/enums'
 import { IError } from '../utils/IError'
 
 class EmailService {
@@ -68,17 +67,14 @@ class EmailService {
         const templateData = {
             firstName: data.firstName ?? 'dear customer',
             lastName: data.lastName ?? '',
-            link: `http//www.localhost:3001/reset-password?token=${JwtService.generateToken({
-                id: data.id,
-                aud: JwtAudience.b2cForgotPassword
-            })}`
+            link: data.link
         }
         const htmlContent = await ejs.renderFile(templatePath, templateData)
 
         const mailOptions = {
             from: this.config.fromAddress,
             to: data.email,
-            subject: 'Welcome to BE-proj!',
+            subject: 'RestBoo - Reset password link',
             html: htmlContent
         }
 
