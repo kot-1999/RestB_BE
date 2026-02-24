@@ -1,13 +1,10 @@
 import { Response, NextFunction, AuthUserRequest } from 'express'
 import Joi from 'joi'
 
-import UserQueries from '../../../database/queries/UserQueries';
 import prisma from '../../../services/Prisma'
 import { AbstractController } from '../../../types/AbstractController'
 import { JoiCommon } from '../../../types/JoiCommon'
 import { IError } from '../../../utils/IError'
-
-const userQueries = new UserQueries(prisma)
 
 export class UsersController extends AbstractController {
     private static readonly userSchema = Joi.object({
@@ -154,7 +151,7 @@ export class UsersController extends AbstractController {
         try {
             const { user, body } = req
 
-            await userQueries.updateOne(
+            await prisma.user.updateOne(
                 user.id,
                 {
                     ...body,
