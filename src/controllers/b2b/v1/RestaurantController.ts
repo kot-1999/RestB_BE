@@ -1,4 +1,4 @@
-import { AdminRole, RestaurantCategories } from '@prisma/client'
+import { AdminRole, Prisma, RestaurantCategories } from '@prisma/client'
 import dayjs from 'dayjs'
 import { Response, NextFunction, AuthAdminRequest } from 'express'
 import Joi from 'joi'
@@ -23,6 +23,7 @@ export class RestaurantController extends AbstractController {
             }),
             putRestaurant: JoiCommon.object.request.keys({
                 body: Joi.object({
+                    restaurantID: Joi.string().optional(),
                     name: JoiCommon.string.name.required(),
 
                     description: Joi.string()
@@ -117,17 +118,86 @@ export class RestaurantController extends AbstractController {
         next: NextFunction
     ) {
         try {
+            const { query, user } = req
+
+            const skip = (query.page - 1) * query.limit;
+            let where: Prisma.RestaurantWhereInput = {
+                brandID: user.brandID
+            }
+            
+            if (user.role === AdminRole.Employee) {
+                where = {
+                    ...where,
+                    staff: {
+                        some: {
+                            adminID: user.id
+                        }
+                    }
+                }
+            }
+
+            const [count, brand, restaurants] = await Promise.all([
+                prisma.restaurant.count({
+                    where
+                }),
+                prisma.brand.findByID(user.brandID, {
+                    id: true,
+                    name: true,
+                    logoURL: true
+                }),
+                prisma.restaurant.findMany({
+                    skip,
+                    take: query.limit,
+                    where,
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                        bannerURL: true,
+                        photosURL: true,
+                        timeFrom: true,
+                        timeTo: true,
+                        categories: true,
+                        autoApprovedBookingsNum: true,
+                        address: {
+                            select: {
+                                building: true,
+                                street: true,
+                                city: true,
+                                postcode: true,
+                                country: true,
+                                latitude: true,
+                                longitude: true
+                            }
+                        },
+                        staff: {
+                            select: {
+                                adminID: true,
+                                admin: {
+                                    select: {
+                                        id: true,
+                                        firstName: true,
+                                        lastName: true,
+                                        email: true,
+                                        role: true
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    orderBy: {
+                        name: 'asc' // optional
+                    }
+                })
+            ])
 
             return res.status(200).json({
-                brand: {
-                    id: 'asdasd',
-                    name: 'asdasd'
-                },
-                restaurants: [],
+                brand,
+                restaurants,
                 pagination: {
-                    page: 1,
-                    limit: 20,
-                    total: 0
+                    page: query.page,
+                    limit: query.limit,
+                    total: count
                 }
             })
         } catch (err) {
@@ -151,14 +221,15 @@ export class RestaurantController extends AbstractController {
                 throw new IError(400, 'Provided address was not recognized')
             }
 
-            const restaurant = await prisma.$transaction(async (tx: any) => {
-                const address = await tx.address.createOne({
-                    ...body.address,
-                    latitude: resAddress.lat,
-                    longitude: resAddress.lon
-                })
-
-                return await tx.restaurant.createOne({
+            let restaurant
+            if (body.restaurantID) {
+                restaurant = await prisma.restaurant.findByID(body.restaurantID, { id: true })
+                
+                if (!restaurant) {
+                    throw new IError(404, 'Restaurant not found')
+                }
+                
+                restaurant = await prisma.restaurant.updateOne(body.restaurantID, {
                     name: req.body.name,
                     description: req.body.description,
                     bannerURL: req.body.bannerURL,
@@ -167,16 +238,48 @@ export class RestaurantController extends AbstractController {
                     autoApprovedBookingsNum: req.body.autoApprovedBookingsNum,
                     timeFrom: req.body.timeFrom,
                     timeTo: req.body.timeTo,
-                    address: { connect: { id: address.id } }, // existing address
+                    address: {   // nested update
+                        update: {
+                            building: req.body.address.building,
+                            street: req.body.address.street,
+                            city: req.body.address.city,
+                            postcode: req.body.address.postcode,
+                            country: req.body.address.country,
+                            latitude: resAddress.lat,
+                            longitude: resAddress.lon
+                        }
+                    }
+                })
+            } else {
+                restaurant = await prisma.restaurant.createOne({
+                    name: req.body.name,
+                    description: req.body.description,
+                    bannerURL: req.body.bannerURL,
+                    photosURL: req.body.photosURL,
+                    categories: req.body.categories,
+                    autoApprovedBookingsNum: req.body.autoApprovedBookingsNum,
+                    timeFrom: req.body.timeFrom,
+                    timeTo: req.body.timeTo,
+                    address: {   // nested create
+                        create: {
+                            building: req.body.address.building,
+                            street: req.body.address.street,
+                            city: req.body.address.city,
+                            postcode: req.body.address.postcode,
+                            country: req.body.address.country,
+                            latitude: resAddress.lat,
+                            longitude: resAddress.lon
+                        }
+                    },
                     brand: { connect: { id: user.brandID } }
                 })
-            })
+            }
 
             return res.status(200).json({
                 restaurant: {
                     id: restaurant.id
                 },
-                message: 'Restaurant was created successfully.'
+                message: body.restaurantID ? 'Restaurant was updated successfully' : 'Restaurant was created successfully.'
             })
         } catch (err) {
             return next(err)

@@ -4,6 +4,8 @@ import { RestaurantController } from '../../controllers/b2b/v1/RestaurantControl
 import authorizationMiddleware from '../../middlewares/authorizationMiddleware'
 import validationMiddleware from '../../middlewares/validationMiddleware';
 import { PassportStrategy } from '../../utils/enums'
+import permissionMiddleware from "../../middlewares/permissionMiddleware";
+import {AdminRole} from "@prisma/client";
 
 // Init router and controller
 const router = Router()
@@ -15,7 +17,7 @@ export default function restaurantRouter() {
     router.get(
         /*
             #swagger.tags = ['b2b-v1-Restaurant']
-            #swagger.description = '(Not Implemented) Detailed List of restaurants.',
+            #swagger.description = 'Detailed List of restaurants.',
             #swagger.security = [{
                 "bearerAuth": []
             }]
@@ -36,7 +38,7 @@ export default function restaurantRouter() {
     router.put(
         /*
             #swagger.tags = ['b2b-v1-Restaurant']
-            #swagger.description = '(Not Implemented) Create new restaurant.',
+            #swagger.description = 'Create new restaurant.',
             #swagger.security = [{
                 "bearerAuth": []
             }]
@@ -50,6 +52,7 @@ export default function restaurantRouter() {
         */
         '/',
         authorizationMiddleware([PassportStrategy.jwtB2b]),
+        permissionMiddleware([AdminRole.Admin]),
         validationMiddleware(RestaurantController.schemas.request.putRestaurant),
         restaurantController.putRestaurant
     )

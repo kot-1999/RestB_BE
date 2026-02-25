@@ -1,13 +1,13 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 
-import logger from './Logger';
-import AdminQueries from '../database/queries/AdminQueries';
-import BookingQueries from '../database/queries/BookingQueries';
-import BrandQueries from '../database/queries/BrandQueries';
-import DashboardQueries from '../database/queries/DashboardQueries';
-import RestaurantQueries from '../database/queries/RestaurantQueries';
+import logger from './Logger'
+import AddressQueries from '../database/queries/AddressQueries'
+import AdminQueries from '../database/queries/AdminQueries'
+import BookingQueries from '../database/queries/BookingQueries'
+import BrandQueries from '../database/queries/BrandQueries'
+import DashboardQueries from '../database/queries/DashboardQueries'
+import RestaurantQueries from '../database/queries/RestaurantQueries'
 import UserQueries from '../database/queries/UserQueries'
-import AddressQueries from "../database/queries/AddressQueries";
 
 interface Queries {
     user: UserQueries,
