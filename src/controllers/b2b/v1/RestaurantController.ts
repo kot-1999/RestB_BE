@@ -1,7 +1,9 @@
 import { AdminRole, RestaurantCategories } from '@prisma/client';
+import dayjs from 'dayjs';
 import { Response, NextFunction, AuthAdminRequest } from 'express'
 import Joi from 'joi'
 
+import { OpenStreetMapService } from '../../../services/OpenStreetMapService';
 import { AbstractController } from '../../../types/AbstractController'
 import { JoiCommon } from '../../../types/JoiCommon'
 
@@ -17,7 +19,7 @@ export class RestaurantController extends AbstractController {
                         .default(20)
                 }).required()
             }),
-            postRestaurant: JoiCommon.object.request.keys({
+            putRestaurant: JoiCommon.object.request.keys({
                 body: Joi.object({
                     name: JoiCommon.string.name.required(),
 
@@ -26,11 +28,11 @@ export class RestaurantController extends AbstractController {
                         .optional(),
 
                     bannerURL: Joi.string()
+                        .uri()
                         .required(),
 
                     photosURL: Joi.array()
-                        .items(Joi.string()
-                            .required())
+                        .items(Joi.string())
                         .required(),
 
                     categories: Joi.array()
@@ -42,13 +44,25 @@ export class RestaurantController extends AbstractController {
                         .required(),
                     autoApprovedBookingsNum: Joi.number().integer()
                         .default(0),
-                    timeFrom: Joi.date().required(),
+                    timeFrom: JoiCommon.string.time.required(),
 
-                    timeTo: Joi.date()
-                        .greater(Joi.ref('timeFrom'))
+                    timeTo: JoiCommon.string.time
+                        .custom((value, helpers) => {
+                            const { timeFrom } = helpers.state.ancestors[0];
+                            const from = dayjs(timeFrom, 'HH:mm', true);
+                            const to = dayjs(value, 'HH:mm', true);
+                            if (!to.isAfter(from)) {
+                                return helpers.error('any.invalid');
+                            }
+
+                            return value;
+                        }, 'time comparison')
                         .required(),
 
-                    address: JoiCommon.object.address.required()
+                    address: JoiCommon.object.address.keys({
+                        latitude: Joi.forbidden(),
+                        longitude: Joi.forbidden()
+                    }).required()
                 }).required()
             })
         },
@@ -80,7 +94,7 @@ export class RestaurantController extends AbstractController {
 
                 pagination: JoiCommon.object.pagination.required()
             }).required(),
-            postRestaurant: Joi.object({
+            putRestaurant: Joi.object({
                 restaurant: Joi.object({
                     id: JoiCommon.string.id
                 }).required(),
@@ -119,14 +133,17 @@ export class RestaurantController extends AbstractController {
         }
     }
 
-    private PostRestaurantReqType: Joi.extractType<typeof RestaurantController.schemas.request.postRestaurant>
-    private PostRestaurantResType: Joi.extractType<typeof RestaurantController.schemas.response.postRestaurant>
-    public async postRestaurant(
-        req: AuthAdminRequest & typeof this.PostRestaurantReqType,
-        res: Response<typeof this.PostRestaurantResType>,
+    private PutRestaurantReqType: Joi.extractType<typeof RestaurantController.schemas.request.putRestaurant>
+    private PutRestaurantResType: Joi.extractType<typeof RestaurantController.schemas.response.putRestaurant>
+    public async putRestaurant(
+        req: AuthAdminRequest & typeof this.PutRestaurantReqType,
+        res: Response<typeof this.PutRestaurantResType>,
         next: NextFunction
     ) {
         try {
+            const { body: { address } } = req
+            const resAddress = await OpenStreetMapService.searchAddress(address)
+
 
             return res.status(200).json({
                 restaurant: {

@@ -28,12 +28,12 @@ export default function restaurantRouter() {
             }
         */
         '/',
-        validationMiddleware(RestaurantController.schemas.request.getRestaurantList),
         authorizationMiddleware([PassportStrategy.jwtB2b]),
+        validationMiddleware(RestaurantController.schemas.request.getRestaurantList),
         restaurantController.getRestaurantList
     )
 
-    router.post(
+    router.put(
         /*
             #swagger.tags = ['b2b-v1-Restaurant']
             #swagger.description = '(Not Implemented) Create new restaurant.',
@@ -42,16 +42,16 @@ export default function restaurantRouter() {
             }]
             #swagger.parameters['body'] = {
                 in: 'body',
-                schema: { $ref: '#/definitions/b2bV1PostRestaurantReqBody' }
+                schema: { $ref: '#/definitions/b2bV1PutRestaurantReqBody' }
             }
             #swagger.responses[200] = {
-                schema: { "$ref": "#/definitions/b2bV1PostRestaurantRes" },
+                schema: { "$ref": "#/definitions/b2bV1PutRestaurantRes" },
             }
         */
         '/',
-        validationMiddleware(RestaurantController.schemas.request.postRestaurant),
         authorizationMiddleware([PassportStrategy.jwtB2b]),
-        restaurantController.postRestaurant
+        validationMiddleware(RestaurantController.schemas.request.putRestaurant),
+        restaurantController.putRestaurant
     )
 
     return router
