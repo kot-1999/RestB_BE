@@ -1,11 +1,13 @@
-import { AdminRole, RestaurantCategories } from '@prisma/client';
-import dayjs from 'dayjs';
+import { AdminRole, RestaurantCategories } from '@prisma/client'
+import dayjs from 'dayjs'
 import { Response, NextFunction, AuthAdminRequest } from 'express'
 import Joi from 'joi'
 
-import { OpenStreetMapService } from '../../../services/OpenStreetMapService';
+import { OpenStreetMapService } from '../../../services/OpenStreetMapService'
+import prisma from '../../../services/Prisma'
 import { AbstractController } from '../../../types/AbstractController'
 import { JoiCommon } from '../../../types/JoiCommon'
+import { IError } from '../../../utils/IError'
 
 export class RestaurantController extends AbstractController {
     public static readonly schemas = {
@@ -141,15 +143,40 @@ export class RestaurantController extends AbstractController {
         next: NextFunction
     ) {
         try {
-            const { body: { address } } = req
-            const resAddress = await OpenStreetMapService.searchAddress(address)
+            const { body, user } = req
 
+            const resAddress = await OpenStreetMapService.searchAddress(body.address)
+
+            if (!resAddress) {
+                throw new IError(400, 'Provided address was not recognized')
+            }
+
+            const restaurant = await prisma.$transaction(async (tx: any) => {
+                const address = await tx.address.createOne({
+                    ...body.address,
+                    latitude: resAddress.lat,
+                    longitude: resAddress.lon
+                })
+
+                return await tx.restaurant.createOne({
+                    name: req.body.name,
+                    description: req.body.description,
+                    bannerURL: req.body.bannerURL,
+                    photosURL: req.body.photosURL,
+                    categories: req.body.categories,
+                    autoApprovedBookingsNum: req.body.autoApprovedBookingsNum,
+                    timeFrom: req.body.timeFrom,
+                    timeTo: req.body.timeTo,
+                    address: { connect: { id: address.id } }, // existing address
+                    brand: { connect: { id: user.brandID } }
+                })
+            })
 
             return res.status(200).json({
                 restaurant: {
-                    id: 'asd'
+                    id: restaurant.id
                 },
-                message: 'asd'
+                message: 'Restaurant was created successfully.'
             })
         } catch (err) {
             return next(err)
