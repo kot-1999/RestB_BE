@@ -37,7 +37,7 @@ export abstract class BaseQueries<
         select: TSelect | null,
         where: TWhere,
         options = { softDeleted: false }
-    ) {
+    ): Promise<TModel | null> {
         return this.delegate.findFirst({
             select,
             where: {
@@ -60,7 +60,7 @@ export abstract class BaseQueries<
         id: string,
         select: TSelect | null,
         options = { softDeleted: false }
-    ) {
+    ): Promise<TModel | null> {
         return this.delegate.findFirst({
             select,
             where: {
@@ -76,7 +76,7 @@ export abstract class BaseQueries<
      * Creates a new raw in database
      * @param data { TCreate } data for a new record
      * */
-    public createOne(data: TCreate) {
+    public createOne(data: TCreate): Promise<TModel> {
         return this.delegate.create({
             data
         })
@@ -87,7 +87,7 @@ export abstract class BaseQueries<
      * @param id { string } id of raw which should be updated
      * @param data { TUpdate } object with new data
      * */
-    public updateOne(id: string, data: TUpdate & { deletedAt: any; }) {
+    public updateOne(id: string, data: TUpdate & { deletedAt: any; }): Promise<TModel> {
         return this.delegate.update({
             where: { id },
             data
@@ -98,7 +98,7 @@ export abstract class BaseQueries<
      * Soft delete of raw
      * @param id {string} ID of raw which should be soft-deleted
      * */
-    public softDelete(id: string) {
+    public softDelete(id: string): Promise<TModel> {
         return this.delegate.update({
             where: { id },
             data: { deletedAt: dayjs().toISOString() } as TUpdate & { deletedAt: any; }
