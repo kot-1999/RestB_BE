@@ -136,7 +136,7 @@ model Admin {
   // Many-to-many with restaurants
   restaurants RestaurantStaff[]
   brand       Brand?            @relation(fields: [brandID], references: [id])
-  brandID     String?           @unique
+  brandID     String
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -184,7 +184,7 @@ model Brand {
 
   // Foreign Keys
   restaurants Restaurant[]
-  admin       Admin?
+  admin       Admin[]
 
   // Metadata
   createdAt DateTime  @default(now())
