@@ -201,8 +201,8 @@ model Restaurant {
   autoApprovedBookingsNum Int                    @default(0) @db.Int
   bannerURL               String                 @db.Text
   photosURL               Json? // array of image URLs
-  timeFrom                DateTime               @db.Time
-  timeTo                  DateTime               @db.Time
+  timeFrom                String                 @db.Text
+  timeTo                  String                 @db.Text
   categories              Json
   // Foreign Keys
   brand                   Brand                  @relation(fields: [brandID], references: [id])
