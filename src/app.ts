@@ -4,6 +4,8 @@ import * as path from 'node:path'
 import config from 'config'
 import { RedisStore as RedisSessionStore } from 'connect-redis'
 import cors from 'cors'
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 import express from 'express'
 import rateLimit from 'express-rate-limit';
 import session from 'express-session'
@@ -23,6 +25,8 @@ import logger from './services/Logger'
 import redis from './services/Redis'
 import { IConfig } from './types/config'
 import { NodeEnv } from './utils/enums';
+
+dayjs.extend(customParseFormat);
 
 // Configs
 const cookieSessionConfig = config.get<IConfig['cookieSession']>('cookieSession')
