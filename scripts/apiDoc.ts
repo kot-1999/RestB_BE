@@ -62,7 +62,7 @@ const schemas: {[key: string]: {[key: string]: any}} = {
             deleteAdmin: AdminController.schemas,
             // Restaurant
             getRestaurantList: AdminRestaurantController.schemas,
-            postRestaurant: AdminRestaurantController.schemas,
+            putRestaurant: AdminRestaurantController.schemas,
             // Booking
             getBookingList: AdminBookingController.schemas,
             getBookingDetails: AdminBookingController.schemas,
