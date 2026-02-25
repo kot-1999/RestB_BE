@@ -31,7 +31,8 @@ export class JoiCommon {
         email: Joi.string().email()
             .trim()
             .case('lower'),
-        token: Joi.string()
+        token: Joi.string(),
+        time: Joi.string().pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
     }
 
     static readonly number = {
