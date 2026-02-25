@@ -79,7 +79,8 @@ const options: IConfig = {
                 scriptSrc: ["'self'", 'apis.google.com', 'code.jquery.com', 'cdn.jsdelivr.net'],
                 styleSrc: ["'self'", 'fonts.googleapis.com', "'unsafe-inline'"],
                 fontSrc: ["'self'", 'fonts.gstatic.com'],
-                imgSrc: ["'self'", 'lh3.googleusercontent.com', 'https://fastly.picsum.photos', 'https://picsum.photos']
+                imgSrc: ["'self'", 'lh3.googleusercontent.com', 'https://fastly.picsum.photos', 'https://picsum.photos', 'http://localhost:9000'],
+                connectSrc: ["'self'", 'http://localhost:9000']
             }
         }
     },
