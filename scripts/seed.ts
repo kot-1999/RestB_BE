@@ -1,8 +1,9 @@
-import dayjs from 'dayjs';
+import dayjs from 'dayjs'
 
-import prisma from '../src/services/Prisma';
-import AdminGenerator from '../tests/utils/AdminGenerator';
-import UserGenerator from '../tests/utils/UserGenerator';
+import prisma from '../src/services/Prisma'
+import AdminGenerator from '../tests/utils/AdminGenerator'
+import BrandGenerator from '../tests/utils/BrandGenerator'
+import UserGenerator from '../tests/utils/UserGenerator'
 
 const timeFrom = dayjs().subtract(20, 'days')
 const timeTo = dayjs().add(20, 'days')
@@ -10,21 +11,39 @@ const timeTo = dayjs().add(20, 'days')
 const seedGrain = 10
 
 async function seed() {
-    const users = [];
-    const admins = [];
-
+    const userData = [];
+    const adminData = [];
+    const brandData = []
     // Generate plain objects
     for (let i = 0; i < seedGrain; i++) {
-        users.push(UserGenerator.generateData({ password: 'TestUser.123' }));
-        admins.push(AdminGenerator.generateData({ password: 'TestAdmin.123' }));
+        userData.push(UserGenerator.generateData({
+            password: 'test123',
+            email: `user${i.toString()}@gmail.com` 
+        }));
+        adminData.push(AdminGenerator.generateData({
+            password: 'test123',
+            email: `admin${i.toString()}@gmail.com`  
+        }));
+        brandData.push(BrandGenerator.generateData())
     }
 
     const promises: Promise<any>[] = [];
     const seededTables: string[] = [];
 
+    let brands: any[]
+    if ((await prisma.brand.count()) === 0) {
+        brands = await prisma.brand.createMany({
+            data: brandData,
+            skipDuplicates: true
+        });
+        seededTables.push('brands');
+    } else {
+        brands = await prisma.brand.findMany()
+    }
+
     if ((await prisma.user.count()) === 0) {
         promises.push(prisma.user.createMany({
-            data: users,
+            data: userData,
             skipDuplicates: true
         }));
         seededTables.push('users');
@@ -32,7 +51,12 @@ async function seed() {
 
     if ((await prisma.admin.count()) === 0) {
         promises.push(prisma.admin.createMany({
-            data: admins,
+            data: adminData.map((value, index) => {
+                return {
+                    ...value,
+                    brandID: brands[index].id
+                }
+            }),
             skipDuplicates: true
         }));
         seededTables.push('admins');
