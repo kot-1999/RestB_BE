@@ -3,7 +3,6 @@ import { Decimal } from '@prisma/client/runtime/library';
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
-import { EncryptionService } from '../src/services/Encryption';
 import prisma from '../src/services/Prisma'
 import AddressGenerator from '../tests/utils/AddressGenerator';
 import AdminGenerator from '../tests/utils/AdminGenerator'
@@ -11,6 +10,7 @@ import BookingGenerator from '../tests/utils/BookingGenerator';
 import BrandGenerator from '../tests/utils/BrandGenerator'
 import RestaurantGenerator from '../tests/utils/RestaurantGenerator';
 import UserGenerator from '../tests/utils/UserGenerator'
+import crypto from "crypto-js";
 
 const timeFrom = dayjs().subtract(20, 'days')
 const timeTo = dayjs().add(20, 'days')
@@ -43,7 +43,7 @@ async function seed() {
         }))
         userData.push(UserGenerator.generateData({
             id: faker.string.uuid(),
-            password: EncryptionService.hashSHA256('test123'),
+            password: crypto.SHA256('test123').toString(),
             email: `user${i.toString()}@gmail.com` 
         }))
         addressData.push(AddressGenerator.generateData({
@@ -58,7 +58,7 @@ async function seed() {
         }))
         adminData.push(AdminGenerator.generateData({
             id: faker.string.uuid(),
-            password: EncryptionService.hashSHA256('test123'),
+            password: crypto.SHA256('test123').toString(),
             email: `admin${i.toString()}@gmail.com`,
             brandID: brandData[i].id
         }))
