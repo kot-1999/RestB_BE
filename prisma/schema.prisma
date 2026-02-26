@@ -23,6 +23,7 @@ enum BookingStatus {
   Confirmed
   Cancelled
   Completed
+  Approved
   Deleted
 }
 
@@ -136,7 +137,7 @@ model Admin {
   // Many-to-many with restaurants
   restaurants RestaurantStaff[]
   brand       Brand?            @relation(fields: [brandID], references: [id])
-  brandID     String?           @unique
+  brandID     String
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -184,7 +185,7 @@ model Brand {
 
   // Foreign Keys
   restaurants Restaurant[]
-  admin       Admin?
+  admin       Admin[]
 
   // Metadata
   createdAt DateTime  @default(now())
@@ -201,8 +202,8 @@ model Restaurant {
   autoApprovedBookingsNum Int                    @default(0) @db.Int
   bannerURL               String                 @db.Text
   photosURL               Json? // array of image URLs
-  timeFrom                DateTime               @db.Time
-  timeTo                  DateTime               @db.Time
+  timeFrom                String                 @db.Text
+  timeTo                  String                 @db.Text
   categories              Json
   // Foreign Keys
   brand                   Brand                  @relation(fields: [brandID], references: [id])

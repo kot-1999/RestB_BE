@@ -19,19 +19,26 @@ const discussionItem = Joi.object({
         .required()
 })
 
+const time = Joi.string().pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
+
 export class JoiCommon {
     static readonly string = {
         id: Joi.string().uuid()
             .required(),
-        name: Joi.string().trim()
-            .alphanum()
-            .allow('\'', '-')
+        name: Joi.string()
+            .trim()
+            .pattern(/^[a-zA-Z0-9\s'&.,-]+$/)
             .min(Constants.number.MIN_NAME_LENGTH)
-            .max(Constants.number.MAX_STRING_LENGTH),
+            .max(Constants.number.MAX_STRING_LENGTH)
+            .required(),
+        companyName: Joi.string().min(5)
+            .max(200)
+            .required(),
         email: Joi.string().email()
             .trim()
             .case('lower'),
-        token: Joi.string()
+        token: Joi.string(),
+        time
     }
 
     static readonly number = {
@@ -48,7 +55,7 @@ export class JoiCommon {
 
         restaurant: Joi.object({
             id: JoiCommon.string.id,
-            name: JoiCommon.string.name.required(),
+            name: JoiCommon.string.companyName.required(),
             description: Joi.string().min(20)
                 .optional(),
             bannerURL: Joi.string()
@@ -58,15 +65,18 @@ export class JoiCommon {
                     .string()
                     .required())
                 .required(),
-            timeFrom: Joi.date().required(),
-            timeTo: Joi.date().greater(Joi.ref('timeFrom'))
+            timeFrom: time.required(),
+            timeTo: time.required(),
+            autoApprovedBookingsNum: Joi.number().integer()
                 .required(),
-            categories: Joi.string().valid(...Object.values(RestaurantCategories))
+            categories: Joi.array()
+                .items(Joi.string().valid(...Object.values(RestaurantCategories)))
+                .required()
         }),
 
         brand: Joi.object({
             id: JoiCommon.string.id,
-            name: JoiCommon.string.name.required(),
+            name: JoiCommon.string.companyName.required(),
             logoURL: Joi.string().optional()
         }),
 

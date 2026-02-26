@@ -70,7 +70,7 @@ export class BookingController extends AbstractController {
             getBookingDetails: Joi.object({
                 restaurant: Joi.object({
                     id: JoiCommon.string.id,
-                    name: JoiCommon.string.name.required(),
+                    name: JoiCommon.string.companyName.required(),
                     bannerURL: Joi.string().uri()
                         .required(),
                     address: JoiCommon.object.address.required(),
@@ -111,7 +111,7 @@ export class BookingController extends AbstractController {
                 restaurants: Joi.array()
                     .items(Joi.object({
                         id: JoiCommon.string.id,
-                        name: JoiCommon.string.name.required(),
+                        name: JoiCommon.string.companyName.required(),
                         bannerURL: Joi.string().uri()
                             .required(),
                         address: JoiCommon.object.address.required(),

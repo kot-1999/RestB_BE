@@ -13,7 +13,7 @@ export class BrandController extends AbstractController {
                 }).required(),
 
                 body: Joi.object({
-                    name: JoiCommon.string.name.optional(),
+                    name: JoiCommon.string.companyName.optional(),
 
                     logoURL: Joi.string()
                         .allow(null, undefined)
