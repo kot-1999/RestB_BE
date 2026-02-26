@@ -61,7 +61,7 @@ export class RestaurantController extends AbstractController {
                         autoConfirmGuestsLimit: Joi.number().integer()
                             .required() // How many more gusts can be confirmed automatically
                     }).required()
-                }).required())
+                }))
                     .min(0)
                     .required(),
                 pagination: JoiCommon.object.pagination.required()
@@ -134,7 +134,7 @@ export class RestaurantController extends AbstractController {
 
             return res.status(200).json({
                 ...restaurant,
-                booking: {
+                availability: {
                     autoConfirmGuestsLimit: restaurant.autoApprovedBookingsNum - booking._sum.guestsNumber,
                     date: query.date
                 }
@@ -250,20 +250,6 @@ export class RestaurantController extends AbstractController {
                                 latitude: true,
                                 longitude: true
                             }
-                        },
-                        staff: {
-                            select: {
-                                adminID: true,
-                                admin: {
-                                    select: {
-                                        id: true,
-                                        firstName: true,
-                                        lastName: true,
-                                        email: true,
-                                        role: true
-                                    }
-                                }
-                            }
                         }
                     },
                     orderBy: {
@@ -296,8 +282,8 @@ export class RestaurantController extends AbstractController {
                         availability: {
                             autoConfirmGuestsLimit: 
                                 bookingSum
-                                    ? restaurant.autoConfirmGuestsLimit - bookingSum._sum.guestsNumber 
-                                    : restaurant.autoConfirmGuestsLimit,
+                                    ? restaurant.autoApprovedBookingsNum - bookingSum._sum.guestsNumber
+                                    : restaurant.autoApprovedBookingsNum,
                             date: query.date
                         }
                     }

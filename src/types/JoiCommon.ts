@@ -28,6 +28,9 @@ export class JoiCommon {
             .allow('\'', '-')
             .min(Constants.number.MIN_NAME_LENGTH)
             .max(Constants.number.MAX_STRING_LENGTH),
+        companyName: Joi.string().min(5)
+            .max(200)
+            .required(),
         email: Joi.string().email()
             .trim()
             .case('lower'),
@@ -49,7 +52,7 @@ export class JoiCommon {
 
         restaurant: Joi.object({
             id: JoiCommon.string.id,
-            name: JoiCommon.string.name.required(),
+            name: JoiCommon.string.companyName.required(),
             description: Joi.string().min(20)
                 .optional(),
             bannerURL: Joi.string()
@@ -64,12 +67,14 @@ export class JoiCommon {
                 .required(),
             autoApprovedBookingsNum: Joi.number().integer()
                 .required(),
-            categories: Joi.string().valid(...Object.values(RestaurantCategories))
+            categories: Joi.array()
+                .items(Joi.string().valid(...Object.values(RestaurantCategories)))
+                .required()
         }),
 
         brand: Joi.object({
             id: JoiCommon.string.id,
-            name: JoiCommon.string.name.required(),
+            name: JoiCommon.string.companyName.required(),
             logoURL: Joi.string().optional()
         }),
 
