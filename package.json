@@ -15,7 +15,7 @@
     "local:dev": "cross-env DOTENV_CONFIG_PATH=.env.local.dev bash -c \"npm run local:prestart:dev && nodemon --watch src -L --verbose --exec 'node -r dotenv/config -r ts-node/register src/index.ts'\"",
     "local:test": "cross-env DOTENV_CONFIG_PATH=.env.local.test bash -c \"npm run local:prestart:test && mocha -r dotenv/config -r ts-node/register --config .mocharc.js\"",
     "local:prestart:dev": "npx prisma generate && MYSQL_URL=mysql://admin:mysql@localhost:3306/development npx prisma db push && npm run apidoc",
-    "local:prestart:test": "npx prisma generate && MYSQL_URL=mysql://test:test@localhost:3307/test npx prisma db push && npm run apidoc",
+    "local:prestart:test": "npx prisma generate && MYSQL_URL=mysql://test:test@localhost:3307/test npx prisma db push",
     "type:check": "tsc --project tsconfig.json --noEmit",
     "db:pull": "npx prisma db pull",
     "db:push": "npx prisma db push",

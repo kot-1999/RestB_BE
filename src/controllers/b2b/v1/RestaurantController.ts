@@ -24,7 +24,7 @@ export class RestaurantController extends AbstractController {
             putRestaurant: JoiCommon.object.request.keys({
                 body: Joi.object({
                     restaurantID: Joi.string().optional(),
-                    name: JoiCommon.string.name.required(),
+                    name: JoiCommon.string.companyName.required(),
 
                     description: Joi.string()
                         .min(20)

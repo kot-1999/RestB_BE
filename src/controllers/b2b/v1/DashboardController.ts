@@ -31,7 +31,7 @@ export class DashboardController extends AbstractController {
                     .items(Joi.object({
                         restaurant: Joi.object({
                             id: JoiCommon.string.id,
-                            name: JoiCommon.string.name.required()
+                            name: JoiCommon.string.companyName.required()
                         }).required(),
 
                         summaries: Joi.array()

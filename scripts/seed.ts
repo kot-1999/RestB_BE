@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { Decimal } from '@prisma/client/runtime/library';
 import dayjs from 'dayjs'
 
+import { EncryptionService } from '../src/services/Encryption';
 import prisma from '../src/services/Prisma'
 import AddressGenerator from '../tests/utils/AddressGenerator';
 import AdminGenerator from '../tests/utils/AdminGenerator'
@@ -9,7 +10,6 @@ import BookingGenerator from '../tests/utils/BookingGenerator';
 import BrandGenerator from '../tests/utils/BrandGenerator'
 import RestaurantGenerator from '../tests/utils/RestaurantGenerator';
 import UserGenerator from '../tests/utils/UserGenerator'
-import {EncryptionService} from "../src/services/Encryption";
 
 const timeFrom = dayjs().subtract(20, 'days')
 const timeTo = dayjs().add(20, 'days')
