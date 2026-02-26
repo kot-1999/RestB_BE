@@ -19,15 +19,18 @@ const discussionItem = Joi.object({
         .required()
 })
 
+const time = Joi.string().pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
+
 export class JoiCommon {
     static readonly string = {
         id: Joi.string().uuid()
             .required(),
-        name: Joi.string().trim()
-            .alphanum()
-            .allow('\'', '-')
+        name: Joi.string()
+            .trim()
+            .pattern(/^[a-zA-Z0-9\s'&.,-]+$/)
             .min(Constants.number.MIN_NAME_LENGTH)
-            .max(Constants.number.MAX_STRING_LENGTH),
+            .max(Constants.number.MAX_STRING_LENGTH)
+            .required(),
         companyName: Joi.string().min(5)
             .max(200)
             .required(),
@@ -35,7 +38,7 @@ export class JoiCommon {
             .trim()
             .case('lower'),
         token: Joi.string(),
-        time: Joi.string().pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
+        time
     }
 
     static readonly number = {
@@ -62,9 +65,8 @@ export class JoiCommon {
                     .string()
                     .required())
                 .required(),
-            timeFrom: Joi.date().required(),
-            timeTo: Joi.date().greater(Joi.ref('timeFrom'))
-                .required(),
+            timeFrom: time.required(),
+            timeTo: time.required(),
             autoApprovedBookingsNum: Joi.number().integer()
                 .required(),
             categories: Joi.array()
