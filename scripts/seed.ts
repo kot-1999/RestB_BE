@@ -1,71 +1,144 @@
+import { faker } from '@faker-js/faker';
+import { Decimal } from '@prisma/client/runtime/library';
 import dayjs from 'dayjs'
 
 import prisma from '../src/services/Prisma'
+import AddressGenerator from '../tests/utils/AddressGenerator';
 import AdminGenerator from '../tests/utils/AdminGenerator'
+import BookingGenerator from '../tests/utils/BookingGenerator';
 import BrandGenerator from '../tests/utils/BrandGenerator'
+import RestaurantGenerator from '../tests/utils/RestaurantGenerator';
 import UserGenerator from '../tests/utils/UserGenerator'
 
 const timeFrom = dayjs().subtract(20, 'days')
 const timeTo = dayjs().add(20, 'days')
 
-const seedGrain = 10
+// London coordinates and sub areas
+const GEO_BOX = {
+    minLat: 51.00,
+    maxLat: 52.00,
+    minLng: -1.00,
+    maxLng: 1.00
+};
+
+const GRAIN = 10
 
 async function seed() {
-    const userData = [];
-    const adminData = [];
-    const brandData = []
+    const userData: any[] = []
+    const adminData: any[] = []
+    const brandData: any[] = []
+
+    const addressData: any[] = []
+    const restaurantData: any[] = []
+    const bookingData: any[] = []
+
     // Generate plain objects
-    for (let i = 0; i < seedGrain; i++) {
+    // NOTE: Same order is used in creation
+    for (let i = 0; i < GRAIN; i++) {
+        brandData.push(BrandGenerator.generateData({
+            id: faker.string.uuid()
+        }))
         userData.push(UserGenerator.generateData({
+            id: faker.string.uuid(),
             password: 'test123',
             email: `user${i.toString()}@gmail.com` 
-        }));
+        }))
+        addressData.push(AddressGenerator.generateData({
+            longitude: new Decimal(faker.number.float({
+                min: GEO_BOX.minLng,
+                max: GEO_BOX.maxLng
+            })),
+            latitude: new Decimal(faker.number.float({
+                min: GEO_BOX.minLng,
+                max: GEO_BOX.maxLng
+            }))
+        }))
         adminData.push(AdminGenerator.generateData({
+            id: faker.string.uuid(),
             password: 'test123',
-            email: `admin${i.toString()}@gmail.com`  
-        }));
-        brandData.push(BrandGenerator.generateData())
+            email: `admin${i.toString()}@gmail.com`,
+            brandID: brandData[i].id
+        }))
+        restaurantData.push(RestaurantGenerator.generateData({
+            id: faker.string.uuid(),
+            name: `${i.toString()} ${faker.food.dish()} ${faker.helpers.arrayElement(['House', 'Restaurant', 'Kitchen', 'Bistro', 'Grill', 'Cafe'])}`,
+            addressID: addressData[i].id,
+            brandID: brandData[i].id
+        }))
+        bookingData.push(BookingGenerator.generateData({
+            id: faker.string.uuid(),
+            restaurantID: restaurantData[i].id,
+            userID: userData[i].id,
+            bookingTime: dayjs(faker.date.between({
+                from: timeFrom.toISOString(),
+                to: timeTo.toISOString()
+            })).toDate()
+        }))
     }
+    await prisma.$transaction(async (tx: any) => {
+        // Promises here
+        // let promises: Promise<any>[] = [];
+        const seededTables: string[] = [];
 
-    const promises: Promise<any>[] = [];
-    const seededTables: string[] = [];
+        if ((await tx.brand.count()) === 0) {
+            await tx.brand.createMany({
+                data: brandData,
+                skipDuplicates: true
+            });
+            seededTables.push('brands');
+        }
 
-    let brands: any[]
-    if ((await prisma.brand.count()) === 0) {
-        brands = await prisma.brand.createMany({
-            data: brandData,
-            skipDuplicates: true
-        });
-        seededTables.push('brands');
-    } else {
-        brands = await prisma.brand.findMany()
-    }
+        if ((await tx.user.count()) === 0) {
+            await tx.user.createMany({
+                data: userData,
+                skipDuplicates: true
+            });
+            seededTables.push('users');
+        }
 
-    if ((await prisma.user.count()) === 0) {
-        promises.push(prisma.user.createMany({
-            data: userData,
-            skipDuplicates: true
-        }));
-        seededTables.push('users');
-    }
+        if ((await tx.address.count()) === 0) {
+            await tx.address.createMany({
+                data: addressData,
+                skipDuplicates: true
+            });
+            seededTables.push('addresses');
+        }
 
-    if ((await prisma.admin.count()) === 0) {
-        promises.push(prisma.admin.createMany({
-            data: adminData.map((value, index) => {
-                return {
-                    ...value,
-                    brandID: brands[index].id
-                }
-            }),
-            skipDuplicates: true
-        }));
-        seededTables.push('admins');
-    }
-    
-    await Promise.all(promises);
+        // await Promise.all(promises);
+        // promises = []
 
-    // eslint-disable-next-line
-    console.info(`Database was seeded with ${seededTables.length} table(s)${seededTables.length > 0 ? ': ' + seededTables.join(', ') : '.'}`);
+        if ((await tx.admin.count()) === 0) {
+            await tx.admin.createMany({
+                data: adminData,
+                skipDuplicates: true
+            });
+            seededTables.push('admins');
+        }
+
+        if ((await tx.restaurant.count()) === 0) {
+            await tx.restaurant.createMany({
+                data: restaurantData,
+                skipDuplicates: true
+
+            });
+            seededTables.push('restaurants');
+        }
+
+        if ((await tx.booking.count()) === 0) {
+            await tx.booking.createMany({
+                data: bookingData,
+                skipDuplicates: true
+
+            });
+            seededTables.push('bookings');
+        }
+
+        // await Promise.all(promises);
+
+        // eslint-disable-next-line
+        console.info(`Database was seeded with ${seededTables.length} table(s)${seededTables.length > 0 ? ': ' + seededTables.join(', ') : '.'}`);
+    })
+
 }
 
 seed().catch((error) => {

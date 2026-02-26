@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { Address } from '@prisma/client'
-import dayjs from 'dayjs'
 import { Decimal } from '@prisma/client/runtime/library'
+import dayjs from 'dayjs'
 
 import prisma from '../../src/services/Prisma'
 

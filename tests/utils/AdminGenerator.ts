@@ -17,7 +17,7 @@ export default class AdminGenerator {
             lastName: adminData.lastName ?? faker.person.lastName(),
             email: adminData.email ?? faker.internet.email(),
             emailVerified: adminData.emailVerified ?? false,
-            brandID: adminData.brandID ?? null,
+            brandID: adminData.brandID ?? faker.string.uuid(),
             avatarURL: adminData.avatarURL ?? null,
             phone: adminData.phone ?? faker.phone.number({ style: 'international' }),
             password: adminData.password ?? EncryptionService.hashSHA256(faker.internet.password()),
