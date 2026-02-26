@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Router } from 'express'
 
 import { RestaurantController } from '../../controllers/b2c/v1/RestaurantController';
@@ -13,7 +12,7 @@ export default function restaurantRouter() {
     router.get(
         /*
             #swagger.tags = ['b2c-v1-Restaurant']
-            #swagger.description = '(Not Implemented) Get Restaurant details',
+            #swagger.description = 'Get Restaurant details',
             #swagger.parameters['body'] = {
                 in: 'body',
                 schema: { $ref: '#/definitions/b2cV1GetRestaurantReqBody' }
