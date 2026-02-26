@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { Decimal } from '@prisma/client/runtime/library';
 import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 import { EncryptionService } from '../src/services/Encryption';
 import prisma from '../src/services/Prisma'
@@ -13,6 +14,7 @@ import UserGenerator from '../tests/utils/UserGenerator'
 
 const timeFrom = dayjs().subtract(20, 'days')
 const timeTo = dayjs().add(20, 'days')
+dayjs.extend(customParseFormat);
 
 // London coordinates and sub areas
 const GEO_BOX = {

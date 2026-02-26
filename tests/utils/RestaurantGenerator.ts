@@ -30,7 +30,7 @@ export default class RestaurantGenerator {
                 to: dayjs().startOf('day')
                     .add(10, 'hour')
                     .toDate()
-            })).format('HH.mm'),
+            })).format('HH:mm'),
             autoApprovedBookingsNum: restaurantData.autoApprovedBookingsNum ?? 0,
             categories: restaurantData.categories ?? allCategories.sort(() => 0.5 - Math.random()).slice(0, 5),
             timeTo: restaurantData.timeTo ?? restaurantData.timeFrom ?? dayjs(faker.date.between({
@@ -40,7 +40,7 @@ export default class RestaurantGenerator {
                 to: dayjs().startOf('day')
                     .add(22, 'hour')
                     .toDate()
-            })).format('HH.mm'),
+            })).format('HH:mm'),
             brandID: restaurantData.brandID ?? faker.string.uuid(),
             addressID: restaurantData.addressID ?? faker.string.uuid(),
             createdAt: restaurantData.createdAt as Date ?? new Date(dayjs().toISOString()),

@@ -1,12 +1,12 @@
-import {Restaurant, RestaurantCategories} from '@prisma/client';
+import { faker } from '@faker-js/faker'
+import { Restaurant, RestaurantCategories } from '@prisma/client'
 import { expect } from 'chai'
-import dayjs from 'dayjs';
+import dayjs from 'dayjs'
 import supertest from 'supertest'
 
 import app from '../../../../../src/app'
 import { RestaurantController as UserRestaurantController } from '../../../../../src/controllers/b2c/v1/RestaurantController';
-import prisma from "../../../../../src/services/Prisma";
-import {faker} from "@faker-js/faker";
+import prisma from '../../../../../src/services/Prisma'
 
 const endpoint = (val: string = '') => '/api/b2c/v1/restaurant/' + val
 

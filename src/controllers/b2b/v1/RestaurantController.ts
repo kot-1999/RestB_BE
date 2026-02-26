@@ -88,10 +88,10 @@ export class RestaurantController extends AbstractController {
                                 role: Joi.string()
                                     .valid(...Object.values(AdminRole))
                                     .required()
-                            }).required())
+                            }))
                             .min(0)
                             .required()
-                    }).required())
+                    }))
                     .min(0)
                     .required(),
 
@@ -222,9 +222,10 @@ export class RestaurantController extends AbstractController {
             }
 
             let restaurant
+
             if (body.restaurantID) {
                 restaurant = await prisma.restaurant.findByID(body.restaurantID, { id: true })
-                
+
                 if (!restaurant) {
                     throw new IError(404, 'Restaurant not found')
                 }
