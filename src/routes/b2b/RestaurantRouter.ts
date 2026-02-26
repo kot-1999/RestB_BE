@@ -1,7 +1,9 @@
+import { AdminRole } from '@prisma/client';
 import { Router } from 'express'
 
 import { RestaurantController } from '../../controllers/b2b/v1/RestaurantController';
 import authorizationMiddleware from '../../middlewares/authorizationMiddleware'
+import permissionMiddleware from '../../middlewares/permissionMiddleware';
 import validationMiddleware from '../../middlewares/validationMiddleware';
 import { PassportStrategy } from '../../utils/enums'
 
@@ -15,7 +17,7 @@ export default function restaurantRouter() {
     router.get(
         /*
             #swagger.tags = ['b2b-v1-Restaurant']
-            #swagger.description = '(Not Implemented) Detailed List of restaurants.',
+            #swagger.description = 'Detailed List of restaurants.',
             #swagger.security = [{
                 "bearerAuth": []
             }]
@@ -28,30 +30,31 @@ export default function restaurantRouter() {
             }
         */
         '/',
-        validationMiddleware(RestaurantController.schemas.request.getRestaurantList),
         authorizationMiddleware([PassportStrategy.jwtB2b]),
+        validationMiddleware(RestaurantController.schemas.request.getRestaurantList),
         restaurantController.getRestaurantList
     )
 
-    router.post(
+    router.put(
         /*
             #swagger.tags = ['b2b-v1-Restaurant']
-            #swagger.description = '(Not Implemented) Create new restaurant.',
+            #swagger.description = 'Create new restaurant.',
             #swagger.security = [{
                 "bearerAuth": []
             }]
             #swagger.parameters['body'] = {
                 in: 'body',
-                schema: { $ref: '#/definitions/b2bV1PostRestaurantReqBody' }
+                schema: { $ref: '#/definitions/b2bV1PutRestaurantReqBody' }
             }
             #swagger.responses[200] = {
-                schema: { "$ref": "#/definitions/b2bV1PostRestaurantRes" },
+                schema: { "$ref": "#/definitions/b2bV1PutRestaurantRes" },
             }
         */
         '/',
-        validationMiddleware(RestaurantController.schemas.request.postRestaurant),
         authorizationMiddleware([PassportStrategy.jwtB2b]),
-        restaurantController.postRestaurant
+        permissionMiddleware([AdminRole.Admin]),
+        validationMiddleware(RestaurantController.schemas.request.putRestaurant),
+        restaurantController.putRestaurant
     )
 
     return router

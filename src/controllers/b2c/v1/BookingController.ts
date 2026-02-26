@@ -51,7 +51,7 @@ export class BookingController extends AbstractController {
                 bookings: Joi.array().items(JoiCommon.object.booking.keys({
                     restaurant: Joi.object({
                         id: JoiCommon.string.id,
-                        name: JoiCommon.string.name.required(),
+                        name: JoiCommon.string.companyName.required(),
                         description: Joi.string().min(20)
                             .optional(),
                         bannerURL: Joi.string().uri()

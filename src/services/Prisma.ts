@@ -1,11 +1,12 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 
-import logger from './Logger';
-import AdminQueries from '../database/queries/AdminQueries';
-import BookingQueries from '../database/queries/BookingQueries';
-import BrandQueries from '../database/queries/BrandQueries';
-import DashboardQueries from '../database/queries/DashboardQueries';
-import RestaurantQueries from '../database/queries/RestaurantQueries';
+import logger from './Logger'
+import AddressQueries from '../database/queries/AddressQueries'
+import AdminQueries from '../database/queries/AdminQueries'
+import BookingQueries from '../database/queries/BookingQueries'
+import BrandQueries from '../database/queries/BrandQueries'
+import DashboardQueries from '../database/queries/DashboardQueries'
+import RestaurantQueries from '../database/queries/RestaurantQueries'
 import UserQueries from '../database/queries/UserQueries'
 
 interface Queries {
@@ -15,6 +16,7 @@ interface Queries {
     brand: BrandQueries,
     restaurant: RestaurantQueries,
     dashboard: DashboardQueries
+    address: AddressQueries
 }
 
 class PrismaService {
@@ -88,6 +90,13 @@ class PrismaService {
                     createOne: queries.restaurant.createOne,
                     updateOne: queries.restaurant.updateOne
                 },
+                address: {
+                    findOne: queries.address.findOne,
+                    softDelete: queries.address.softDelete,
+                    findByID: queries.address.findByID,
+                    createOne: queries.address.createOne,
+                    updateOne: queries.address.updateOne
+                },
                 dashboard: {
 
                 }
@@ -111,7 +120,8 @@ prismaService.attachQueries({
     booking: new BookingQueries(baseClient),
     brand: new BrandQueries(baseClient),
     dashboard: new DashboardQueries(),
-    restaurant: new RestaurantQueries(baseClient)
+    restaurant: new RestaurantQueries(baseClient),
+    address: new AddressQueries(baseClient)
 })
 
 const prisma = prismaService.getPrismaClient()
