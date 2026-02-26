@@ -1,6 +1,6 @@
 import { BookingStatus, Prisma, Restaurant, RestaurantCategories } from '@prisma/client';
 import dayjs from 'dayjs';
-import {Response, NextFunction, Request} from 'express'
+import { Response, NextFunction, Request } from 'express'
 import Joi from 'joi'
 
 import { OpenStreetMapService } from '../../../services/OpenStreetMapService';
