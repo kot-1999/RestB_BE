@@ -1,11 +1,11 @@
+import { AdminRole } from '@prisma/client';
 import { Router } from 'express'
 
 import { RestaurantController } from '../../controllers/b2b/v1/RestaurantController';
 import authorizationMiddleware from '../../middlewares/authorizationMiddleware'
+import permissionMiddleware from '../../middlewares/permissionMiddleware';
 import validationMiddleware from '../../middlewares/validationMiddleware';
 import { PassportStrategy } from '../../utils/enums'
-import permissionMiddleware from "../../middlewares/permissionMiddleware";
-import {AdminRole} from "@prisma/client";
 
 // Init router and controller
 const router = Router()

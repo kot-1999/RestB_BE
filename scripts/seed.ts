@@ -17,11 +17,11 @@ const timeTo = dayjs().add(20, 'days')
 const GEO_BOX = {
     minLat: 51.00,
     maxLat: 52.00,
-    minLng: -1.00,
-    maxLng: 1.00
+    minLng: -0.7,
+    maxLng: 0.7
 };
 
-const GRAIN = 100
+const GRAIN = 500
 
 async function seed() {
     const userData: any[] = []
@@ -49,8 +49,8 @@ async function seed() {
                 max: GEO_BOX.maxLng
             })),
             latitude: new Decimal(faker.number.float({
-                min: GEO_BOX.minLng,
-                max: GEO_BOX.maxLng
+                min: GEO_BOX.minLat,
+                max: GEO_BOX.maxLat
             }))
         }))
         adminData.push(AdminGenerator.generateData({
