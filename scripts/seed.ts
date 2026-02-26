@@ -21,7 +21,7 @@ const GEO_BOX = {
     maxLng: 1.00
 };
 
-const GRAIN = 10
+const GRAIN = 100
 
 async function seed() {
     const userData: any[] = []
@@ -75,6 +75,7 @@ async function seed() {
             })).toDate()
         }))
     }
+
     await prisma.$transaction(async (tx: any) => {
         // Promises here
         // let promises: Promise<any>[] = [];
