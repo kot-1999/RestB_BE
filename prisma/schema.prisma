@@ -23,6 +23,7 @@ enum BookingStatus {
   Confirmed
   Cancelled
   Completed
+  Approved
   Deleted
 }
 

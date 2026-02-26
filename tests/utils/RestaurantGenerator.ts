@@ -16,6 +16,7 @@ export default class RestaurantGenerator {
     }
 
     public static generateData(restaurantData: Partial<Restaurant> = {}): Restaurant {
+        const allCategories = Object.values(RestaurantCategories)
         return {
             id: restaurantData.id ?? faker.string.uuid(),
             name: restaurantData.name ?? faker.company.name(),
@@ -31,7 +32,7 @@ export default class RestaurantGenerator {
                     .toDate()
             })).format('HH.mm'),
             autoApprovedBookingsNum: restaurantData.autoApprovedBookingsNum ?? 0,
-            categories: restaurantData.categories ?? [RestaurantCategories.BBQ],
+            categories: restaurantData.categories ?? allCategories.sort(() => 0.5 - Math.random()).slice(0, 5),
             timeTo: restaurantData.timeTo ?? restaurantData.timeFrom ?? dayjs(faker.date.between({
                 from: dayjs().startOf('day')
                     .add(14, 'hour')
