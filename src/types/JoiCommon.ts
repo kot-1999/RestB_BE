@@ -62,6 +62,8 @@ export class JoiCommon {
             timeFrom: Joi.date().required(),
             timeTo: Joi.date().greater(Joi.ref('timeFrom'))
                 .required(),
+            autoApprovedBookingsNum: Joi.number().integer()
+                .required(),
             categories: Joi.string().valid(...Object.values(RestaurantCategories))
         }),
 
