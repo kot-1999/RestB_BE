@@ -4,6 +4,7 @@ import adminAuthorizationRouter from './b2b/AdminAuthorizationRouter'
 import adminRouter from './b2b/AdminRouter'
 import adminBookingRouter from './b2b/BookingRouter'
 import dashboardRouter from './b2b/DashboardRouter'
+import brandRouter from './b2b/BrandRouter'
 import adminRestaurantRouter from './b2b/RestaurantRouter'
 import userBookingRouter from './b2c/BookingRouter'
 import userRestaurantRouter from './b2c/RestaurantRouter'
@@ -25,6 +26,7 @@ export default function authorizeRouters() {
     router.use('/b2b/v1/restaurant', adminRestaurantRouter())
     router.use('/b2b/v1/booking', adminBookingRouter())
     router.use('/b2b/v1/dashboard', dashboardRouter())
+    router.use('/b2b/v1/brand', brandRouter())
     // B2C
     router.use('/b2c/v1/authorization',userAuthorizationRouter())
     router.use('/b2c/v1/user', userRouter())
