@@ -1,5 +1,7 @@
 import { faker } from '@faker-js/faker';
+import { BookingStatus } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
+import crypto from 'crypto-js';
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
@@ -10,7 +12,6 @@ import BookingGenerator from '../tests/utils/BookingGenerator';
 import BrandGenerator from '../tests/utils/BrandGenerator'
 import RestaurantGenerator from '../tests/utils/RestaurantGenerator';
 import UserGenerator from '../tests/utils/UserGenerator'
-import crypto from "crypto-js";
 
 const timeFrom = dayjs().subtract(20, 'days')
 const timeTo = dayjs().add(20, 'days')
@@ -68,15 +69,31 @@ async function seed() {
             addressID: addressData[i].id,
             brandID: brandData[i].id
         }))
-        bookingData.push(BookingGenerator.generateData({
-            id: faker.string.uuid(),
-            restaurantID: restaurantData[i].id,
-            userID: userData[i].id,
-            bookingTime: dayjs(faker.date.between({
+
+        for (let bi = 0; bi < (GRAIN / 25) + 1; bi++) {
+            const bookingTime = dayjs(faker.date.between({
                 from: timeFrom.toISOString(),
                 to: timeTo.toISOString()
-            })).toDate()
-        }))
+            }))
+
+            const before = [BookingStatus.Completed, BookingStatus.Cancelled, BookingStatus.NoShow]
+            const after = [BookingStatus.Approved, BookingStatus.Cancelled, BookingStatus.Pending]
+
+            let status
+            if(dayjs().isBefore(dayjs())) {
+                status = before[Math.floor(Math.random() * before.length)]
+            } else {
+                status = after[Math.floor(Math.random() * after.length)]
+            }
+
+            bookingData.push(BookingGenerator.generateData({
+                id: faker.string.uuid(),
+                restaurantID: restaurantData[i].id,
+                userID: userData[i].id,
+                bookingTime: bookingTime.toDate(),
+                status: status
+            }))
+        }
     }
 
     await prisma.$transaction(async (tx: any) => {
