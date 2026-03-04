@@ -224,10 +224,17 @@ export class RestaurantController extends AbstractController {
             let restaurant
 
             if (body.restaurantID) {
-                restaurant = await prisma.restaurant.findByID(body.restaurantID, { id: true })
+                restaurant = await prisma.restaurant.findByID(body.restaurantID, {
+                    id: true,
+                    brandID: true 
+                })
 
                 if (!restaurant) {
                     throw new IError(404, 'Restaurant not found')
+                }
+
+                if (user.brandID !== restaurant.brandID) {
+                    throw new IError(403, 'Not a restaurant owner')
                 }
                 
                 restaurant = await prisma.restaurant.updateOne(body.restaurantID, {
