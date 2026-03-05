@@ -26,3 +26,8 @@ export enum NodeEnv {
     Prod = 'prod',
     Test = 'test',
 }
+
+export enum AuthorType {
+    User = 'user',
+    Admin = 'admin'
+}
