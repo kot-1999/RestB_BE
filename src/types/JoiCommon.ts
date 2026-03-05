@@ -12,7 +12,7 @@ const discussionItem = Joi.object({
         .required(),
 
     message: Joi.string().trim()
-        .min(1)
+        .min(5)
         .required(),
 
     createdAt: Joi.date().iso()
