@@ -78,8 +78,9 @@ export class BookingController extends AbstractController {
                         .required(),
                     updatedAt: Joi.date().iso()
                         .allow(null)
-                }).required())
-                    .required()
+                }))
+                    .required(),
+                pagination: JoiCommon.object.pagination.required()
             }).required(),
             postBooking: Joi.object({
                 booking: Joi.object({
@@ -112,56 +113,62 @@ export class BookingController extends AbstractController {
                 .toDate()
 
             const skip = (query.page - 1) * query.limit;
-
-            const bookings = await prisma.booking.findMany({
-                skip,
-                take: query.limit,
-                where: {
-                    AND: [
-                        {
-                            status: {
-                                in: query.statuses
-                            }
-                        },
-                        {
-                            userID: user.id
-                        },
-                        {
-                            bookingTime: {
-                                gte: timeFrom,
-                                lt: timeTo
-                            }
+            const where = {
+                AND: [
+                    {
+                        status: {
+                            in: query.statuses
                         }
-                    ]
-                },
-                orderBy: {
-                    bookingTime: 'asc' // optional
-                },
-                select: {
-                    id: true,
-                    guestsNumber: true,
-                    bookingTime: true,
-                    status: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    discussion: true,
-                    restaurant: {
-                        select: {
-                            id: true,
-                            name: true,
-                            description: true,
-                            bannerURL: true,
-                            brand: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                    logoURL: true
+                    },
+                    {
+                        userID: user.id
+                    },
+                    {
+                        bookingTime: {
+                            gte: timeFrom,
+                            lt: timeTo
+                        }
+                    }
+                ]
+            }
+
+            const [count, bookings] = await Promise.all([
+                prisma.booking.count({
+                    where
+                }),
+                prisma.booking.findMany({
+                    skip,
+                    take: query.limit,
+                    where,
+                    orderBy: {
+                        bookingTime: 'asc' // optional
+                    },
+                    select: {
+                        id: true,
+                        guestsNumber: true,
+                        bookingTime: true,
+                        status: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        discussion: true,
+                        restaurant: {
+                            select: {
+                                id: true,
+                                name: true,
+                                description: true,
+                                bannerURL: true,
+                                brand: {
+                                    select: {
+                                        id: true,
+                                        name: true,
+                                        logoURL: true
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            })
+                })
+            ])
 
             const adminIDs: string[] = []
 
@@ -221,7 +228,12 @@ export class BookingController extends AbstractController {
                         }
                     }) : [],
                     restaurant: booking.restaurant
-                }))
+                })),
+                pagination: {
+                    page: query.page,
+                    limit: query.limit,
+                    total: count
+                }
             })
         } catch (err) {
             return next(err)
