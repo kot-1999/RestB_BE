@@ -303,8 +303,6 @@ export class BookingController extends AbstractController {
                     authorID: user.id,
                     authorType: AuthorType.User,
                     message: body.message,
-
-
                     createdAt: dayjs().toISOString()
                 }] : [],
                 userID: user.id,

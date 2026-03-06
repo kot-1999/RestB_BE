@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { BookingStatus } from '@prisma/client';
+import {AdminRole, BookingStatus} from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import crypto from 'crypto-js';
 import dayjs from 'dayjs'
@@ -36,6 +36,13 @@ async function seed() {
     const restaurantData: any[] = []
     const bookingData: any[] = []
 
+    const restaurantEmployees: {
+        employees: any[]
+        restaurantStaff: any[]
+    } = {
+        employees: [],
+        restaurantStaff: []
+    }
     // Generate plain objects
     // NOTE: Same order is used in creation
     for (let i = 0; i < GRAIN; i++) {
@@ -51,7 +58,14 @@ async function seed() {
             email: `user${i.toString()}@gmail.com` 
         }))
 
-        for (let ai = 0; ai < random; ai++) {
+        adminData.push(AdminGenerator.generateData({
+            id: faker.string.uuid(),
+            password: crypto.SHA256('test123').toString(),
+            email: `admin${i.toString()}@gmail.com`,
+            brandID: brandData[i].id
+        }))
+
+        for (let ri = 0; ri < random; ri++) {
             addressData.push(AddressGenerator.generateData({
                 longitude: new Decimal(faker.number.float({
                     min: GEO_BOX.minLng,
@@ -64,23 +78,30 @@ async function seed() {
                 country: 'United Kingdom',
                 city: 'London'
             }))
-        }
-
-        adminData.push(AdminGenerator.generateData({
-            id: faker.string.uuid(),
-            password: crypto.SHA256('test123').toString(),
-            email: `admin${i.toString()}@gmail.com`,
-            brandID: brandData[i].id
-        }))
-
-        for (let ri = 0; ri < random; ri++) {
+            const restaurantID = faker.string.uuid()
             restaurantData.push(RestaurantGenerator.generateData({
-                id: faker.string.uuid(),
+                id: restaurantID,
                 // eslint-disable-next-line max-len
                 name: `${i.toString()}-${ri.toString()} ${faker.food.dish()} ${faker.helpers.arrayElement(['House', 'Restaurant', 'Kitchen', 'Bistro', 'Grill', 'Cafe'])}`,
                 addressID: addressData[i + ri].id,
                 brandID: brandData[i].id
             }))
+            const numOfEmployees = Math.floor(Math.random() * 5) + 1;
+            for (let ei = 0; ei < numOfEmployees; ei++) {
+                const adminID = faker.string.uuid()
+                restaurantEmployees.employees.push(AdminGenerator.generateData({
+                    id: adminID,
+                    password: crypto.SHA256('test123').toString(),
+                    email: `employee${i.toString()}-${ei.toString()}@gmail.com`,
+                    brandID: brandData[i].id,
+                    role: AdminRole.Employee
+                }))
+
+                restaurantEmployees.restaurantStaff.push({
+                    restaurantID,
+                    adminID
+                })
+            }
         }
 
         for (let bdi = 0; bdi < random; bdi++) {
@@ -144,10 +165,16 @@ async function seed() {
         // promises = []
 
         if ((await tx.admin.count()) === 0) {
-            await tx.admin.createMany({
-                data: adminData,
-                skipDuplicates: true
-            });
+            await Promise.all([
+                tx.admin.createMany({
+                    data: adminData,
+                    skipDuplicates: true
+                }),
+                tx.admin.createMany({
+                    data: restaurantEmployees.employees,
+                    skipDuplicates: true
+                })
+            ])
             seededTables.push('admins');
         }
 
@@ -158,6 +185,14 @@ async function seed() {
 
             });
             seededTables.push('restaurants');
+        }
+
+        if ((await tx.restaurantStaff.count()) === 0) {
+            await tx.restaurantStaff.createMany({
+                data: restaurantEmployees.restaurantStaff,
+                skipDuplicates: true
+            })
+            seededTables.push('restaurantStaff');
         }
 
         if ((await tx.booking.count()) === 0) {

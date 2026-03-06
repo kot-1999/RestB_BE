@@ -1,4 +1,4 @@
-import { BookingStatus, Restaurant } from '@prisma/client';
+import { Admin, AdminRole, Booking, BookingStatus, Restaurant, User } from '@prisma/client';
 import dayjs from 'dayjs';
 import { Response, NextFunction, AuthAdminRequest } from 'express'
 import Joi from 'joi'
@@ -6,6 +6,8 @@ import Joi from 'joi'
 import prisma from '../../../services/Prisma';
 import { AbstractController } from '../../../types/AbstractController'
 import { JoiCommon } from '../../../types/JoiCommon'
+import { AuthorType } from '../../../utils/enums';
+import { IError } from '../../../utils/IError';
 
 export class BookingController extends AbstractController {
     public static readonly schemas = {
@@ -15,7 +17,7 @@ export class BookingController extends AbstractController {
                     restaurantID: JoiCommon.string.id
                 }).required(),
                 query: Joi.object({
-                    status: Joi.string().valid(...Object.values(BookingStatus))
+                    statuses: Joi.array().items(Joi.string().valid(...Object.values(BookingStatus)))
                         .default([BookingStatus.Completed, BookingStatus.Pending]),
                     dateFrom: Joi.date().iso()
                         .default(() => dayjs().toISOString()),
@@ -23,8 +25,17 @@ export class BookingController extends AbstractController {
                     dateTo: Joi.date()
                         .iso()
                         .greater(Joi.ref('dateFrom'))
-                        .default(() => dayjs().add(7, 'days')
-                            .toISOString())
+                        .default(() => dayjs().add(4, 'days')
+                            .toISOString()),
+                    page: Joi.number()
+                        .integer()
+                        .positive()
+                        .default(1),
+
+                    limit: Joi.number()
+                        .integer()
+                        .positive()
+                        .default(20)
                 }).required()
             }).required(),
 
@@ -69,7 +80,13 @@ export class BookingController extends AbstractController {
                     brand: JoiCommon.object.brand.required(),
                     staff: Joi.array()
                         .items({
-                            
+                            admin: Joi.object({
+                                id: JoiCommon.string.id,
+                                firstName: JoiCommon.string.name.required(),
+                                lastName: JoiCommon.string.name.required(),
+                                email: JoiCommon.string.email.required(),
+                                avatarURL: Joi.string().uri()
+                            })
                         })
                         .min(0)
                         .required()
@@ -77,7 +94,9 @@ export class BookingController extends AbstractController {
                 bookings: Joi.array()
                     .items(JoiCommon.object.booking.keys({
                         discussion: Joi.array().items(JoiCommon.object.discussionItem.keys({
-                            avatarURL: Joi.string().required()
+                            firstName: JoiCommon.string.name.required(),
+                            lastName: JoiCommon.string.name.required(),
+                            avatarURL: Joi.string().uri()
                         }))
                             .min(0)
                             .required(),
@@ -85,7 +104,8 @@ export class BookingController extends AbstractController {
                             id: JoiCommon.string.id,
                             firstName: JoiCommon.string.name.required(),
                             lastName: JoiCommon.string.name.required(),
-                            email: JoiCommon.string.email.required()
+                            email: JoiCommon.string.email.required(),
+                            avatarURL: Joi.string().uri()
                         }).required(),
                         createdAt: Joi.date().iso()
                             .required(),
@@ -94,7 +114,8 @@ export class BookingController extends AbstractController {
                             .required()
                     }).required())
                     .min(0)
-                    .required()
+                    .required(),
+                pagination: JoiCommon.object.pagination.required()
             }).required(),
 
             getBookingList: Joi.object({
@@ -137,8 +158,179 @@ export class BookingController extends AbstractController {
         next: NextFunction
     ) {
         try {
+            const { params, query, user } = req
+            const skip = (query.page - 1) * query.limit;
 
-            return res.status(200).json({ message: 'Response from a backend template' })
+            const timeFrom = dayjs(query.dateFrom).startOf('day')
+                .toDate()
+            const timeTo = dayjs(query.dateTo).endOf('day')
+                .toDate()
+
+            const where = {
+                AND: [
+                    {
+                        status: {
+                            in: query.statuses
+                        }
+                    },
+                    {
+                        bookingTime: {
+                            gte: timeFrom,
+                            lt: timeTo
+                        }
+                    }
+                ]
+            }
+
+            const [restaurant, count, bookings] = await Promise.all([
+                prisma.restaurant.findByID(params.restaurantID, {
+                    id: true,
+                    name: true,
+                    bannerURL: true,
+                    address: {
+                        select: {
+                            building: true,
+                            street: true,
+                            city: true,
+                            postcode: true,
+                            country: true,
+                            latitude: true,
+                            longitude: true
+                        }
+                    },
+                    brand: {
+                        select: {
+                            id: true,
+                            name: true,
+                            logoURL: true
+                        }
+                    },
+                    staff: {
+                        select: {
+                            admin: {
+                                select: {
+                                    id: true,
+                                    firstName: true,
+                                    lastName: true,
+                                    email: true,
+                                    avatarURL: true
+                                }
+                            }
+                        }
+                    }
+                }),
+                prisma.booking.count({
+                    where
+                }),
+                prisma.booking.findMany({
+                    skip,
+                    take: query.limit,
+                    where,
+                    orderBy: {
+                        bookingTime: 'asc' // optional
+                    },
+                    select: {
+                        id: true,
+                        guestsNumber: true,
+                        bookingTime: true,
+                        status: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        discussion: true,
+                        user: {
+                            select: {
+                                id: true,
+                                firstName: true,
+                                lastName: true,
+                                email: true,
+                                avatarURL: true
+                            }
+                        }
+                    }
+                })
+            ])
+
+            if (!restaurant) {
+                throw new IError(404, 'Restaurant not found');
+            }
+
+            if (user.role !== AdminRole.Admin) {
+                const staffMember = restaurant.staff.find((staff: { admin: { id: string }}) => staff.admin.id === user.id)
+                if (!staffMember) {
+                    throw new IError(403, 'Employee has no permission to view this restaurant');
+                }
+            }
+
+            const adminIDs: string[] = []
+            const userIDs: string[] = []
+
+            for (let i = 0; i < bookings.length; i++) {
+                if (bookings[i].discussion) {
+                    bookings[i].discussion.forEach((discussion: { authorID: string, authorType: string}) => {
+                        if (discussion.authorType === AuthorType.Admin) {
+                            adminIDs.push(discussion.authorID)
+                        } else {
+                            userIDs.push(discussion.authorID)
+                        }
+                    })
+                }
+            }
+            const admins: Admin[] = await prisma.admin.findMany({
+                where: {
+                    id: {
+                        in: adminIDs
+                    }
+                },
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    avatarURL: true
+                }
+            })
+
+            return res.status(200).json({
+                restaurant,
+                bookings: bookings.map((booking: Booking & { user: User }) => ({
+                    id: booking.id,
+                    guestsNumber: booking.guestsNumber,
+                    bookingTime: booking.bookingTime,
+                    status: booking.status,
+                    createdAt: booking.createdAt,
+                    updatedAt: booking.updatedAt,
+                    user: booking.user,
+                    discussion: booking.discussion ? (booking.discussion as any[]).map((discussion) => {
+                        let author: Partial<Admin> | Partial<User> = booking.user
+                        
+                        if (discussion.authorType === AuthorType.Admin) {
+                            const resultAdmin = admins.find((admin) => admin.id === discussion.authorID)
+                            if (resultAdmin) {
+                                author = resultAdmin
+                            } else {
+                                author = {
+                                    firstName: 'Unknown',
+                                    lastName: 'Administrator'
+                                }
+                            }
+                        }
+
+                        return {
+                            authorID: discussion.authorID,
+                            authorType: discussion.authorType,
+                            message: discussion.message,
+                            createAt: discussion.createAt,
+                            firstName: author.firstName,
+                            lastName: author.lastName,
+                            avatarUrl: author?.avatarURL
+                        }
+                    }) : []
+                })),
+                pagination: {
+                    page: query.page,
+                    limit: query.limit,
+                    total: count
+                }
+            })
         } catch (err) {
             return next(err)
         }
