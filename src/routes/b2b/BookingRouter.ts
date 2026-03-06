@@ -15,7 +15,7 @@ export default function bookingRouter() {
     router.get(
         /*
             #swagger.tags = ['b2b-v1-Booking']
-            #swagger.description = '(Not Implemented) List restaurants with booking daily summary.',
+            #swagger.description = 'List restaurants with booking daily summary.',
             #swagger.security = [{
                 "bearerAuth": []
             }]
@@ -36,7 +36,7 @@ export default function bookingRouter() {
     router.get(
         /*
             #swagger.tags = ['b2b-v1-Booking']
-            #swagger.description = '(Not Implemented) List restaurants with booking daily summary.',
+            #swagger.description = 'List restaurants with booking daily summary.',
             #swagger.security = [{
                 "bearerAuth": []
             }]
