@@ -1,10 +1,9 @@
-// @ts-nocheck
-
-import { BookingStatus } from '@prisma/client';
+import { BookingStatus, Restaurant } from '@prisma/client';
 import dayjs from 'dayjs';
 import { Response, NextFunction, AuthAdminRequest } from 'express'
 import Joi from 'joi'
 
+import prisma from '../../../services/Prisma';
 import { AbstractController } from '../../../types/AbstractController'
 import { JoiCommon } from '../../../types/JoiCommon'
 
@@ -17,7 +16,7 @@ export class BookingController extends AbstractController {
                 }).required(),
                 query: Joi.object({
                     status: Joi.string().valid(...Object.values(BookingStatus))
-                        .default([BookingStatus.Confirmed, BookingStatus.Pending]),
+                        .default([BookingStatus.Completed, BookingStatus.Pending]),
                     dateFrom: Joi.date().iso()
                         .default(() => dayjs().toISOString()),
 
@@ -31,13 +30,6 @@ export class BookingController extends AbstractController {
 
             getBookingList: JoiCommon.object.request.keys({
                 query: Joi.object({
-                    brandID: JoiCommon.string.id.optional(),
-                    statuses: Joi.array()
-                        .items(Joi.string()
-                            .valid(...Object.values(BookingStatus))
-                            .required())
-                        .default([]),
-
                     page: Joi.number()
                         .integer()
                         .positive()
@@ -160,8 +152,110 @@ export class BookingController extends AbstractController {
         next: NextFunction
     ) {
         try {
+            const { query, user } = req
+            const skip = (query.page - 1) * query.limit
 
-            return res.status(200).json({ message: 'Response from a backend template' })
+            const where = {
+                brandID: user.brandID
+            }
+
+            const [brand, count, restaurants] = await Promise.all([
+                prisma.brand.findByID(user.brandID, {
+                    id: true,
+                    name: true,
+                    logoURL: true
+                }),
+                prisma.restaurant.count({
+                    where
+                }),
+                prisma.restaurant.findMany({
+                    skip,
+                    take: query.limit,
+                    orderBy: {
+                        name: 'asc'
+                    },
+                    where,
+                    select: {
+                        id: true,
+                        name: true,
+                        bannerURL: true,
+                        address: {
+                            select: {
+                                building: true,
+                                street: true,
+                                city: true,
+                                postcode: true,
+                                country: true,
+                                latitude: true,
+                                longitude: true
+                            }
+                        }
+                    }
+                })
+            ])
+
+            const today = dayjs()
+            const bookingStats = (await prisma.booking.groupBy({
+                by: ['restaurantID', 'status'],
+                where: {
+                    status: {
+                        in: [BookingStatus.Pending, BookingStatus.Approved, BookingStatus.Completed]
+                    },
+                    restaurantID: { in: restaurants.map((rest: Restaurant) => rest.id) },
+                    bookingTime: {
+                        gte: today.startOf('day')
+                            .toISOString(),
+                        lt: today.endOf('day')
+                            .toISOString()
+                    }
+                },
+                _count: true,
+                _sum: {
+                    guestsNumber: true
+                }
+            })) as {
+                _count: number,
+                _sum: {
+                    guestsNumber: number
+                },
+                restaurantID: string,
+                status: BookingStatus
+            }[]
+
+            return res.status(200).json({
+                brand,
+                restaurants: restaurants.map((restaurant: Restaurant) => {
+                    const restaurantStats = bookingStats.filter((bStat) => bStat.restaurantID === restaurant.id)
+
+                    let totalApprovedAndConfirmedBookings = 0
+                    let totalPendingBookings = 0
+                    let totalGuests = 0
+
+                    restaurantStats.forEach((rStat) => {
+                        if (rStat.status === BookingStatus.Pending) {
+                            totalPendingBookings += rStat._count
+                        } else {
+                            totalApprovedAndConfirmedBookings += rStat._count
+                            totalGuests += rStat._sum.guestsNumber
+                        }
+                    })
+
+                    return {
+                        ...restaurant,
+                        bookingsDailySummaries: {
+                            today: today.toISOString(),
+                            totalApprovedAndConfirmedBookings,
+                            totalPendingBookings,
+                            totalGuests
+                        }
+                    }
+                }),
+                pagination: {
+                    page: query.page,
+                    limit: query.limit,
+                    total: count
+                }
+            })
         } catch (err) {
             return next(err)
         }
