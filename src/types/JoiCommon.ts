@@ -137,7 +137,7 @@ export class JoiCommon {
             date: Joi.date().iso()
                 .required(),
 
-            totalApprovedBookings: Joi.number()
+            totalApprovedAndConfirmedBookings: Joi.number()
                 .integer()
                 .min(0)
                 .required(),
@@ -148,11 +148,6 @@ export class JoiCommon {
                 .required(),
 
             totalGuests: Joi.number()
-                .integer()
-                .min(0)
-                .required(),
-
-            autoConfirmGuestsLimit: Joi.number()
                 .integer()
                 .min(0)
                 .required()
