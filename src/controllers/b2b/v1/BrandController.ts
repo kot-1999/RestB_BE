@@ -1,8 +1,10 @@
 import { Response, NextFunction, AuthAdminRequest } from 'express'
 import Joi from 'joi'
 
+import prisma from '../../../services/Prisma';
 import { AbstractController } from '../../../types/AbstractController'
 import { JoiCommon } from '../../../types/JoiCommon'
+import { IError } from '../../../utils/IError';
 
 export class BrandController extends AbstractController {
     public static readonly schemas = {
@@ -16,7 +18,7 @@ export class BrandController extends AbstractController {
                     name: JoiCommon.string.companyName.optional(),
 
                     logoURL: Joi.string()
-                        .allow(null, undefined)
+                        .allow(null)
                         .optional()
                 })
                     .min(1) // at least one field must be updated
@@ -45,9 +47,29 @@ export class BrandController extends AbstractController {
         next: NextFunction
     ) {
         try {
+            const { user, params, body } = req
+            
+            const brand = await prisma.brand.findByID(params.brandID, {
+                id: true,
+                name: true,
+                logoURL: true 
+            })
+
+            if (!brand) {
+                throw new IError(404, 'Brand not found')
+            }
+
+            if (user.brandID !== brand.id) {
+                throw new IError(403, 'Not a brand owner')
+            }
+
+            prisma.brand.updateOne({ brandID: params.brandID }, {
+                name: body.name ?? brand.name,
+                logoURL: body.logoURL ?? brand.logoURL
+            })
 
             return res.status(200).json({
-                brand: { id: 'asd' },
+                brand: { id: brand.id },
                 message: 'Brand was successfully updated'
             })
         } catch (err) {

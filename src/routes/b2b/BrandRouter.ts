@@ -1,7 +1,9 @@
+import { AdminRole } from '@prisma/client';
 import { Router } from 'express'
 
 import { BrandController } from '../../controllers/b2b/v1/BrandController';
 import authorizationMiddleware from '../../middlewares/authorizationMiddleware'
+import permissionMiddleware from '../../middlewares/permissionMiddleware';
 import validationMiddleware from '../../middlewares/validationMiddleware';
 import { PassportStrategy } from '../../utils/enums'
 
@@ -12,10 +14,10 @@ const brandController = new BrandController()
 export default function restaurantRouter() {
     // List endpoints
 
-    router.get(
+    router.patch(
         /*
             #swagger.tags = ['b2b-v1-Brand']
-            #swagger.description = '(Not Implemented) Update brand.',
+            #swagger.description = 'Update brand.',
             #swagger.security = [{
                 "bearerAuth": []
             }]
@@ -28,8 +30,9 @@ export default function restaurantRouter() {
             }
         */
         '/:brandID',
-        validationMiddleware(BrandController.schemas.request.updateBrand),
         authorizationMiddleware([PassportStrategy.jwtB2b]),
+        permissionMiddleware([AdminRole.Admin]),
+        validationMiddleware(BrandController.schemas.request.updateBrand),
         brandController.updateBrand
     )
 
