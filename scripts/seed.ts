@@ -1,5 +1,7 @@
 import { faker } from '@faker-js/faker';
+import {AdminRole, BookingStatus} from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
+import crypto from 'crypto-js';
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
@@ -10,7 +12,6 @@ import BookingGenerator from '../tests/utils/BookingGenerator';
 import BrandGenerator from '../tests/utils/BrandGenerator'
 import RestaurantGenerator from '../tests/utils/RestaurantGenerator';
 import UserGenerator from '../tests/utils/UserGenerator'
-import crypto from "crypto-js";
 
 const timeFrom = dayjs().subtract(20, 'days')
 const timeTo = dayjs().add(20, 'days')
@@ -24,7 +25,7 @@ const GEO_BOX = {
     maxLng: 0.7
 };
 
-const GRAIN = 500
+const GRAIN = 300
 
 async function seed() {
     const userData: any[] = []
@@ -35,48 +36,100 @@ async function seed() {
     const restaurantData: any[] = []
     const bookingData: any[] = []
 
+    const restaurantEmployees: {
+        employees: any[]
+        restaurantStaff: any[]
+    } = {
+        employees: [],
+        restaurantStaff: []
+    }
     // Generate plain objects
     // NOTE: Same order is used in creation
     for (let i = 0; i < GRAIN; i++) {
+        const random = Math.floor(Math.random() * 10) + 1;
+
         brandData.push(BrandGenerator.generateData({
             id: faker.string.uuid()
         }))
+
         userData.push(UserGenerator.generateData({
             id: faker.string.uuid(),
             password: crypto.SHA256('test123').toString(),
             email: `user${i.toString()}@gmail.com` 
         }))
-        addressData.push(AddressGenerator.generateData({
-            longitude: new Decimal(faker.number.float({
-                min: GEO_BOX.minLng,
-                max: GEO_BOX.maxLng
-            })),
-            latitude: new Decimal(faker.number.float({
-                min: GEO_BOX.minLat,
-                max: GEO_BOX.maxLat
-            }))
-        }))
+
         adminData.push(AdminGenerator.generateData({
             id: faker.string.uuid(),
             password: crypto.SHA256('test123').toString(),
             email: `admin${i.toString()}@gmail.com`,
             brandID: brandData[i].id
         }))
-        restaurantData.push(RestaurantGenerator.generateData({
-            id: faker.string.uuid(),
-            name: `${i.toString()} ${faker.food.dish()} ${faker.helpers.arrayElement(['House', 'Restaurant', 'Kitchen', 'Bistro', 'Grill', 'Cafe'])}`,
-            addressID: addressData[i].id,
-            brandID: brandData[i].id
-        }))
-        bookingData.push(BookingGenerator.generateData({
-            id: faker.string.uuid(),
-            restaurantID: restaurantData[i].id,
-            userID: userData[i].id,
-            bookingTime: dayjs(faker.date.between({
-                from: timeFrom.toISOString(),
-                to: timeTo.toISOString()
-            })).toDate()
-        }))
+
+        for (let ri = 0; ri < random; ri++) {
+            addressData.push(AddressGenerator.generateData({
+                longitude: new Decimal(faker.number.float({
+                    min: GEO_BOX.minLng,
+                    max: GEO_BOX.maxLng
+                })),
+                latitude: new Decimal(faker.number.float({
+                    min: GEO_BOX.minLat,
+                    max: GEO_BOX.maxLat
+                })),
+                country: 'United Kingdom',
+                city: 'London'
+            }))
+            const restaurantID = faker.string.uuid()
+            restaurantData.push(RestaurantGenerator.generateData({
+                id: restaurantID,
+                // eslint-disable-next-line max-len
+                name: `${i.toString()}-${ri.toString()} ${faker.food.dish()} ${faker.helpers.arrayElement(['House', 'Restaurant', 'Kitchen', 'Bistro', 'Grill', 'Cafe'])}`,
+                addressID: addressData[i + ri].id,
+                brandID: brandData[i].id
+            }))
+            const numOfEmployees = Math.floor(Math.random() * 5) + 1;
+            for (let ei = 0; ei < numOfEmployees; ei++) {
+                const adminID = faker.string.uuid()
+                restaurantEmployees.employees.push(AdminGenerator.generateData({
+                    id: adminID,
+                    password: crypto.SHA256('test123').toString(),
+                    email: `employee${i.toString()}-${ei.toString()}@gmail.com`,
+                    brandID: brandData[i].id,
+                    role: AdminRole.Employee
+                }))
+
+                restaurantEmployees.restaurantStaff.push({
+                    restaurantID,
+                    adminID
+                })
+            }
+        }
+
+        for (let bdi = 0; bdi < random; bdi++) {
+            for (let bi = 0; bi < (GRAIN / 20) + 1; bi++) {
+                const bookingTime = dayjs(faker.date.between({
+                    from: timeFrom.toISOString(),
+                    to: timeTo.toISOString()
+                }))
+
+                const before = [BookingStatus.Completed, BookingStatus.Cancelled, BookingStatus.NoShow]
+                const after = [BookingStatus.Approved, BookingStatus.Cancelled, BookingStatus.Pending]
+
+                let status
+                if (dayjs().isBefore(dayjs())) {
+                    status = before[Math.floor(Math.random() * before.length)]
+                } else {
+                    status = after[Math.floor(Math.random() * after.length)]
+                }
+
+                bookingData.push(BookingGenerator.generateData({
+                    id: faker.string.uuid(),
+                    restaurantID: restaurantData[i + bdi].id,
+                    userID: userData[i].id,
+                    bookingTime: bookingTime.toDate(),
+                    status: status
+                }))
+            }
+        }
     }
 
     await prisma.$transaction(async (tx: any) => {
@@ -112,10 +165,16 @@ async function seed() {
         // promises = []
 
         if ((await tx.admin.count()) === 0) {
-            await tx.admin.createMany({
-                data: adminData,
-                skipDuplicates: true
-            });
+            await Promise.all([
+                tx.admin.createMany({
+                    data: adminData,
+                    skipDuplicates: true
+                }),
+                tx.admin.createMany({
+                    data: restaurantEmployees.employees,
+                    skipDuplicates: true
+                })
+            ])
             seededTables.push('admins');
         }
 
@@ -126,6 +185,14 @@ async function seed() {
 
             });
             seededTables.push('restaurants');
+        }
+
+        if ((await tx.restaurantStaff.count()) === 0) {
+            await tx.restaurantStaff.createMany({
+                data: restaurantEmployees.restaurantStaff,
+                skipDuplicates: true
+            })
+            seededTables.push('restaurantStaff');
         }
 
         if ((await tx.booking.count()) === 0) {

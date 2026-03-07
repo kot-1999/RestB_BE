@@ -77,20 +77,7 @@ export class RestaurantController extends AbstractController {
                     .items(JoiCommon.object.restaurant.keys({
                         autoApprovedBookingsNum: Joi.number().integer()
                             .required(),
-                        address: JoiCommon.object.address.required(),
-                        staff: Joi.array()
-                            .items(Joi.object({
-                                id: JoiCommon.string.id,
-                                firstName: JoiCommon.string.name.required(),
-                                lastName: JoiCommon.string.name.required(),
-                                email: JoiCommon.string.email.required(),
-
-                                role: Joi.string()
-                                    .valid(...Object.values(AdminRole))
-                                    .required()
-                            }))
-                            .min(0)
-                            .required()
+                        address: JoiCommon.object.address.required()
                     }))
                     .min(0)
                     .required(),
@@ -172,16 +159,7 @@ export class RestaurantController extends AbstractController {
                         },
                         staff: {
                             select: {
-                                adminID: true,
-                                admin: {
-                                    select: {
-                                        id: true,
-                                        firstName: true,
-                                        lastName: true,
-                                        email: true,
-                                        role: true
-                                    }
-                                }
+                                adminID: true
                             }
                         }
                     },
@@ -190,6 +168,8 @@ export class RestaurantController extends AbstractController {
                     }
                 })
             ])
+            
+            restaurants.forEach((restaurant: any) => { delete restaurant.staff })
 
             return res.status(200).json({
                 brand,
@@ -224,10 +204,17 @@ export class RestaurantController extends AbstractController {
             let restaurant
 
             if (body.restaurantID) {
-                restaurant = await prisma.restaurant.findByID(body.restaurantID, { id: true })
+                restaurant = await prisma.restaurant.findByID(body.restaurantID, {
+                    id: true,
+                    brandID: true 
+                })
 
                 if (!restaurant) {
                     throw new IError(404, 'Restaurant not found')
+                }
+
+                if (user.brandID !== restaurant.brandID) {
+                    throw new IError(403, 'Not a restaurant owner')
                 }
                 
                 restaurant = await prisma.restaurant.updateOne(body.restaurantID, {

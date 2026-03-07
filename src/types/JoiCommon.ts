@@ -12,7 +12,7 @@ const discussionItem = Joi.object({
         .required(),
 
     message: Joi.string().trim()
-        .min(1)
+        .min(5)
         .required(),
 
     createdAt: Joi.date().iso()
@@ -137,7 +137,7 @@ export class JoiCommon {
             date: Joi.date().iso()
                 .required(),
 
-            totalApprovedBookings: Joi.number()
+            totalApprovedAndConfirmedBookings: Joi.number()
                 .integer()
                 .min(0)
                 .required(),
@@ -148,11 +148,6 @@ export class JoiCommon {
                 .required(),
 
             totalGuests: Joi.number()
-                .integer()
-                .min(0)
-                .required(),
-
-            autoConfirmGuestsLimit: Joi.number()
                 .integer()
                 .min(0)
                 .required()

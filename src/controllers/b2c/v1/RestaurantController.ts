@@ -263,7 +263,9 @@ export class RestaurantController extends AbstractController {
                 _sum: { guestsNumber: true }, // sum guests per restaurant
                 where: {
                     restaurantID: { in: restaurants.map((rest: Restaurant) => rest.id) }, // array of restaurant IDs
-                    status: BookingStatus.Approved,
+                    status: {
+                        in: [BookingStatus.Approved, BookingStatus.Completed]
+                    },
                     bookingTime: {
                         gte: dayjs(query.date).startOf('day')
                             .toDate(),

@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { Admin, AdminRole } from '@prisma/client'
 import { expect } from 'chai'
 import supertest from 'supertest'
@@ -8,7 +9,6 @@ import { JwtService } from '../../../../../src/services/Jwt'
 import prisma from '../../../../../src/services/Prisma'
 import { JwtAudience } from '../../../../../src/utils/enums'
 import RestaurantGenerator from '../../../../utils/RestaurantGenerator'
-import {faker} from "@faker-js/faker";
 
 const endpoint = (val: string = '') => '/api/b2b/v1/restaurant/' + val
 
@@ -31,7 +31,6 @@ describe('GET ' + endpoint(''), () => {
                 id: admin.id,
                 aud: JwtAudience.b2b
             })}`)
-        
         expect(res.statusCode).to.equal(200)
         expect(res.type).to.eq('application/json')
 

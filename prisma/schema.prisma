@@ -20,11 +20,11 @@ enum AdminRole {
 
 enum BookingStatus {
   Pending
-  Confirmed
   Cancelled
   Completed
   Approved
   Deleted
+  NoShow
 }
 
 enum RestaurantCategories {
