@@ -99,7 +99,7 @@ export default function adminAuthorizationRouter() {
     router.post(
         /*
             #swagger.tags = ['b2b-v1-AdminAuthorization']
-            #swagger.description = '(Not Implemented) Send invitation to a new admin.',
+            #swagger.description = 'Send invitation to a new admin.',
             #swagger.security = [{
                 "bearerAuth": []
             }]
@@ -111,7 +111,7 @@ export default function adminAuthorizationRouter() {
                 schema: { "$ref": "#/definitions/b2bV1InviteAdminRes" },
             }
         */
-        '/auth/invite',
+        '/employee/invite',
         validationMiddleware(AuthorizationController.schemas.request.inviteAdmin),
         authorizationMiddleware([PassportStrategy.jwtB2b]),
         authorizationController.inviteAdmin
@@ -120,7 +120,7 @@ export default function adminAuthorizationRouter() {
     router.post(
         /*
             #swagger.tags = ['b2b-v1-AdminAuthorization']
-            #swagger.description = '(Not Implemented) Register new employee (admin account).',
+            #swagger.description = 'Register new employee (admin account).',
             #swagger.security = [{
                 "bearerAuth": []
             }]
@@ -132,7 +132,7 @@ export default function adminAuthorizationRouter() {
                 schema: { "$ref": "#/definitions/b2bV1RegisterEmployeeRes" },
             }
         */
-        '/auth/employee/register',
+        '/employee/register',
         validationMiddleware(AuthorizationController.schemas.request.registerEmployee),
         authorizationMiddleware([PassportStrategy.jwtB2bInvite]),
         authorizationController.registerEmployee

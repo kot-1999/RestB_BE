@@ -1,5 +1,6 @@
 import { AdminRole } from '@prisma/client';
 import config from 'config';
+import dayjs from 'dayjs';
 import { Request, Response, NextFunction, AuthAdminRequest, EmployeeRegisterRequest } from 'express'
 import Joi from 'joi'
 
@@ -62,7 +63,8 @@ export class AuthorizationController extends AbstractController {
             }),
             inviteAdmin: JoiCommon.object.request.keys({
                 body: Joi.object({
-                    email: JoiCommon.string.email.required()
+                    email: JoiCommon.string.email.required(),
+                    restaurantID: JoiCommon.string.id
                 }).required()
             }),
             registerEmployee: JoiCommon.object.request.keys({
@@ -355,9 +357,35 @@ export class AuthorizationController extends AbstractController {
         next: NextFunction
     ) {
         try {
+            const { body, user } = req
+
+            const restaurant = await prisma.restaurant.findByID(body.restaurantID, {
+                id: true,
+                name: true 
+            })
+
+            if (!restaurant) {
+                throw new IError(404, 'Restaurant not found')
+            }
+
+            await emailService.sendEmail(EmailType.employeeInvite, {
+                email: body.email,
+                restaurantName: restaurant.name,
+                managerFirstName: user.firstName,
+                managerLastName: user.lastName,
+                position: AdminRole.Employee,
+                link: appConfig.frontendUrl + '/#register-employee' + `?token=${JwtService.generateToken({
+                    id: user.id,
+                    aud: JwtAudience.inviteEmployee,
+                    restID: restaurant.id,
+                    email: body.email
+                }, 72 * 60 * 60 * 1000)}`,
+                expiryDate: dayjs().add(3, 'days')
+                    .format('YYYY-MM-DD HH:mm')
+            })
 
             res.status(200).json({
-                message: 'Response from backend template'
+                message: 'Invitation email was sent successfully'
             })
         } catch (err) {
             return next(err)
@@ -372,13 +400,58 @@ export class AuthorizationController extends AbstractController {
         next: NextFunction
     ) {
         try {
+            const { body, user } = req
+
+            const [restaurant, admin] = await Promise.all([
+                prisma.restaurant.findByID(user.restaurantID, {
+                    id: true,
+                    brandID: true
+                }),
+                prisma.admin.findOne(null, {
+                    email: { equals: user.email }
+                })
+            ])
+            if (admin) {
+                throw new IError(403, 'Admin already exists')
+            }
+
+            if (!restaurant) {
+                throw new IError(404, 'Restaurant not found')
+            }
+            const employee = await prisma.admin.createOne({
+                firstName: body.firstName,
+                lastName: body.lastName,
+                email: user.email,
+                brand: {
+                    connect: {
+                        id: '41cca44c-9d0c-4009-b682-6fdca32501ec'
+                    }
+                },
+                emailVerified: false,
+                password: EncryptionService.hashSHA256(body.password),
+                phone: body.phone,
+                role: AdminRole.Employee,
+                restaurants: {
+                    create: {
+                        restaurantID: restaurant.id
+                    }
+                }
+            })
+
+            const jwt = JwtService.generateToken({
+                id: employee.id,
+                aud: JwtAudience.b2b
+            })
+
+            req.session.jwt = jwt
+
             res.status(200).json({
                 admin: {
-                    id: 'asdasdasd',
-                    role: 'asdsad',
-                    token: 'asdsad'
+                    id: employee.id,
+                    role: employee.role,
+                    token: jwt
                 },
-                message: 'Response from backend template'
+                message: 'Employee registered successfully'
             })
         } catch (err) {
             return next(err)
