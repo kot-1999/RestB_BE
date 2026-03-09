@@ -98,7 +98,7 @@ class EmailService {
         const mailOptions = {
             from: this.config.fromAddress,
             to: data.email,
-            subject: 'RestBoo - Reset password link',
+            subject: `RestBoo - Join ${data.restaurantName}`,
             html: htmlContent
         }
 
