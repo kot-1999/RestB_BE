@@ -81,6 +81,30 @@ class EmailService {
         return mailOptions 
     }
 
+    private async buildEmployeeInvite(data: EmailDataType<EmailType.employeeInvite>)
+        : Promise<Mail.Options & { html: string }> {
+        const templatePath = path.join(__dirname, 'emailTemplates', 'employeeInvite.ejs')
+        const templateData = {
+            email: data.email,
+            restaurantName: data.restaurantName,
+            managerFirstName: data.managerFirstName,
+            managerLastName: data.managerLastName,
+            position: data.position,
+            link: data.link,
+            expiryDate: data.expiryDate
+        }
+        const htmlContent = await ejs.renderFile(templatePath, templateData)
+
+        const mailOptions = {
+            from: this.config.fromAddress,
+            to: data.email,
+            subject: `RestBoo - Join ${data.restaurantName}`,
+            html: htmlContent
+        }
+
+        return mailOptions
+    }
+
     public async sendEmail<T extends EmailType>(
         emailType: T,
         data: EmailDataType<T>
@@ -92,6 +116,9 @@ class EmailService {
             break
         case EmailType.forgotPassword:
             mailOptions = await this.buildForgotPassword(data as EmailDataType<EmailType.forgotPassword>)
+            break
+        case EmailType.employeeInvite:
+            mailOptions = await this.buildEmployeeInvite(data as EmailDataType<EmailType.employeeInvite>)
             break
         default:
             throw new IError(500, `Unknown email type: ${emailType}`)

@@ -18,7 +18,8 @@ export enum JwtAudience {
     b2c ='b2c',
     b2b = 'b2b',
     b2cForgotPassword = 'b2cfps',
-    b2bForgotPassword = 'b2bfps'
+    b2bForgotPassword = 'b2bfps',
+    inviteEmployee = 'invemp'
 }
 
 export enum NodeEnv {
