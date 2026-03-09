@@ -52,6 +52,14 @@ class PassportSetup {
             this.b2cJwtForgotPasswordStrategy
         ))
 
+        passport.use(PassportStrategy.jwtB2bInvite, new JwtStrategy(
+            {
+                jwtFromRequest: ExtractJwt.fromExtractors([this.passportConfig.jwtFromRequestHeader]),
+                secretOrKey: this.jwtConfig.secret
+            },
+            this.inviteEmployee
+        ))
+
         passport.use(PassportStrategy.jwtB2b, new JwtStrategy(
             {
                 jwtFromRequest: ExtractJwt.fromExtractors([this.passportConfig.jwtFromRequestHeader, this.passportConfig.jwtFromCookie]),
@@ -207,6 +215,23 @@ class PassportSetup {
                 throw new IError(401, 'Not authorized (JwtForgotPasswordStrategy)')
             }
             return done(null, admin)
+        } catch {
+            return done(null, false)
+        }
+    }
+
+    private async inviteEmployee(payload: JwtPayload, done: VerifyCallback) {
+        try {
+            if (payload.aud !== JwtAudience.inviteEmployee) {
+                throw new IError(401, 'Not authorized (JwtForgotPasswordStrategy)')
+            }
+            
+            return done(null, {
+                user: {
+                    email: payload.email,
+                    restaurantID: payload.restID 
+                } 
+            })
         } catch {
             return done(null, false)
         }
