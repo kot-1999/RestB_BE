@@ -29,12 +29,10 @@ export type EmailDataType<T extends EmailType> =
     } :
     T extends typeof EmailType.employeeInvite ? {
         email: string,
-        firstName: string | null,
-        lastName: string | null,
         restaurantName: string,
-        managerName: string,
+        managerFirstName: string,
+        managerLastName: string,
         position: string,
-        inviteCode: string,
-        expiryDate: string,
-        message?: string
+        link: string,
+        expiryDate: string
     } : never
