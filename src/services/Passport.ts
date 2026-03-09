@@ -227,10 +227,8 @@ class PassportSetup {
             }
             
             return done(null, {
-                user: {
-                    email: payload.email,
-                    restaurantID: payload.restID 
-                } 
+                email: payload.email,
+                restaurantID: payload.restID
             })
         } catch {
             return done(null, false)
