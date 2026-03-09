@@ -18,29 +18,22 @@
   <body>
     <div class="container">
       <h1>Employee Invitation</h1>
-      <p>Hi <%= firstName %> <%= lastName %>,</p>
-      <p>You've been invited to join <%= restaurantName %> as a <%= position %>.</p>
+      <p>Hello,</p>
+      <p>You've been invited to join <b><%= restaurantName %></b> as a <%= position %>.</p>
       
       <div class="invite-info">
         <h3>Invitation Details</h3>
         <p><strong>Restaurant:</strong> <%= restaurantName %></p>
         <p><strong>Position:</strong> <%= position %></p>
-        <p><strong>Invited by:</strong> <%= managerName %></p>
+        <p><strong>Invited by:</strong> <%= managerFirstName %> <%= managerLastName %></p>
       </div>
       
       <div class="code-box">
         <h3>Your Invitation Code</h3>
-        <p>Use this code to complete your registration:</p>
-        <div class="code-display"><%= inviteCode %></div>
+        <p>Use this link to complete your registration:</p>
+        <div class="code-display"><a href="<%= link %>">Accept invitation</a></div>
         <p><strong>Expires:</strong> <%= expiryDate %></p>
       </div>
-      
-      <% if (message) { %>
-      <div class="invite-info">
-        <h3>Message</h3>
-        <p><%= message %></p>
-      </div>
-      <% } %>
       
       <div class="footer">
         <p>If you have questions, please contact your manager.</p>
