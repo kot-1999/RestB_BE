@@ -96,13 +96,11 @@ class PrismaService {
                     findByID: queries.address.findByID,
                     createOne: queries.address.createOne,
                     updateOne: queries.address.updateOne
-                },
-                dashboard: {
-
                 }
-
             }
         })
+
+        this.client.dashboard = queries.dashboard
     }
 
     public getPrismaClient() {
