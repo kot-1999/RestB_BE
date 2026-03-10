@@ -17,12 +17,9 @@ export type EmailDataType<T extends EmailType> =
         email: string,
         firstName: string | null,
         lastName: string | null,
-        bookingId: string,
         restaurantName: string,
         bookingDate: string,
-        bookingTime: string,
         guestsNumber: number,
-        previousStatus: string,
         newStatus: string,
         updatedAt: string,
         message?: string

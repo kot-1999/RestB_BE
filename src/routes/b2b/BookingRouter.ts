@@ -57,7 +57,7 @@ export default function bookingRouter() {
     router.patch(
         /*
             #swagger.tags = ['b2c-v1-Booking', 'b2b-v1-Booking']
-            #swagger.description = '(Not Implemented) Update Booking',
+            #swagger.description = 'Update Booking',
             #swagger.parameters['body'] = {
                 in: 'body',
                 schema: { $ref: '#/definitions/b2bV1UpdateBookingReqBody' }
