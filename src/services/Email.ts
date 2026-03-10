@@ -1,6 +1,8 @@
 import * as path from 'node:path'
 
+import { BookingStatus } from '@prisma/client';
 import config from 'config'
+import dayjs from 'dayjs';
 import ejs from 'ejs'
 import { compile, compiledFunction } from 'html-to-text'
 import nodemailer from 'nodemailer'
@@ -105,6 +107,34 @@ class EmailService {
         return mailOptions
     }
 
+    private async bookingUpdate(data: EmailDataType<EmailType.bookingUpdated>)
+        : Promise<Mail.Options & { html: string }> {
+        const templatePath = path.join(__dirname, 'emailTemplates', 'bookingUpdated.ejs')
+
+        const templateData = {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            restaurantName: data.restaurantName,
+            bookingDate: dayjs(data.bookingDate).format('YYYY-MM-DD HH:mm'),
+            guestsNumber: data.guestsNumber,
+            newStatus: data.newStatus,
+            updatedAt: data.updatedAt,
+            message: data.message
+        }
+        const htmlContent = await ejs.renderFile(templatePath, templateData)
+
+        const subject = data.newStatus === BookingStatus.Pending ? 'RestBoo - New booking was created' : `RestBoo - Booking was ${data.newStatus}`
+
+        const mailOptions = {
+            from: this.config.fromAddress,
+            to: data.email,
+            subject,
+            html: htmlContent
+        }
+
+        return mailOptions
+    }
+
     public async sendEmail<T extends EmailType>(
         emailType: T,
         data: EmailDataType<T>
@@ -119,6 +149,9 @@ class EmailService {
             break
         case EmailType.employeeInvite:
             mailOptions = await this.buildEmployeeInvite(data as EmailDataType<EmailType.employeeInvite>)
+            break
+        case EmailType.bookingUpdated:
+            mailOptions = await this.bookingUpdate(data as EmailDataType<EmailType.bookingUpdated>)
             break
         default:
             throw new IError(500, `Unknown email type: ${emailType}`)
