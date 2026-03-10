@@ -3,10 +3,11 @@ import dayjs from 'dayjs';
 import { Response, NextFunction, AuthUserRequest } from 'express'
 import Joi from 'joi'
 
+import emailService from '../../../services/Email';
 import prisma from '../../../services/Prisma';
 import { AbstractController } from '../../../types/AbstractController'
 import { JoiCommon } from '../../../types/JoiCommon'
-import { AuthorType } from '../../../utils/enums';
+import { AuthorType, EmailType } from '../../../utils/enums';
 import { IError } from '../../../utils/IError';
 
 const allowedStatuses: BookingStatus[]
@@ -257,7 +258,9 @@ export class BookingController extends AbstractController {
                     id: true,
                     timeFrom: true,
                     timeTo: true,
-                    autoApprovedBookingsNum: true
+                    name: true,
+                    autoApprovedBookingsNum: true,
+                    brandID: true
                 }) as Promise<Restaurant>,
                 prisma.booking.groupBy({
                     by: ['restaurantID'],
@@ -295,25 +298,57 @@ export class BookingController extends AbstractController {
             const peopleTotallyBooked: number = bookingSum[0]?._sum.guestsNumber ?? 0
             const isAutoApproved = (restaurant.autoApprovedBookingsNum - (peopleTotallyBooked + body.guestsNumber)) >= 0
 
-            const booking = await prisma.booking.createOne({
-                guestsNumber: body.guestsNumber,
-                bookingTime: body.bookingTime,
-                status: isAutoApproved ?  BookingStatus.Approved : BookingStatus.Pending,
-                discussion: body.message ? [{
-                    authorID: user.id,
-                    authorType: AuthorType.User,
-                    message: body.message,
-                    createdAt: dayjs().toISOString()
-                }] : [],
-                userID: user.id,
-                restaurantID: body.restaurantID
+            const [booking, admins] = await Promise.all([
+                prisma.booking.createOne({
+                    guestsNumber: body.guestsNumber,
+                    bookingTime: body.bookingTime,
+                    status: isAutoApproved ?  BookingStatus.Approved : BookingStatus.Pending,
+                    discussion: body.message ? [{
+                        authorID: user.id,
+                        authorType: AuthorType.User,
+                        message: body.message,
+                        createdAt: dayjs().toISOString()
+                    }] : [],
+                    userID: user.id,
+                    restaurantID: body.restaurantID
+                }),
+                prisma.admin.findMany({
+                    select: {
+                        id: true,
+                        email: true
+                    },
+                    where: {
+                        brandID: restaurant.brandID
+                    }
+                }) as Promise<Admin[]>
+            ])
+
+            let emails = ''
+
+            for (let i = 0; i < admins.length; i++) {
+                emails += admins[i].email
+                if (i !== admins.length - 1) {
+                    emails += ', '
+                }
+            }
+
+            await emailService.sendEmail(EmailType.bookingUpdated, {
+                email: emails,
+                firstName: '',
+                lastName: '',
+                restaurantName: restaurant.name,
+                bookingDate: booking.bookingTime,
+                guestsNumber: booking.guestsNumber,
+                newStatus: booking.status,
+                updatedAt: dayjs().toISOString(),
+                message: body.message ?? undefined
             })
 
             return res.status(200).json({
                 booking: {
                     id: booking.id
                 },
-                message: 'Response from a backend template'
+                message: 'Booking was created successfully'
             })
         } catch (err) {
             return next(err)
