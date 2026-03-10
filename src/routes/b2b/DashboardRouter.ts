@@ -15,7 +15,7 @@ export default function dashboardRouter() {
     router.get(
         /*
             #swagger.tags = ['b2b-v1-Dashboard']
-            #swagger.description = '(Not Implemented) Get admin dashboard details.',
+            #swagger.description = 'Get admin dashboard details.',
             #swagger.security = [{
                 "bearerAuth": []
             }]
