@@ -1,12 +1,13 @@
 import { Admin, AdminRole, Booking, BookingStatus, Restaurant, User } from '@prisma/client';
 import dayjs from 'dayjs';
-import { Response, NextFunction, AuthAdminRequest } from 'express'
+import { AuthAdminRequest, NextFunction, Response } from 'express'
 import Joi from 'joi'
 
+import emailService from '../../../services/Email';
 import prisma from '../../../services/Prisma';
 import { AbstractController } from '../../../types/AbstractController'
 import { JoiCommon } from '../../../types/JoiCommon'
-import { AuthorType } from '../../../utils/enums';
+import { AuthorType, EmailType } from '../../../utils/enums';
 import { IError } from '../../../utils/IError';
 
 export class BookingController extends AbstractController {
@@ -63,9 +64,14 @@ export class BookingController extends AbstractController {
                         .valid(...Object.values(BookingStatus))
                         .required(),
 
-                    discussion: JoiCommon.object.discussionItem.keys({
-                        createdAt: Joi.forbidden()
-                    }).optional()
+                    message: Joi.string()
+                        .trim()
+                        .min(5)
+                        .when('status', {
+                            is: BookingStatus.Cancelled,
+                            then: Joi.required(),
+                            otherwise: Joi.allow(null).optional()
+                        })
                 }).required()
             })
         },
@@ -461,8 +467,112 @@ export class BookingController extends AbstractController {
         next: NextFunction
     ) {
         try {
+            const { user, params, body } = req
 
-            return res.status(200).json({ message: 'Response from a backend template' })
+            const booking = await prisma.booking.findByID(params.bookingID, {
+                id: true,
+                discussion: true,
+                status: true,
+                bookingTime: true,
+                guestsNumber: true,
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        firstName: true,
+                        lastName: true
+                    }
+                },
+                restaurant: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            })
+
+            if (!booking) {
+                throw new IError(404, 'Booking not found')
+            }
+
+            const nonUpgradableStates = [BookingStatus.NoShow, BookingStatus.Cancelled, BookingStatus.Completed, BookingStatus.Deleted]
+            const pendingUpdate: BookingStatus[] = [BookingStatus.Approved, BookingStatus.Cancelled]
+            const approvedUpdate: BookingStatus[] = [BookingStatus.NoShow, BookingStatus.Cancelled, BookingStatus.Completed]
+            const afterBooking: BookingStatus[] = [BookingStatus.Completed, BookingStatus.NoShow]
+            const isAdmin: boolean = !!user.role
+            const isAfter = dayjs().isAfter(booking.bookingTime)
+
+            if (nonUpgradableStates.includes(booking.status)) {
+                throw new IError(403, `Booking can not be updated from ${booking.status} status to ${body.status}`)
+            }
+
+            // Handle PENDING state
+            if (isAfter) {
+                throw new IError(403, 'Pending booking can not be updated after booking time')
+            }
+
+            if (booking.status === BookingStatus.Pending && !pendingUpdate.includes(body.status)) {
+                throw new IError(403, `Booking can not be moved from ${BookingStatus.Pending} to ${body.status}`)
+            }
+
+            if (booking.status === BookingStatus.Pending && body.status === BookingStatus.Approved && !isAdmin) {
+                throw new IError(403, 'User can not Approve booking')
+            }
+
+            // Handle APPROVED state
+            if (booking.status === BookingStatus.Approved && !approvedUpdate.includes(body.status)) {
+                throw new IError(403, `Booking can not be updated from ${booking.status} status to ${body.status}`)
+            }
+
+            if (booking.status === BookingStatus.Approved && body.status !== BookingStatus.Cancelled && !isAdmin) {
+                throw new IError(403, `User can not move Approved booking to ${body.status}`)
+            }
+
+            if (booking.status === BookingStatus.Approved && body.status === BookingStatus.Cancelled && isAfter) {
+                throw new IError(403, 'Booking can not be canceled after it\'s booking time')
+            }
+
+            if (afterBooking.includes(body.status) && !isAfter) {
+                throw new IError(403, `Booking can not be moved to ${body.status} before booking time`)
+            }
+
+            const discussion = booking.discussion ?? []
+
+            if (body.message) {
+                discussion.push({
+                    authorID: user.id,
+                    authorType: isAdmin ? AuthorType.Admin : AuthorType.User,
+                    message: body.message,
+                    createdAt: dayjs().toISOString()
+                })
+            }
+
+            await prisma.booking.updateOne(booking.id, {
+                status: body.status,
+                discussion: discussion
+            })
+            const emailStatuses: BookingStatus[] = [BookingStatus.Approved, BookingStatus.Cancelled]
+
+            if (emailStatuses.includes(body.status) && isAdmin) {
+                await emailService.sendEmail(EmailType.bookingUpdated, {
+                    email: booking.user.email,
+                    firstName: booking.user.firstName,
+                    lastName: booking.user.email,
+                    restaurantName: booking.restaurant.name,
+                    bookingDate: booking.bookingTime,
+                    guestsNumber: booking.guestsNumber,
+                    newStatus: body.status,
+                    updatedAt: dayjs().toISOString(),
+                    message: body.message ?? undefined
+                })
+            }
+
+            return res.status(200).json({
+                booking: {
+                    id: booking.id
+                },
+                message: `Booking was moved to ${body.status} state`
+            })
         } catch (err) {
             return next(err)
         }
