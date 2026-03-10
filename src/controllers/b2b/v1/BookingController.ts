@@ -498,6 +498,7 @@ export class BookingController extends AbstractController {
             const nonUpgradableStates = [BookingStatus.NoShow, BookingStatus.Cancelled, BookingStatus.Completed, BookingStatus.Deleted]
             const pendingUpdate: BookingStatus[] = [BookingStatus.Approved, BookingStatus.Cancelled]
             const approvedUpdate: BookingStatus[] = [BookingStatus.NoShow, BookingStatus.Cancelled, BookingStatus.Completed]
+            const afterBooking: BookingStatus[] = [BookingStatus.Completed, BookingStatus.NoShow]
             const isAdmin: boolean = !!user.role
             const isAfter = dayjs().isAfter(booking.bookingTime)
 
@@ -531,6 +532,10 @@ export class BookingController extends AbstractController {
                 throw new IError(403, 'Booking can not be canceled after it\'s booking time')
             }
 
+            if (afterBooking.includes(body.status) && !isAfter) {
+                throw new IError(403, `Booking can not be moved to ${body.status} before booking time`)
+            }
+
             const discussion = booking.discussion ?? []
 
             if (body.message) {
@@ -548,7 +553,6 @@ export class BookingController extends AbstractController {
             })
             const emailStatuses: BookingStatus[] = [BookingStatus.Approved, BookingStatus.Cancelled]
 
-            console.log(isAdmin)
             if (emailStatuses.includes(body.status) && isAdmin) {
                 await emailService.sendEmail(EmailType.bookingUpdated, {
                     email: booking.user.email,
