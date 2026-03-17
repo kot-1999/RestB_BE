@@ -16,7 +16,6 @@ services:
     command: >
       sh -c '
         npm install --legacy-peer-deps &&
-        npm run build:frontend &&
         npm run start;
       '
 
