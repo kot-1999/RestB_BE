@@ -7,6 +7,9 @@ import { AbstractController } from '../../../types/AbstractController'
 import { JoiCommon } from '../../../types/JoiCommon'
 import { IError } from '../../../utils/IError'
 
+/**
+ * @class AdminController handles administrators
+ * */
 export class AdminController extends AbstractController {
     private static readonly adminSchema = Joi.object({
         id: JoiCommon.string.id,
@@ -71,12 +74,19 @@ export class AdminController extends AbstractController {
 
     private GetAdminReqType: Joi.extractType<typeof AdminController.schemas.request.getAdmin>
     private GetAdminResType: Joi.extractType<typeof AdminController.schemas.response.getAdmin>
+    /**
+     * @method getAdmin retries admin by his ID
+     * @param req Authenticated admin request with adminID param
+     * @return Returns current admin from req.user if IDs match, otherwise queries DB
+     * @throws IError(404) if admin not found
+     */
     async getAdmin(
         req: AuthAdminRequest & typeof this.GetAdminReqType,
         res: Response<typeof this.GetAdminResType>,
         next: NextFunction
     ) {
         try {
+            req.params.adminID
             let resultAdmin: typeof this.GetAdminResType['admin'] | null = null
             const { user, params: { adminID } } = req
 
@@ -150,6 +160,11 @@ export class AdminController extends AbstractController {
 
     private UpdateAdminReqType: Joi.extractType<typeof AdminController.schemas.request.updateAdmin>
     private UpdateAdminResType: Joi.extractType<typeof AdminController.schemas.response.updateAdmin>
+    /**
+     * @method updateAdmin updates admin
+     * @param req Authenticated admin request
+     * @return Returns admin ID if update was successful
+     */
     public async updateAdmin(
         req: AuthAdminRequest & typeof this.UpdateAdminReqType,
         res: Response<typeof this.UpdateAdminResType>,
