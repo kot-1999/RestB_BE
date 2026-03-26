@@ -1,94 +1,70 @@
-import { AdminRole, Prisma, RestaurantCategories } from '@prisma/client'
-import dayjs from 'dayjs'
-import { Response, NextFunction, AuthAdminRequest } from 'express'
+import { BookingStatus, Prisma, Restaurant, RestaurantCategories } from '@prisma/client';
+import dayjs from 'dayjs';
+import { Response, NextFunction, Request } from 'express'
 import Joi from 'joi'
 
-import { OpenStreetMapService } from '../../../services/OpenStreetMapService'
-import prisma from '../../../services/Prisma'
+import { OpenStreetMapService } from '../../../services/OpenStreetMapService';
+import prisma from '../../../services/Prisma';
 import { AbstractController } from '../../../types/AbstractController'
 import { JoiCommon } from '../../../types/JoiCommon'
-import { IError } from '../../../utils/IError'
+import { IError } from '../../../utils/IError';
 
 export class RestaurantController extends AbstractController {
     public static readonly schemas = {
         request: {
+            getRestaurant: JoiCommon.object.request.keys({
+                params: Joi.object({
+                    restaurantID: JoiCommon.string.id
+                }).required(),
+                query: Joi.object({
+                    date: Joi.date().iso()
+                        .default(() => dayjs().toISOString())
+                }).required()
+            }).required(),
             getRestaurantList: JoiCommon.object.request.keys({
                 query: Joi.object({
+                    search: Joi.string().min(2)
+                        .optional(),
+                    radius: Joi.number().integer()
+                        .min(1)
+                        .max(100)
+                        .default(20),
                     brandID: JoiCommon.string.id.optional(),
+                    date: Joi.date().default(() => dayjs().toISOString()),
+                    categories: Joi.array().items(Joi.string().valid(...Object.values(RestaurantCategories)))
+                        .optional(),
                     page: Joi.number().positive()
                         .default(1),
                     limit: Joi.number().positive()
                         .default(20)
                 }).required()
-            }),
-            putRestaurant: JoiCommon.object.request.keys({
-                body: Joi.object({
-                    restaurantID: Joi.string().optional(),
-                    name: JoiCommon.string.companyName.required(),
-
-                    description: Joi.string()
-                        .min(20)
-                        .optional(),
-
-                    bannerURL: Joi.string()
-                        .uri()
-                        .required(),
-
-                    photosURL: Joi.array()
-                        .items(Joi.string())
-                        .required(),
-
-                    categories: Joi.array()
-                        .items(Joi.string()
-                            .valid(...Object.values(RestaurantCategories))
-                            .required())
-                        .min(1)
-                        .max(5)
-                        .required(),
-                    autoApprovedBookingsNum: Joi.number().integer()
-                        .default(0),
-                    timeFrom: JoiCommon.string.time.required(),
-
-                    timeTo: JoiCommon.string.time
-                        .custom((value, helpers) => {
-                            const { timeFrom } = helpers.state.ancestors[0];
-                            const from = dayjs(timeFrom, 'HH:mm', true);
-                            const to = dayjs(value, 'HH:mm', true);
-                            if (!to.isAfter(from)) {
-                                return helpers.error('any.invalid');
-                            }
-
-                            return value;
-                        }, 'time comparison')
-                        .required(),
-
-                    address: JoiCommon.object.address.keys({
-                        latitude: Joi.forbidden(),
-                        longitude: Joi.forbidden()
-                    }).required()
-                }).required()
             })
         },
         response: {
-            getRestaurantList: Joi.object({
+            getRestaurant: JoiCommon.object.restaurant.keys({
                 brand: JoiCommon.object.brand.required(),
-
-                restaurants: Joi.array()
-                    .items(JoiCommon.object.restaurant.keys({
-                        autoApprovedBookingsNum: Joi.number().integer()
+                address: JoiCommon.object.address.required(),
+                availability: Joi.object({
+                    date: Joi.date().iso()
+                        .required(),
+                    autoConfirmGuestsLimit: Joi.number().integer()
+                        .required() // How many more gusts can be confirmed automatically
+                }).required()
+            }).required(),
+            getRestaurantList: Joi.object({
+                restaurants: Joi.array().items(JoiCommon.object.restaurant.keys({
+                    brand: JoiCommon.object.brand.required(),
+                    address: JoiCommon.object.address.required(),
+                    availability: Joi.object({
+                        date: Joi.date().iso()
                             .required(),
-                        address: JoiCommon.object.address.required()
-                    }))
+                        autoConfirmGuestsLimit: Joi.number().integer()
+                            .required() // How many more gusts can be confirmed automatically
+                    }).required()
+                }))
                     .min(0)
                     .required(),
-
                 pagination: JoiCommon.object.pagination.required()
-            }).required(),
-            putRestaurant: Joi.object({
-                restaurant: Joi.object({
-                    id: JoiCommon.string.id
-                }).required(),
-                message: Joi.string().required()
             }).required()
         }
     }
@@ -97,40 +73,167 @@ export class RestaurantController extends AbstractController {
         super()
     }
 
+    private GetRestaurantReqType: Joi.extractType<typeof RestaurantController.schemas.request.getRestaurant>
+    private GetRestaurantResType: Joi.extractType<typeof RestaurantController.schemas.response.getRestaurant>
+    /**
+     * @method getRestaurant
+     * @param req Request object with restaurant ID and date query parameters.
+     * @param res Response object to send the restaurant details.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns detailed information about a specific restaurant, including its availability for a given date.
+     * @throws IError(404) if the restaurant is not found.
+     */
+    public async getRestaurant(
+        req: Request & typeof this.GetRestaurantReqType,
+        res: Response<typeof this.GetRestaurantResType>,
+        next: NextFunction
+    ) {
+        try {
+            const { params, query } = req
+
+            const [restaurant, booking] = await Promise.all([
+                prisma.restaurant.findByID(params.restaurantID, {
+                    id: true,
+                    name: true,
+                    description: true,
+                    bannerURL: true,
+                    photosURL: true,
+                    timeFrom: true,
+                    timeTo: true,
+                    categories: true,
+                    autoApprovedBookingsNum: true,
+                    brand: {
+                        select: {
+                            id: true,
+                            name: true,
+                            logoURL: true
+                        }
+                    },
+                    address: {
+                        select: {
+                            building: true,
+                            street: true,
+                            city: true,
+                            postcode: true,
+                            country: true,
+                            latitude: true,
+                            longitude: true
+                        }
+                    }
+                }),
+                prisma.booking.aggregate({
+                    _sum: {
+                        guestsNumber: true
+                    },
+                    where: {
+                        bookingTime: {
+                            gte: dayjs(query.date).startOf('day'),
+                            lt: dayjs(query.date).endOf('day')
+                        },
+                        restaurantID: params.restaurantID,
+                        status: BookingStatus.Approved
+                    }
+                })
+            ])
+
+            if (!restaurant) {
+                throw new IError(404, 'Restaurant was not found')
+            }
+
+            return res.status(200).json({
+                ...restaurant,
+                availability: {
+                    autoConfirmGuestsLimit: restaurant.autoApprovedBookingsNum - booking._sum.guestsNumber,
+                    date: query.date
+                }
+            })
+        } catch (err) {
+            return next(err)
+        }
+    }
+
     private GetRestaurantListReqType: Joi.extractType<typeof RestaurantController.schemas.request.getRestaurantList>
     private GetRestaurantListResType: Joi.extractType<typeof RestaurantController.schemas.response.getRestaurantList>
+    /**
+     * @method getRestaurantList
+     * @param req Request object with query parameters for filtering and pagination.
+     * @param res Response object to send the list of restaurants.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns a paginated list of restaurants, optionally filtered by search, radius, brand, and categories.
+     * @throws IError(404) if no restaurants are found in the given area or if the brand doesn't exist.
+     */
     public async getRestaurantList(
-        req: AuthAdminRequest & typeof this.GetRestaurantListReqType,
+        req: Request & typeof this.GetRestaurantListReqType,
         res: Response<typeof this.GetRestaurantListResType>,
         next: NextFunction
     ) {
         try {
-            const { query, user } = req
+            const { query } = req
 
+            const where: { AND: Prisma.RestaurantWhereInput[] } = { AND: [] }
             const skip = (query.page - 1) * query.limit;
-            let where: Prisma.RestaurantWhereInput = {
-                brandID: user.brandID
-            }
-            
-            if (user.role === AdminRole.Employee) {
-                where = {
-                    ...where,
-                    staff: {
-                        some: {
-                            adminID: user.id
+
+            // Geo Search
+            if (query.search) {
+                const coord = await OpenStreetMapService.search(query.search)
+
+                if (!coord) {
+                    throw new IError(404, 'Could not find restaurants in given area')
+                }
+
+                const earthRadiusKmPerDegree = 111
+
+                const latDelta = query.radius / earthRadiusKmPerDegree
+
+                const lngDelta
+                    = query.radius
+                    / (earthRadiusKmPerDegree
+                        * Math.cos(Number(coord.lat) * Math.PI / 180))
+
+                where.AND.push({
+                    address: {
+                        is: {
+                            latitude: {
+                                gte: Number(coord.lat) - latDelta,
+                                lte: Number(coord.lat) + latDelta
+                            },
+                            longitude: {
+                                gte: Number(coord.lon) - lngDelta,
+                                lte: Number(coord.lon) + lngDelta
+                            }
                         }
                     }
-                }
+                })
             }
 
-            const [count, brand, restaurants] = await Promise.all([
+            if (query.brandID) {
+                const brand = await prisma.brand.findByID(
+                    query.brandID,
+                    { id: true }
+                )
+
+                if (!brand) {
+                    throw new IError(404, "Brand doesn't exist")
+                }
+
+                where.AND.push({
+                    brandID: query.brandID
+                })
+            }
+
+            if (query.categories?.length) {
+                where.AND.push({
+                    AND: query.categories.map((cat) => ({
+                        categories: {
+                            path: '$[*]',
+                            array_contains: cat // or any string value
+                        }
+                    }))
+                })
+            }
+            const [count, restaurants] = await Promise.all([
                 prisma.restaurant.count({
                     where
-                }),
-                prisma.brand.findByID(user.brandID, {
-                    id: true,
-                    name: true,
-                    logoURL: true
                 }),
                 prisma.restaurant.findMany({
                     skip,
@@ -146,6 +249,13 @@ export class RestaurantController extends AbstractController {
                         timeTo: true,
                         categories: true,
                         autoApprovedBookingsNum: true,
+                        brand: {
+                            select: {
+                                id: true,
+                                name: true,
+                                logoURL: true
+                            }
+                        },
                         address: {
                             select: {
                                 building: true,
@@ -156,11 +266,6 @@ export class RestaurantController extends AbstractController {
                                 latitude: true,
                                 longitude: true
                             }
-                        },
-                        staff: {
-                            select: {
-                                adminID: true
-                            }
                         }
                     },
                     orderBy: {
@@ -168,106 +273,44 @@ export class RestaurantController extends AbstractController {
                     }
                 })
             ])
-            
-            restaurants.forEach((restaurant: any) => { delete restaurant.staff })
+
+            const bookingSums = await prisma.booking.groupBy({
+                by: ['restaurantID'],       // group by restaurant
+                _sum: { guestsNumber: true }, // sum guests per restaurant
+                where: {
+                    restaurantID: { in: restaurants.map((rest: Restaurant) => rest.id) }, // array of restaurant IDs
+                    status: {
+                        in: [BookingStatus.Approved, BookingStatus.Completed]
+                    },
+                    bookingTime: {
+                        gte: dayjs(query.date).startOf('day')
+                            .toDate(),
+                        lt: dayjs(query.date).endOf('day')
+                            .toDate()
+                    }
+                }
+            });
 
             return res.status(200).json({
-                brand,
-                restaurants,
+                restaurants: restaurants.map((restaurant: any) => {
+                    const bookingSum = bookingSums.find((booking: any) => booking.restaurantID === restaurant.id)
+
+                    return {
+                        ...restaurant,
+                        availability: {
+                            autoConfirmGuestsLimit:
+                                bookingSum
+                                    ? restaurant.autoApprovedBookingsNum - bookingSum._sum.guestsNumber
+                                    : restaurant.autoApprovedBookingsNum,
+                            date: query.date
+                        }
+                    }
+                }),
                 pagination: {
                     page: query.page,
                     limit: query.limit,
                     total: count
                 }
-            })
-        } catch (err) {
-            return next(err)
-        }
-    }
-
-    private PutRestaurantReqType: Joi.extractType<typeof RestaurantController.schemas.request.putRestaurant>
-    private PutRestaurantResType: Joi.extractType<typeof RestaurantController.schemas.response.putRestaurant>
-    public async putRestaurant(
-        req: AuthAdminRequest & typeof this.PutRestaurantReqType,
-        res: Response<typeof this.PutRestaurantResType>,
-        next: NextFunction
-    ) {
-        try {
-            const { body, user } = req
-
-            const resAddress = await OpenStreetMapService.searchAddress(body.address)
-
-            if (!resAddress) {
-                throw new IError(400, 'Provided address was not recognized')
-            }
-
-            let restaurant
-
-            if (body.restaurantID) {
-                restaurant = await prisma.restaurant.findByID(body.restaurantID, {
-                    id: true,
-                    brandID: true 
-                })
-
-                if (!restaurant) {
-                    throw new IError(404, 'Restaurant not found')
-                }
-
-                if (user.brandID !== restaurant.brandID) {
-                    throw new IError(403, 'Not a restaurant owner')
-                }
-                
-                restaurant = await prisma.restaurant.updateOne(body.restaurantID, {
-                    name: req.body.name,
-                    description: req.body.description,
-                    bannerURL: req.body.bannerURL,
-                    photosURL: req.body.photosURL,
-                    categories: req.body.categories,
-                    autoApprovedBookingsNum: req.body.autoApprovedBookingsNum,
-                    timeFrom: req.body.timeFrom,
-                    timeTo: req.body.timeTo,
-                    address: {   // nested update
-                        update: {
-                            building: req.body.address.building,
-                            street: req.body.address.street,
-                            city: req.body.address.city,
-                            postcode: req.body.address.postcode,
-                            country: req.body.address.country,
-                            latitude: resAddress.lat,
-                            longitude: resAddress.lon
-                        }
-                    }
-                })
-            } else {
-                restaurant = await prisma.restaurant.createOne({
-                    name: req.body.name,
-                    description: req.body.description,
-                    bannerURL: req.body.bannerURL,
-                    photosURL: req.body.photosURL,
-                    categories: req.body.categories,
-                    autoApprovedBookingsNum: req.body.autoApprovedBookingsNum,
-                    timeFrom: req.body.timeFrom,
-                    timeTo: req.body.timeTo,
-                    address: {   // nested create
-                        create: {
-                            building: req.body.address.building,
-                            street: req.body.address.street,
-                            city: req.body.address.city,
-                            postcode: req.body.address.postcode,
-                            country: req.body.address.country,
-                            latitude: resAddress.lat,
-                            longitude: resAddress.lon
-                        }
-                    },
-                    brand: { connect: { id: user.brandID } }
-                })
-            }
-
-            return res.status(200).json({
-                restaurant: {
-                    id: restaurant.id
-                },
-                message: body.restaurantID ? 'Restaurant was updated successfully' : 'Restaurant was created successfully.'
             })
         } catch (err) {
             return next(err)

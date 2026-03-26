@@ -75,6 +75,14 @@ export class RestaurantController extends AbstractController {
 
     private GetRestaurantReqType: Joi.extractType<typeof RestaurantController.schemas.request.getRestaurant>
     private GetRestaurantResType: Joi.extractType<typeof RestaurantController.schemas.response.getRestaurant>
+    /**
+     * @method getRestaurant
+     * @param req Request object with restaurant ID and date query parameters.
+     * @param res Response object to send the restaurant details.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns detailed information about a specific restaurant, including its availability for a given date.
+     * @throws IError(404) if the restaurant is not found.
+     */
     public async getRestaurant(
         req: Request & typeof this.GetRestaurantReqType,
         res: Response<typeof this.GetRestaurantResType>,
@@ -146,6 +154,14 @@ export class RestaurantController extends AbstractController {
 
     private GetRestaurantListReqType: Joi.extractType<typeof RestaurantController.schemas.request.getRestaurantList>
     private GetRestaurantListResType: Joi.extractType<typeof RestaurantController.schemas.response.getRestaurantList>
+    /**
+     * @method getRestaurantList
+     * @param req Request object with query parameters for filtering and pagination.
+     * @param res Response object to send the list of restaurants.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns a paginated list of restaurants, optionally filtered by search, radius, brand, and categories.
+     * @throws IError(404) if no restaurants are found in the given area or if the brand doesn't exist.
+     */
     public async getRestaurantList(
         req: Request & typeof this.GetRestaurantListReqType,
         res: Response<typeof this.GetRestaurantListResType>,
@@ -282,7 +298,7 @@ export class RestaurantController extends AbstractController {
                     return {
                         ...restaurant,
                         availability: {
-                            autoConfirmGuestsLimit: 
+                            autoConfirmGuestsLimit:
                                 bookingSum
                                     ? restaurant.autoApprovedBookingsNum - bookingSum._sum.guestsNumber
                                     : restaurant.autoApprovedBookingsNum,

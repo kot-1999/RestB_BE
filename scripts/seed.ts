@@ -25,7 +25,7 @@ const GEO_BOX = {
     maxLng: 0.7
 };
 
-const GRAIN = 300
+const GRAIN = 100
 
 async function seed() {
     const userData: any[] = []
