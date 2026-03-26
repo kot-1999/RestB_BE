@@ -99,6 +99,13 @@ export class BookingController extends AbstractController {
     private GetBookingListReqType: Joi.extractType<typeof BookingController.schemas.request.getBookingList>
     private GetBookingListResType: Joi.extractType<typeof BookingController.schemas.response.getBookingList>
 
+    /**
+     * @method getBookingList
+     * @param req Authenticated user request with query parameters for filtering and pagination.
+     * @param res Response object to send the list of user bookings.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns a paginated list of bookings for the authenticated user, optionally filtered by date and status.
+     */
     public async getBookingList(
         req: AuthUserRequest & typeof this.GetBookingListReqType,
         res: Response<typeof this.GetBookingListResType>,
@@ -243,6 +250,15 @@ export class BookingController extends AbstractController {
 
     private PostBookingReqType: Joi.extractType<typeof BookingController.schemas.request.postBooking>
     private PostBookingResType: Joi.extractType<typeof BookingController.schemas.response.postBooking>
+    /**
+     * @method postBooking
+     * @param req Authenticated user request with new booking details.
+     * @param res Response object to confirm the booking creation.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns the ID of the newly created booking and a success message.
+     * @throws IError(404) if the restaurant is not found.
+     * @throws IError(400) if the restaurant does not accept bookings at the given time or if there are no available spots.
+     */
     public async postBooking(
         req: AuthUserRequest & typeof this.PostBookingReqType,
         res: Response<typeof this.PostBookingResType>,

@@ -82,6 +82,14 @@ export class AuthorizationController extends AbstractController {
 
     private RegisterReqType: Joi.extractType<typeof AuthorizationController.schemas.request.register>
     private RegisterResType: Joi.extractType<typeof AuthorizationController.schemas.response.register>
+    /**
+     * @method register
+     * @param req Request object with new user details.
+     * @param res Response object to send the new user's token.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns the new user's ID, JWT token, and a success message.
+     * @throws IError(409) if a profile with the same email already exists.
+     */
     public async register(
         req: Request & typeof this.RegisterReqType,
         res: Response<typeof this.RegisterResType>,
@@ -143,6 +151,14 @@ export class AuthorizationController extends AbstractController {
 
     private LoginReqType: Joi.extractType<typeof AuthorizationController.schemas.request.login>
     private LoginResType: Joi.extractType<typeof AuthorizationController.schemas.response.login>
+    /**
+     * @method login
+     * @param req Request object with user credentials.
+     * @param res Response object to send the user's token.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns the user's ID, JWT token, and a success message.
+     * @throws IError(401) if the password or email is incorrect.
+     */
     public async login(
         req: Request & typeof this.LoginReqType,
         res: Response<typeof this.LoginResType>,
@@ -190,6 +206,13 @@ export class AuthorizationController extends AbstractController {
         }
     }
 
+    /**
+     * @method googleRedirect
+     * @param req Request object.
+     * @param res Response object.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns a JSON response with a message indicating the callback URI.
+     */
     public googleRedirect(
         req: Request,
         res: Response,
@@ -203,6 +226,13 @@ export class AuthorizationController extends AbstractController {
     }
 
     private LogoutResType: Joi.extractType<typeof AuthorizationController.schemas.response.logout>
+    /**
+     * @method logout
+     * @param req Authenticated user request.
+     * @param res Response object to confirm logout.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns the ID of the logged-out user and a success message.
+     */
     public async logout(
         req: AuthUserRequest,
         res: Response<typeof this.LogoutResType>,
@@ -245,6 +275,13 @@ export class AuthorizationController extends AbstractController {
 
     private ForgotPasswordReqType: Joi.extractType<typeof AuthorizationController.schemas.request.forgotPassword>
     private ForgotPasswordResType: Joi.extractType<typeof AuthorizationController.schemas.response.forgotPassword>
+    /**
+     * @method forgotPassword
+     * @param req Request object with user email for password recovery.
+     * @param res Response object to confirm email sending.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns a success message indicating the email with the password recovery link was sent.
+     */
     public async forgotPassword(
         req: Request & typeof this.ForgotPasswordReqType,
         res: Response<typeof this.ForgotPasswordResType>,
@@ -286,6 +323,13 @@ export class AuthorizationController extends AbstractController {
     }
     private ResetPasswordReqType: Joi.extractType<typeof AuthorizationController.schemas.request.resetPassword>
     private ResetPasswordResType: Joi.extractType<typeof AuthorizationController.schemas.response.resetPassword>
+    /**
+     * @method resetPassword
+     * @param req Authenticated user request with new password in the body.
+     * @param res Response object to confirm password reset.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns the ID of the user whose password was reset and a success message.
+     */
     public async resetPassword(
         req: AuthUserRequest & typeof this.ResetPasswordReqType,
         res: Response<typeof this.ResetPasswordResType>,
@@ -315,6 +359,6 @@ export class AuthorizationController extends AbstractController {
         } catch (err) {
             return next(err)
         }
-    
+
     }
 }

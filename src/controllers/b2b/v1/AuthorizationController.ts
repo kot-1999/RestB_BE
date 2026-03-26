@@ -108,6 +108,14 @@ export class AuthorizationController extends AbstractController {
 
     private RegisterReqType: Joi.extractType<typeof AuthorizationController.schemas.request.register>
     private RegisterResType: Joi.extractType<typeof AuthorizationController.schemas.response.register>
+    /**
+     * @method register
+     * @param req Request object with new admin and brand details.
+     * @param res Response object to send the new admin's token.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns the new admin's ID, JWT token, role, and a success message.
+     * @throws IError(409) if a profile with the same email already exists.
+     */
     public async register(
         req: Request & typeof this.RegisterReqType,
         res: Response<typeof this.RegisterResType>,
@@ -147,7 +155,7 @@ export class AuthorizationController extends AbstractController {
 
                 return {
                     brand,
-                    admin 
+                    admin
                 };
             });
 
@@ -185,6 +193,14 @@ export class AuthorizationController extends AbstractController {
 
     private LoginReqType: Joi.extractType<typeof AuthorizationController.schemas.request.login>
     private LoginResType: Joi.extractType<typeof AuthorizationController.schemas.response.login>
+    /**
+     * @method login
+     * @param req Request object with admin credentials.
+     * @param res Response object to send the admin's token.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns the admin's ID, JWT token, role, and a success message.
+     * @throws IError(401) if the password or email is incorrect.
+     */
     public async login(
         req: Request & typeof this.LoginReqType,
         res: Response<typeof this.LoginResType>,
@@ -234,6 +250,13 @@ export class AuthorizationController extends AbstractController {
     }
 
     private LogoutResType: Joi.extractType<typeof AuthorizationController.schemas.response.logout>
+    /**
+     * @method logout
+     * @param req Authenticated admin request.
+     * @param res Response object to confirm logout.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns the ID of the logged-out admin and a success message.
+     */
     public async logout(
         req: AuthAdminRequest,
         res: Response<typeof this.LogoutResType>,
@@ -276,6 +299,13 @@ export class AuthorizationController extends AbstractController {
 
     private ForgotPasswordReqType: Joi.extractType<typeof AuthorizationController.schemas.request.forgotPassword>
     private ForgotPasswordResType: Joi.extractType<typeof AuthorizationController.schemas.response.forgotPassword>
+    /**
+     * @method forgotPassword
+     * @param req Request object with the admin's email.
+     * @param res Response object to confirm that the password reset email has been sent.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns a success message.
+     */
     public async forgotPassword(
         req: Request & typeof this.ForgotPasswordReqType,
         res: Response<typeof this.ForgotPasswordResType>,
@@ -317,6 +347,13 @@ export class AuthorizationController extends AbstractController {
     }
     private ResetPasswordReqType: Joi.extractType<typeof AuthorizationController.schemas.request.resetPassword>
     private ResetPasswordResType: Joi.extractType<typeof AuthorizationController.schemas.response.resetPassword>
+    /**
+     * @method resetPassword
+     * @param req Authenticated admin request with the new password.
+     * @param res Response object to confirm the password has been reset.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns the admin's ID and a success message.
+     */
     public async resetPassword(
         req: AuthAdminRequest & typeof this.ResetPasswordReqType,
         res: Response<typeof this.ResetPasswordResType>,
@@ -351,6 +388,16 @@ export class AuthorizationController extends AbstractController {
 
     private InviteAdminReqType: Joi.extractType<typeof AuthorizationController.schemas.request.inviteAdmin>
     private InviteAdminResType: Joi.extractType<typeof AuthorizationController.schemas.response.inviteAdmin>
+    /**
+     * @method inviteAdmin
+     * @param req Authenticated admin request with the new admin's email and restaurant ID.
+     * @param res Response object to confirm the invitation has been sent.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns a success message.
+     * @throws IError(404) if the restaurant is not found.
+     * @throws IError(403) if the inviting admin is not the owner of the restaurant.
+     * @throws IError(409) if an admin with the same email already exists.
+     */
     public async inviteAdmin(
         req: AuthAdminRequest & typeof this.InviteAdminReqType,
         res: Response<typeof this.InviteAdminResType>,
@@ -361,7 +408,7 @@ export class AuthorizationController extends AbstractController {
 
             const restaurant = await prisma.restaurant.findByID(body.restaurantID, {
                 id: true,
-                name: true 
+                name: true
             })
 
             if (!restaurant) {
@@ -394,6 +441,19 @@ export class AuthorizationController extends AbstractController {
 
     private RegisterEmployeeReqType: Joi.extractType<typeof AuthorizationController.schemas.request.registerEmployee>
     private RegisterEmployeeResType: Joi.extractType<typeof AuthorizationController.schemas.response.registerEmployee>
+    /**
+     * @method registerEmployee
+     * @param req Request object with the new employee's details.
+     * @param res Response object to send the new employee's token.
+
+     /**
+     * @method registerEmployee
+     * @param req Request object with the new employee's details.
+     * @param res Response object to send the new employee's token.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns the new employee's ID, JWT token, role, and a success message.
+     * @throws IError(404) if the invitation is not found.
+     */
     public async registerEmployee(
         req: EmployeeRegisterRequest & typeof this.RegisterEmployeeReqType,
         res: Response<typeof this.RegisterEmployeeResType>,

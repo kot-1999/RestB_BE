@@ -41,6 +41,15 @@ export class BrandController extends AbstractController {
 
     private UpdateBrandReqType: Joi.extractType<typeof BrandController.schemas.request.updateBrand>
     private UpdateBrandResType: Joi.extractType<typeof BrandController.schemas.response.updateBrand>
+    /**
+     * @method updateBrand
+     * @param req Authenticated admin request with brand ID and updated brand details.
+     * @param res Response object to confirm the brand update.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns the ID of the updated brand and a success message.
+     * @throws IError(404) if the brand is not found.
+     * @throws IError(403) if the admin is not the owner of the brand.
+     */
     public async updateBrand(
         req: AuthAdminRequest & typeof this.UpdateBrandReqType,
         res: Response<typeof this.UpdateBrandResType>,
@@ -48,11 +57,11 @@ export class BrandController extends AbstractController {
     ) {
         try {
             const { user, params, body } = req
-            
+
             const brand = await prisma.brand.findByID(params.brandID, {
                 id: true,
                 name: true,
-                logoURL: true 
+                logoURL: true
             })
 
             if (!brand) {

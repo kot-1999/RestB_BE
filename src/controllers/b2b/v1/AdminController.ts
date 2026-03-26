@@ -75,10 +75,12 @@ export class AdminController extends AbstractController {
     private GetAdminReqType: Joi.extractType<typeof AdminController.schemas.request.getAdmin>
     private GetAdminResType: Joi.extractType<typeof AdminController.schemas.response.getAdmin>
     /**
-     * @method getAdmin retries admin by his ID
-     * @param req Authenticated admin request with adminID param
-     * @return Returns current admin from req.user if IDs match, otherwise queries DB
-     * @throws IError(404) if admin not found
+     * @method getAdmin
+     * @param req Authenticated admin request with adminID param.
+     * @param res Response object to send the admin data.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns current admin from req.user if IDs match, otherwise queries DB.
+     * @throws IError(404) if admin not found.
      */
     async getAdmin(
         req: AuthAdminRequest & typeof this.GetAdminReqType,
@@ -137,6 +139,13 @@ export class AdminController extends AbstractController {
 
     private DeleteAdminReqType: Joi.extractType<typeof AdminController.schemas.request.deleteAdmin>
     private DeleteAdminResType: Joi.extractType<typeof AdminController.schemas.response.deleteAdmin>
+    /**
+     * @method deleteAdmin
+     * @param req Authenticated admin request.
+     * @param res Response object to send the result of the operation.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns the ID of the deleted admin and a success message.
+     */
     public async deleteAdmin(
         req: AuthAdminRequest & typeof this.DeleteAdminReqType,
         res: Response<typeof this.DeleteAdminResType>,
@@ -160,10 +169,13 @@ export class AdminController extends AbstractController {
 
     private UpdateAdminReqType: Joi.extractType<typeof AdminController.schemas.request.updateAdmin>
     private UpdateAdminResType: Joi.extractType<typeof AdminController.schemas.response.updateAdmin>
+
     /**
-     * @method updateAdmin updates admin
-     * @param req Authenticated admin request
-     * @return Returns admin ID if update was successful
+     * @method updateAdmin
+     * @param req Authenticated admin request with updated admin details in the body.
+     * @param res Response object to send the result of the operation.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns the ID of the updated admin and a success message.
      */
     public async updateAdmin(
         req: AuthAdminRequest & typeof this.UpdateAdminReqType,
