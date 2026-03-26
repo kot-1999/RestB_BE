@@ -158,6 +158,15 @@ export class BookingController extends AbstractController {
 
     private GetBookingDetailsReqType: Joi.extractType<typeof BookingController.schemas.request.getBookingDetails>
     private GetBookingDetailsResType: Joi.extractType<typeof BookingController.schemas.response.getBookingDetails>
+    /**
+     * @method getBookingDetails
+     * @param req Authenticated admin request with restaurant ID and booking query parameters.
+     * @param res Response object to send the booking details.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns detailed information about a restaurant and its bookings.
+     * @throws IError(404) if the restaurant is not found.
+     * @throws IError(403) if the admin is not authorized to view bookings for this restaurant.
+     */
     public async getBookingDetails(
         req: AuthAdminRequest & typeof this.GetBookingDetailsReqType,
         res: Response<typeof this.GetBookingDetailsResType>,
@@ -307,7 +316,7 @@ export class BookingController extends AbstractController {
                     user: booking.user,
                     discussion: booking.discussion ? (booking.discussion as any[]).map((discussion) => {
                         let author: Partial<Admin> | Partial<User> = booking.user
-                        
+
                         if (discussion.authorType === AuthorType.Admin) {
                             const resultAdmin = admins.find((admin) => admin.id === discussion.authorID)
                             if (resultAdmin) {
@@ -344,6 +353,13 @@ export class BookingController extends AbstractController {
 
     private GetBookingListReqType: Joi.extractType<typeof BookingController.schemas.request.getBookingList>
     private GetBookingListResType: Joi.extractType<typeof BookingController.schemas.response.getBookingList>
+    /**
+     * @method getBookingList
+     * @param req Authenticated admin request with pagination query parameters.
+     * @param res Response object to send the list of restaurants with booking summaries.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns a list of restaurants associated with the admin's brand, along with daily booking summaries.
+     */
     public async getBookingList(
         req: AuthAdminRequest & typeof this.GetBookingListReqType,
         res: Response<typeof this.GetBookingListResType>,
@@ -461,6 +477,15 @@ export class BookingController extends AbstractController {
 
     private UpdateBookingReqType: Joi.extractType<typeof BookingController.schemas.request.updateBooking>
     private UpdateBookingResType: Joi.extractType<typeof BookingController.schemas.response.updateBooking>
+    /**
+     * @method updateBooking
+     * @param req Authenticated admin request with booking ID and new status/message.
+     * @param res Response object to confirm the booking update.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns the ID of the updated booking and a success message.
+     * @throws IError(404) if the booking is not found.
+     * @throws IError(403) if the admin is not authorized to update this booking.
+     */
     public async updateBooking(
         req: AuthAdminRequest & typeof this.UpdateBookingReqType,
         res: Response<typeof this.UpdateBookingResType>,

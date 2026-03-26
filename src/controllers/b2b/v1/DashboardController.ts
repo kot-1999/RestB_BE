@@ -90,13 +90,22 @@ export class DashboardController extends AbstractController {
 
     private GetDashboardReqType: Joi.extractType<typeof DashboardController.schemas.request.getDashboard>
     private GetDashboardResType: Joi.extractType<typeof DashboardController.schemas.response.getDashboard>
+
+    /**
+     * @method getDashboard
+     * @param req Authenticated admin request with optional timeFrom and timeTo query parameters.
+     * @param res Response object to send the dashboard data.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns a dashboard summary including brand information, restaurant data with booking statistics, and the queried time range.
+     * @throws IError(404) if staff not found for a non-Admin role.
+     */
     public async getDashboard(
         req: AuthAdminRequest & typeof this.GetDashboardReqType,
         res: Response<typeof this.GetDashboardResType>,
         next: NextFunction
     ) {
         try {
-            const { user, query } = req
+            const {user, query} = req
             const restaurantIDs = []
 
             if (user.role === AdminRole.Admin) {
@@ -152,7 +161,7 @@ export class DashboardController extends AbstractController {
                             in: restaurantIDs
                         }
                     }
-                }) as Promise<{ id: string, name: string, bannerURL: string}[]>
+                }) as Promise<{ id: string, name: string, bannerURL: string }[]>
             ])
 
             return res.status(200).json({
