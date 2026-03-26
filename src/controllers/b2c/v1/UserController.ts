@@ -68,6 +68,14 @@ export class UsersController extends AbstractController {
 
     private GetUserReqType: Joi.extractType<typeof UsersController.schemas.request.getUser>
     private GetUserResType: Joi.extractType<typeof UsersController.schemas.response.getUser>
+    /**
+     * @method getUser
+     * @param req Authenticated user request with userID param.
+     * @param res Response object to send the user data.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns current user from req.user if IDs match, otherwise queries DB.
+     * @throws IError(404) if user not found.
+     */
     async getUser(
         req: AuthUserRequest & typeof this.GetUserReqType,
         res: Response<typeof this.GetUserResType>,
@@ -105,7 +113,7 @@ export class UsersController extends AbstractController {
                     }
                 })
             }
-            
+
             if (!resultUser) {
                 throw new IError(404, 'User was not found')
             }
@@ -120,6 +128,13 @@ export class UsersController extends AbstractController {
 
     private DeleteUserReqType: Joi.extractType<typeof UsersController.schemas.request.deleteUser>
     private DeleteUserResType: Joi.extractType<typeof UsersController.schemas.response.deleteUser>
+    /**
+     * @method deleteUser
+     * @param req Authenticated user request.
+     * @param res Response object to confirm user deletion.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns the ID of the deleted user and a success message.
+     */
     public async deleteUser(
         req: AuthUserRequest & typeof this.DeleteUserReqType,
         res: Response<typeof this.DeleteUserResType>,
@@ -143,6 +158,13 @@ export class UsersController extends AbstractController {
 
     private UpdateUserReqType: Joi.extractType<typeof UsersController.schemas.request.updateUser>
     private UpdateUserResType: Joi.extractType<typeof UsersController.schemas.response.updateUser>
+    /**
+     * @method updateUser
+     * @param req Authenticated user request with updated user details in the body.
+     * @param res Response object to confirm user update.
+     * @param next NextFunction to pass control to the next middleware.
+     * @returns Returns the ID of the updated user and a success message.
+     */
     public async updateUser(
         req: AuthUserRequest & typeof this.UpdateUserReqType,
         res: Response<typeof this.UpdateUserResType>,
@@ -155,7 +177,7 @@ export class UsersController extends AbstractController {
                 user.id,
                 {
                     ...body,
-                    deletedAt: null 
+                    deletedAt: null
                 }
             )
 
