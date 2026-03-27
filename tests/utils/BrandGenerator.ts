@@ -12,13 +12,11 @@ export default class BrandGenerator {
     }
 
     public static generateData(brandData: Partial<Brand> = {}): Brand {
+        const name = brandData.name ?? faker.company.name()
         return {
             id: brandData.id ?? faker.string.uuid(),
-            name: brandData.name ?? faker.company.name(),
-            logoURL: brandData.logoURL ?? faker.image.urlPicsumPhotos({
-                width: 200,
-                height: 200
-            }),
+            name,
+            logoURL: brandData.logoURL ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=256&background=random`,
             createdAt: brandData.createdAt as Date ?? new Date(dayjs().toISOString()),
             updatedAt: brandData.updatedAt as Date ?? new Date(dayjs().toISOString()),
             deletedAt: brandData.deletedAt ?? null

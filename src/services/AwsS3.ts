@@ -85,6 +85,36 @@ class AwsS3 {
     public async getPublicUrl(key: string) {
         return `${this.s3Config.endpoint.replace('rustfs_dev', 'localhost')}/${this.bucketName}/${key}`
     }
+
+    public async uploadFile(filePath: string, keyPrefix: 'banner' | 'menu') {
+        const fs = await import('fs')
+        const path = await import('path')
+
+        const fileBuffer = fs.readFileSync(filePath)
+        const filename = path.basename(filePath)
+
+        const key = `${keyPrefix}/${randomUUID()}-${filename}`
+
+        await this.s3.send(new PutObjectCommand({
+            Bucket: this.bucketName,
+            Key: key,
+            Body: fileBuffer,
+            ContentType: this.getContentType(filename),
+            ACL: 'public-read'
+        }))
+
+        return this.getPublicUrl(key)
+    }
+
+    private getContentType(filename: string) {
+        if (filename.endsWith('.png')) {
+            return 'image/png'
+        }
+        if (filename.endsWith('.jpg') || filename.endsWith('.jpeg')) {
+            return 'image/jpeg'
+        }
+        return 'application/octet-stream'
+    }
 }
 
 const s3Config = config.get<IConfig['s3']>('s3')

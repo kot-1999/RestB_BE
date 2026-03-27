@@ -19,7 +19,7 @@ export default class UserGenerator {
             emailVerified: userData.emailVerified ?? false,
             password: userData.password ?? EncryptionService.hashSHA256(faker.internet.password()),
             type: userData.type ?? UserType.Default,
-            avatarURL: userData.avatarURL ?? faker.image.avatar(),
+            avatarURL: userData.avatarURL ?? `https://api.dicebear.com/7.x/avataaars/svg?seed=${faker.string.uuid()}&size=256`,
             phone: userData.phone ?? faker.phone.number({ style: 'international' }),
             googleProfileID: userData.googleProfileID ?? null,
             createdAt: userData.createdAt as Date ?? dayjs().toISOString(),
