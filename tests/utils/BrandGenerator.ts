@@ -15,7 +15,10 @@ export default class BrandGenerator {
         return {
             id: brandData.id ?? faker.string.uuid(),
             name: brandData.name ?? faker.company.name(),
-            logoURL: brandData.logoURL ?? faker.image.url(),
+            logoURL: brandData.logoURL ?? faker.image.urlPicsumPhotos({
+                width: 200,
+                height: 200
+            }),
             createdAt: brandData.createdAt as Date ?? new Date(dayjs().toISOString()),
             updatedAt: brandData.updatedAt as Date ?? new Date(dayjs().toISOString()),
             deletedAt: brandData.deletedAt ?? null
