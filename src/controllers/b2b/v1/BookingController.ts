@@ -271,7 +271,6 @@ export class BookingController extends AbstractController {
             const userIDs: string[] = []
 
             for (let i = 0; i < bookings.length; i++) {
-                console.log(bookings[0].discussion)
                 if (bookings[i].discussion) {
                     bookings[i].discussion.forEach((discussion: { authorID: string, authorType: string}) => {
                         if (discussion.authorType === AuthorType.Admin) {
