@@ -1,11 +1,16 @@
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+
 import { faker } from '@faker-js/faker';
-import {AdminRole, BookingStatus} from '@prisma/client';
+import { AdminRole, BookingStatus } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import crypto from 'crypto-js';
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
+import s3Service from '../src/services/AwsS3';
 import prisma from '../src/services/Prisma'
+import { AuthorType } from '../src/utils/enums';
 import AddressGenerator from '../tests/utils/AddressGenerator';
 import AdminGenerator from '../tests/utils/AdminGenerator'
 import BookingGenerator from '../tests/utils/BookingGenerator';
@@ -27,6 +32,49 @@ const GEO_BOX = {
 
 const GRAIN = 300
 
+const restaurantImagesDir = path.join(__dirname, 'restaurantPictures')
+const menuImagesDir = path.join(__dirname, 'menuPictures')
+
+const restaurantImages = fs.readdirSync(restaurantImagesDir)
+const menuImages = fs.readdirSync(menuImagesDir)
+
+const genDiscussion = (
+    status: BookingStatus,
+    adminID: string,
+    userID: string
+) => {
+    const now = dayjs()
+
+    const msg = (authorID: string, authorType: AuthorType, m = 0) => ({
+        authorID,
+        authorType,
+        message: faker.lorem.sentence(),
+        createdAt: now.subtract(m, 'minute').toISOString()
+    })
+
+    if (status === BookingStatus.Pending) {
+        return [msg(userID, AuthorType.User, 10)]
+    }
+
+    if (status === BookingStatus.Approved) {
+        return [
+            msg(userID, AuthorType.User, 10),
+            msg(adminID, AuthorType.Admin, 5),
+            ...(Math.random() > 0.5 ? [msg(userID, AuthorType.User)] : [])
+        ]
+    }
+
+    if (status === BookingStatus.Cancelled) {
+        const byAdmin = Math.random() > 0.5
+        return [
+            msg(userID, AuthorType.User, 10),
+            msg(byAdmin ? adminID : userID, byAdmin ? AuthorType.Admin : AuthorType.User)
+        ]
+    }
+
+    return []
+}
+
 async function seed() {
     const userData: any[] = []
     const adminData: any[] = []
@@ -43,6 +91,28 @@ async function seed() {
         employees: [],
         restaurantStaff: []
     }
+
+    const uploadedRestaurantImages: string[] = []
+    const uploadedMenuImages: string[] = []
+
+    if ((await prisma.restaurant.count()) === 0) {
+        for (const file of restaurantImages) {
+            const url = await s3Service.uploadFile(
+                path.join(restaurantImagesDir, file),
+                'banner'
+            )
+            uploadedRestaurantImages.push(url)
+        }
+
+        for (const file of menuImages) {
+            const url = await s3Service.uploadFile(
+                path.join(menuImagesDir, file),
+                'menu'
+            )
+            uploadedMenuImages.push(url)
+        }
+    }
+
     // Generate plain objects
     // NOTE: Same order is used in creation
     for (let i = 0; i < GRAIN; i++) {
@@ -84,7 +154,14 @@ async function seed() {
                 // eslint-disable-next-line max-len
                 name: `${i.toString()}-${ri.toString()} ${faker.food.dish()} ${faker.helpers.arrayElement(['House', 'Restaurant', 'Kitchen', 'Bistro', 'Grill', 'Cafe'])}`,
                 addressID: addressData[i + ri].id,
-                brandID: brandData[i].id
+                brandID: brandData[i].id,
+                bannerURL: uploadedRestaurantImages.length ? faker.helpers.arrayElement(uploadedRestaurantImages) : undefined,
+                photosURL: uploadedMenuImages.length 
+                    ? faker.helpers.arrayElements(uploadedMenuImages, faker.number.int({
+                        min: 1,
+                        max: 8 
+                    })) 
+                    : undefined
             }))
             const numOfEmployees = Math.floor(Math.random() * 5) + 1;
             for (let ei = 0; ei < numOfEmployees; ei++) {
@@ -126,7 +203,8 @@ async function seed() {
                     restaurantID: restaurantData[i + bdi].id,
                     userID: userData[i].id,
                     bookingTime: bookingTime.toDate(),
-                    status: status
+                    status: status,
+                    discussion: genDiscussion(status, adminData[i].id, userData[i].id)
                 }))
             }
         }
@@ -208,6 +286,8 @@ async function seed() {
 
         // eslint-disable-next-line
         console.info(`Database was seeded with ${seededTables.length} table(s)${seededTables.length > 0 ? ': ' + seededTables.join(', ') : '.'}`);
+    }, {
+        timeout: 60000 // 60s
     })
 
 }
