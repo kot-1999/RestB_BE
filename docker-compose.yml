@@ -89,8 +89,7 @@ services:
       - dev
       - localDev
     volumes:
-      - localstack_data:/data
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ./localstack-data:/persisted-data
 
   rustfs_test:
     container_name: rustfs_test
@@ -105,3 +104,6 @@ volumes:
   mysql_data:
     driver: local
   localstack_data:
+    driver: local
+  localstack_bucket:
+    driver: local
