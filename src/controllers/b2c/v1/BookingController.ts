@@ -217,15 +217,14 @@ export class BookingController extends AbstractController {
                                 }
                             }
                         }
-
                         return {
                             authorID: discussion.authorID,
                             authorType: discussion.authorType,
                             message: discussion.message,
-                            createAt: discussion.createAt,
+                            createdAt: discussion.createdAt,
                             firstName: author.firstName,
                             lastName: author.lastName,
-                            avatarUrl: author?.avatarURL
+                            avatarURL: author?.avatarURL
                         }
                     }) : [],
                     restaurant: booking.restaurant

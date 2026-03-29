@@ -90,7 +90,8 @@ services:
       - localDev
     volumes:
       - ./localstack-data:/persisted-data
-
+    environment:
+      DATA_DIR: /data
   rustfs_test:
     container_name: rustfs_test
     extends:
