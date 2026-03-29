@@ -12,7 +12,7 @@ export async function clearDatabase() {
           AND TABLE_NAME != '_prisma_migrations';
     `);
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
         await tx.$executeRawUnsafe(`SET FOREIGN_KEY_CHECKS = 0`);
 
         for (const { TABLE_NAME } of tables) {
