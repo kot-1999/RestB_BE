@@ -27,9 +27,10 @@ describe('GET ' + endpoint(), () => {
                 id: user.id,
                 aud: JwtAudience.b2c
             })}`)
+
         expect(res.statusCode).to.equal(200)
         expect(res.type).to.eq('application/json')
-
+        
         const validationResult = BookingController.schemas.response.getBookingList.validate(res.body)
         expect(validationResult.error).to.eq(undefined)
     })

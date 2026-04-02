@@ -30,6 +30,6 @@
     "./src/**/*",
     "./config/**/*",
     "./tests/**/*",
-    "scripts/**/*.ts"
+    "./scripts/**/*.ts"
   ]
 }

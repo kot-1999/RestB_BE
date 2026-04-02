@@ -101,6 +101,12 @@ class PrismaService {
         })
 
         this.client.dashboard = queries.dashboard
+    //     this.client.booking = queries.booking
+    //     this.client.brand = queries.brand
+    //     this.client.restaurant = queries.restaurant
+    //     this.client.user = queries.user
+    //     this.client.admin = queries.admin
+    //     this.client.address = queries.address
     }
 
     public getPrismaClient() {
