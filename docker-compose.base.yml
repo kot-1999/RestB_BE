@@ -57,7 +57,7 @@ services:
 # TODO: Change container name
 #  LOCALSTACK CONTAINER
   rustfs:
-    image: gresau/localstack-persist:latest
+    image: gresau/localstack-persist:3
     ports:
       - "${S3_PORT}:${S3_PORT}"
     environment:

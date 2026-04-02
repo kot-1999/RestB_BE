@@ -1,14 +1,14 @@
 import { RestaurantCategories } from '@prisma/client';
 import Joi from 'joi'
 
-import { UserType } from './enums';
 import { Constants } from '../utils/Constants'
+import { AuthorType } from '../utils/enums';
 
 const discussionItem = Joi.object({
     authorID: Joi.string().required(),
 
     authorType: Joi.string()
-        .valid(...Object.values(UserType))
+        .valid(...Object.values(AuthorType))
         .required(),
 
     message: Joi.string().trim()
