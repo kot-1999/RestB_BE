@@ -130,10 +130,4 @@ All team members confirm their understanding and acceptance of this Code of Cond
 
 Oleksandr Kashytskyi - Date: February 3, 2026
 
-Muhammad Wasim Khan - Date: February 3, 2026
-
 Stephen Lyne - Date: February 3, 2026
-
-America Bernal-Hluz - Date: February 2, 2026
-
-Ravula Bhavya Sree - Date: February 5, 2026
