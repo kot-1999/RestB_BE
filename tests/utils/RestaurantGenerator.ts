@@ -31,7 +31,7 @@ export default class RestaurantGenerator {
                     .add(10, 'hour')
                     .toDate()
             })).format('HH:mm'),
-            autoApprovedBookingsNum: restaurantData.autoApprovedBookingsNum ?? 0,
+            autoApprovedBookingsNum: restaurantData.autoApprovedBookingsNum ?? Math.floor(Math.random() * 100),
             categories: restaurantData.categories ?? allCategories.sort(() => 0.5 - Math.random()).slice(0, 5),
             timeTo: restaurantData.timeTo ?? restaurantData.timeFrom ?? dayjs(faker.date.between({
                 from: dayjs().startOf('day')
