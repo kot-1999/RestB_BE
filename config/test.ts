@@ -25,7 +25,8 @@ const options: IConfig = {
             secretAccessKey: process.env.S3_SECRET_ACCESS_KEY as string
         },
 
-        forcePathStyle: true
+        forcePathStyle: true,
+        requestChecksumCalculation: 'DISABLED'
     },
     cookieSession: {
         name: 'session',

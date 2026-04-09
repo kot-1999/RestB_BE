@@ -80,7 +80,7 @@ const options: IConfig = {
                 styleSrc: ["'self'", 'fonts.googleapis.com', "'unsafe-inline'"],
                 fontSrc: ["'self'", 'fonts.gstatic.com'],
                 imgSrc: ["'self'", '*'],
-                connectSrc: ["'self'", '*a']
+                connectSrc: ["'self'", '*']
             }
         }
     },
@@ -124,7 +124,8 @@ const options: IConfig = {
             secretAccessKey: process.env.S3_SECRET_ACCESS_KEY as string
         },
 
-        forcePathStyle: true
+        forcePathStyle: true,
+        requestChecksumCalculation: 'DISABLED'
     }
 }
 export default options

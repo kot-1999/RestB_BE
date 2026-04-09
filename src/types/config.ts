@@ -73,6 +73,7 @@ export interface IConfig {
       secretAccessKey: string
     },
 
-    forcePathStyle: boolean
+    forcePathStyle: boolean,
+    requestChecksumCalculation: string
   }
 }
