@@ -116,7 +116,7 @@ if (fs.existsSync(apiDocPath)) {
 app.use(errorMiddleware)
 
 // Default route
-app.get('/', (req, res) => {
+app.get('/info', (req, res) => {
     const baseUrl = `${req.protocol}://${req.get('host')}`
     const mailUrl = `${req.protocol}://${req.hostname}`
     res.status(200).send(`
@@ -195,7 +195,7 @@ app.get('/', (req, res) => {
 
 const fePath = path.join(__dirname, '..', 'RestB_FE', 'dist')
 if (fs.existsSync(fePath)) {
-    app.use(express.static(fePath))
+    app.use('/', express.static(fePath))
     logger.info('Frontend is available at /index.html')
 } else {
     logger.error(`index.html file wasn't found in ${fePath}`)
