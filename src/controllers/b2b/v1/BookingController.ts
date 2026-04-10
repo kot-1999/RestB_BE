@@ -60,19 +60,13 @@ export class BookingController extends AbstractController {
                 }).required(),
 
                 body: Joi.object({
-                    status: Joi.string()
-                        .valid(...Object.values(BookingStatus))
-                        .required(),
+                    status: Joi.string().valid(...Object.values(BookingStatus)),
 
                     message: Joi.string()
                         .trim()
                         .min(5)
-                        .when('status', {
-                            is: BookingStatus.Cancelled,
-                            then: Joi.required(),
-                            otherwise: Joi.allow(null).optional()
-                        })
-                }).required()
+                        .allow(null)
+                }).or('status', 'message')
             })
         },
         response: {
@@ -175,6 +169,9 @@ export class BookingController extends AbstractController {
             const where = {
                 AND: [
                     {
+                        restaurantID: params.restaurantID
+                    },
+                    {
                         status: {
                             in: query.statuses
                         }
@@ -219,7 +216,8 @@ export class BookingController extends AbstractController {
                                     firstName: true,
                                     lastName: true,
                                     email: true,
-                                    avatarURL: true
+                                    avatarURL: true,
+                                    phone: true
                                 }
                             }
                         }
@@ -486,7 +484,8 @@ export class BookingController extends AbstractController {
                 restaurant: {
                     select: {
                         id: true,
-                        name: true
+                        name: true,
+                        brandID: true
                     }
                 }
             })
@@ -502,40 +501,45 @@ export class BookingController extends AbstractController {
             const isAdmin: boolean = !!user.role
             const isAfter = dayjs().isAfter(booking.bookingTime)
 
-            if (nonUpgradableStates.includes(booking.status)) {
-                throw new IError(403, `Booking can not be updated from ${booking.status} status to ${body.status}`)
+            if (isAdmin && user.brandID !== booking.restaurant.brandID) {
+                throw new IError(403, 'User not authorized')
             }
 
-            // Handle PENDING state
-            if (isAfter) {
-                throw new IError(403, 'Pending booking can not be updated after booking time')
-            }
+            if (body.status && body.status !== booking.status) {
+                if (nonUpgradableStates.includes(booking.status)) {
+                    throw new IError(403, `Booking can not be updated from ${booking.status} status to ${body.status}`)
+                }
 
-            if (booking.status === BookingStatus.Pending && !pendingUpdate.includes(body.status)) {
-                throw new IError(403, `Booking can not be moved from ${BookingStatus.Pending} to ${body.status}`)
-            }
+                // Handle PENDING state
+                if (isAfter) {
+                    throw new IError(403, 'Pending booking can not be updated after booking time')
+                }
 
-            if (booking.status === BookingStatus.Pending && body.status === BookingStatus.Approved && !isAdmin) {
-                throw new IError(403, 'User can not Approve booking')
-            }
+                if (booking.status === BookingStatus.Pending && !pendingUpdate.includes(body.status)) {
+                    throw new IError(403, `Booking can not be moved from ${BookingStatus.Pending} to ${body.status}`)
+                }
 
-            // Handle APPROVED state
-            if (booking.status === BookingStatus.Approved && !approvedUpdate.includes(body.status)) {
-                throw new IError(403, `Booking can not be updated from ${booking.status} status to ${body.status}`)
-            }
+                if (booking.status === BookingStatus.Pending && body.status === BookingStatus.Approved && !isAdmin) {
+                    throw new IError(403, 'User can not Approve booking')
+                }
 
-            if (booking.status === BookingStatus.Approved && body.status !== BookingStatus.Cancelled && !isAdmin) {
-                throw new IError(403, `User can not move Approved booking to ${body.status}`)
-            }
+                // Handle APPROVED state
+                if (booking.status === BookingStatus.Approved && !approvedUpdate.includes(body.status)) {
+                    throw new IError(403, `Booking can not be updated from ${booking.status} status to ${body.status}`)
+                }
 
-            if (booking.status === BookingStatus.Approved && body.status === BookingStatus.Cancelled && isAfter) {
-                throw new IError(403, 'Booking can not be canceled after it\'s booking time')
-            }
+                if (booking.status === BookingStatus.Approved && body.status !== BookingStatus.Cancelled && !isAdmin) {
+                    throw new IError(403, `User can not move Approved booking to ${body.status}`)
+                }
 
-            if (afterBooking.includes(body.status) && !isAfter) {
-                throw new IError(403, `Booking can not be moved to ${body.status} before booking time`)
-            }
+                if (booking.status === BookingStatus.Approved && body.status === BookingStatus.Cancelled && isAfter) {
+                    throw new IError(403, 'Booking can not be canceled after it\'s booking time')
+                }
 
+                if (afterBooking.includes(body.status) && !isAfter) {
+                    throw new IError(403, `Booking can not be moved to ${body.status} before booking time`)
+                }
+            }
             const discussion = booking.discussion ?? []
 
             if (body.message) {
@@ -548,12 +552,13 @@ export class BookingController extends AbstractController {
             }
 
             await prisma.booking.updateOne(booking.id, {
-                status: body.status,
+                status: body.status ?? booking.status,
                 discussion: discussion
             })
+
             const emailStatuses: BookingStatus[] = [BookingStatus.Approved, BookingStatus.Cancelled]
 
-            if (emailStatuses.includes(body.status) && isAdmin) {
+            if (body.status && emailStatuses.includes(body.status) && isAdmin) {
                 await emailService.sendEmail(EmailType.bookingUpdated, {
                     email: booking.user.email,
                     firstName: booking.user.firstName,
@@ -571,7 +576,7 @@ export class BookingController extends AbstractController {
                 booking: {
                     id: booking.id
                 },
-                message: `Booking was moved to ${body.status} state`
+                message: body.status ? `Booking was moved to ${body.status} state` : 'Message was sent'
             })
         } catch (err) {
             return next(err)
