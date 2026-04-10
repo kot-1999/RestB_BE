@@ -60,19 +60,13 @@ export class BookingController extends AbstractController {
                 }).required(),
 
                 body: Joi.object({
-                    status: Joi.string()
-                        .valid(...Object.values(BookingStatus))
-                        .required(),
+                    status: Joi.string().valid(...Object.values(BookingStatus)),
 
                     message: Joi.string()
                         .trim()
                         .min(5)
-                        .when('status', {
-                            is: BookingStatus.Cancelled,
-                            then: Joi.required(),
-                            otherwise: Joi.allow(null).optional()
-                        })
-                }).required()
+                        .allow(null)
+                }).or('status', 'message')
             })
         },
         response: {
@@ -175,6 +169,9 @@ export class BookingController extends AbstractController {
             const where = {
                 AND: [
                     {
+                        restaurantID: params.restaurantID
+                    },
+                    {
                         status: {
                             in: query.statuses
                         }
@@ -219,7 +216,8 @@ export class BookingController extends AbstractController {
                                     firstName: true,
                                     lastName: true,
                                     email: true,
-                                    avatarURL: true
+                                    avatarURL: true,
+                                    phone: true
                                 }
                             }
                         }
