@@ -31,6 +31,7 @@ export default function restaurantRouter() {
         */
         '/',
         authorizationMiddleware([PassportStrategy.jwtB2b]),
+        permissionMiddleware([AdminRole.Admin]),
         validationMiddleware(RestaurantController.schemas.request.getRestaurantList),
         restaurantController.getRestaurantList
     )

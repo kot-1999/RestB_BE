@@ -138,9 +138,27 @@ export class BookingController extends AbstractController {
                 pagination: JoiCommon.object.pagination.required()
             }).required(),
             updateBooking: Joi.object({
-                booking: Joi.object({
-                    id: JoiCommon.string.id
-                }),
+                booking: JoiCommon.object.booking.keys({
+                    discussion: Joi.array().items(JoiCommon.object.discussionItem.keys({
+                        firstName: JoiCommon.string.name.required(),
+                        lastName: JoiCommon.string.name.required(),
+                        avatarURL: Joi.string().uri()
+                    }))
+                        .min(0)
+                        .required(),
+                    user: Joi.object({
+                        id: JoiCommon.string.id,
+                        firstName: JoiCommon.string.name.required(),
+                        lastName: JoiCommon.string.name.required(),
+                        email: JoiCommon.string.email.required(),
+                        avatarURL: Joi.string().uri()
+                    }).required(),
+                    createdAt: Joi.date().iso()
+                        .required(),
+                    updatedAt: Joi.date().iso()
+                        .allow(null)
+                        .required()
+                }).required(),
                 message: Joi.string().required()
             }).required()
         }
@@ -266,15 +284,12 @@ export class BookingController extends AbstractController {
             }
 
             const adminIDs: string[] = []
-            const userIDs: string[] = []
 
             for (let i = 0; i < bookings.length; i++) {
                 if (bookings[i].discussion) {
                     bookings[i].discussion.forEach((discussion: { authorID: string, authorType: string}) => {
                         if (discussion.authorType === AuthorType.Admin) {
                             adminIDs.push(discussion.authorID)
-                        } else {
-                            userIDs.push(discussion.authorID)
                         }
                     })
                 }
@@ -572,9 +587,82 @@ export class BookingController extends AbstractController {
                 })
             }
 
+            const resultBooking = await prisma.booking.findByID(booking.id, {
+                id: true,
+                guestsNumber: true,
+                bookingTime: true,
+                status: true,
+                createdAt: true,
+                updatedAt: true,
+                discussion: true,
+                user: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                        avatarURL: true
+                    }
+                }
+            })
+
+            const adminIDs: string[] = []
+
+            if (resultBooking.discussion) {
+                resultBooking.discussion.forEach((discussion: { authorID: string, authorType: string}) => {
+                    if (discussion.authorType === AuthorType.Admin) {
+                        adminIDs.push(discussion.authorID)
+                    }
+                })
+            }
+            const admins: Admin[] = await prisma.admin.findMany({
+                where: {
+                    id: {
+                        in: adminIDs
+                    }
+                },
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    avatarURL: true
+                }
+            })
+
             return res.status(200).json({
                 booking: {
-                    id: booking.id
+                    id: resultBooking.id,
+                    guestsNumber: resultBooking.guestsNumber,
+                    bookingTime: resultBooking.bookingTime,
+                    status: resultBooking.status,
+                    createdAt: resultBooking.createdAt,
+                    updatedAt: resultBooking.updatedAt,
+                    user: resultBooking.user,
+                    discussion: resultBooking.discussion ? (resultBooking.discussion as any[]).map((discussion) => {
+                        let author: Partial<Admin> | Partial<User> = resultBooking.user
+
+                        if (discussion.authorType === AuthorType.Admin) {
+                            const resultAdmin = admins.find((admin) => admin.id === discussion.authorID)
+                            if (resultAdmin) {
+                                author = resultAdmin
+                            } else {
+                                author = {
+                                    firstName: 'Unknown',
+                                    lastName: 'Administrator'
+                                }
+                            }
+                        }
+
+                        return {
+                            authorID: discussion.authorID,
+                            authorType: discussion.authorType,
+                            message: discussion.message,
+                            createAt: discussion.createAt,
+                            firstName: author.firstName,
+                            lastName: author.lastName,
+                            avatarUrl: author?.avatarURL
+                        }
+                    }) as any[] : []
                 },
                 message: body.status ? `Booking was moved to ${body.status} state` : 'Message was sent'
             })
