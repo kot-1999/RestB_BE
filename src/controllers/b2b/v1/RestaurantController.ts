@@ -85,9 +85,11 @@ export class RestaurantController extends AbstractController {
                 pagination: JoiCommon.object.pagination.required()
             }).required(),
             putRestaurant: Joi.object({
-                restaurant: Joi.object({
-                    id: JoiCommon.string.id
-                }).required(),
+                restaurant: JoiCommon.object.restaurant.keys({
+                    autoApprovedBookingsNum: Joi.number().integer()
+                        .required(),
+                    address: JoiCommon.object.address.required()
+                }),
                 message: Joi.string().required()
             }).required()
         }
@@ -159,17 +161,24 @@ export class RestaurantController extends AbstractController {
                         },
                         staff: {
                             select: {
-                                adminID: true
+                                admin: {
+                                    select: {
+                                        id: true,
+                                        firstName: true,
+                                        lastName: true,
+                                        email: true,
+                                        avatarURL: true,
+                                        phone: true
+                                    }
+                                }
                             }
                         }
                     },
                     orderBy: {
-                        name: 'asc' // optional
+                        createdAt: 'asc'
                     }
                 })
             ])
-            
-            restaurants.forEach((restaurant: any) => { delete restaurant.staff })
 
             return res.status(200).json({
                 brand,
@@ -264,9 +273,7 @@ export class RestaurantController extends AbstractController {
             }
 
             return res.status(200).json({
-                restaurant: {
-                    id: restaurant.id
-                },
+                restaurant: restaurant,
                 message: body.restaurantID ? 'Restaurant was updated successfully' : 'Restaurant was created successfully.'
             })
         } catch (err) {
