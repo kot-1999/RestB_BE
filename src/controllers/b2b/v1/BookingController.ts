@@ -366,9 +366,24 @@ export class BookingController extends AbstractController {
             const { query, user } = req
             const skip = (query.page - 1) * query.limit
 
-            const where = {
-                brandID: user.brandID
+            let where = {}
+
+            if (user.role === AdminRole.Admin) {
+                where = { brandID: user.brandID }
+            } else {
+                const restaurantStaff = await prisma.restaurantStaff.findFirst({
+                    where: {
+                        adminID: user.id
+                    }
+                })
+
+                if (restaurantStaff) {
+                    where = {
+                        id: restaurantStaff.restaurantID
+                    }
+                }
             }
+
 
             const [brand, count, restaurants] = await Promise.all([
                 prisma.brand.findByID(user.brandID, {
