@@ -1,3 +1,4 @@
+import { S3ClientConfig } from '@aws-sdk/client-s3';
 import { NodeOptions } from '@sentry/node';
 import { Options as RateLimitRedisOptions } from 'express-rate-limit';
 import { SessionOptions } from 'express-session'
@@ -24,7 +25,7 @@ export interface IConfig {
   database: {
     dbURL: string
   }
-  googleStrategy: OAuth2StrategyOptionsWithoutRequiredURLs
+  googleStrategy: OAuth2StrategyOptionsWithoutRequiredURLs | null
   cookieSession: SessionOptions & { cookie: NonNullable<SessionOptions['cookie']> }
   jwt: {
     secret: string,
@@ -63,17 +64,7 @@ export interface IConfig {
     release: string
     debug: boolean
   }) | null,
-  s3: {
-    region: string,
-
-    endpoint: string,
-
-    credentials: {
-      accessKeyId: string,
-      secretAccessKey: string
-    },
-
-    forcePathStyle: boolean,
-    requestChecksumCalculation: string
+  s3: S3ClientConfig & {
+    endpoint: string
   }
 }
