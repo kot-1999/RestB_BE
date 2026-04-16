@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import process from 'node:process';
 
+import { S3ClientConfig } from '@aws-sdk/client-s3';
 import { Request } from 'express'
 import { ExtractJwt } from 'passport-jwt'
 
@@ -31,11 +32,11 @@ const options: IConfig = {
     database: {
         dbURL: process.env.MYSQL_URL as string
     },
-    googleStrategy: {
+    googleStrategy: process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET ? {
         clientID: process.env.GOOGLE_CLIENT_ID as string,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
         callbackURL: '/api/b2c/v1/authorization/google/redirect'
-    },
+    } : null,
     passport: {
         jwtFromCookie: ExtractJwt.fromExtractors([
             (req: Request) => {
@@ -97,7 +98,7 @@ const options: IConfig = {
         },
         error: {
             isLoggedToConsole: true,
-            isLoggedToSentry: true
+            isLoggedToSentry: false
         },
         info: {
             isLoggedToConsole: true
@@ -106,14 +107,14 @@ const options: IConfig = {
             isLoggedToConsole: true
         }
     },
-    sentry: {
+    sentry: process.env.SENTRY_DNS ? {
         environment: process.env.NODE_ENV as NodeEnv,
         dsn: process.env.SENTRY_DNS as string,
         tracesSampleRate: 1.0, //  Capture 100% of the transactions
         profilesSampleRate: 1.0,
         release: 'latest',
         debug: false
-    },
+    } : null,
     s3: {
         region: process.env.S3_REGION as string,
 
@@ -125,7 +126,7 @@ const options: IConfig = {
         },
 
         forcePathStyle: true,
-        requestChecksumCalculation: 'DISABLED'
+        requestChecksumCalculation: 'WHEN_REQUIRED'
     }
 }
 export default options
