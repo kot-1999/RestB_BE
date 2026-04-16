@@ -384,7 +384,6 @@ export class BookingController extends AbstractController {
                 }
             }
 
-
             const [brand, count, restaurants] = await Promise.all([
                 prisma.brand.findByID(user.brandID, {
                     id: true,
