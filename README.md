@@ -1,60 +1,248 @@
-# RestB - BACK END
+# RestBoo
 Restaurant booking app
 
-## Useful links
-- Api doc: https://app.swaggerhub.com/apis/restboo/my-api/1.0.0
-- ERD diagram of database tables:  https://drive.google.com/file/d/1fgut3lXZLW6Uo9-cbyJet8_v3tjKnhpQ/view?usp=sharing
-- Figma wireframes with design sketch: https://www.figma.com/design/A0Mk7mNWrrSzMPxlRoEQGO/Software-Development-2?node-id=0-1&p=f&t=qsNQl3OlH6IuaS6L-0
-- UML diagram of backend: https://drive.google.com/file/d/1fgut3lXZLW6Uo9-cbyJet8_v3tjKnhpQ/view?usp=sharing
 
-## Getting started
+## Content
+
+- [About RestBoo](#about-restboo)
+- [How to start](#how-to-start)
+  - [Prerequisites](#prerequisites)
+  - [Run application](#run-application)
+  - [Test data](#test-data)
+- [Useful links](#useful-links)
+- [Project Structure](#project-structure)
+- [Backend and DevOps features](#backend-and-devops-features)
+- [Team](#team)
+- [Gallery](#gallery)
+- [License](#license)
+
+---
+
+## About RestBoo
+
+**RestBoo** is a multi-role restaurant booking platform designed to simplify and centralise the reservation process for both customers and restaurant operators.
+
+The system allows users to discover restaurants, view availability in real time, and make reservations instantly without the need for phone calls or manual coordination. At the same time, restaurant owners and administrators gain a powerful dashboard to manage bookings, staff, locations, and availability across multiple branches.
+
+RestBoo focuses on eliminating common problems in the hospitality industry such as double bookings, fragmented tools, and inefficient communication between staff and customers. By centralising all operations into a single system, it improves operational efficiency, reduces administrative workload, and increases table occupancy rates.
+
+The platform supports both B2C and B2B workflows, enabling:
+- Customers to easily book, modify, and cancel reservations
+- Administrators to manage restaurants, brands, and staff at scale
+- Real-time updates across all bookings and availability
+- Secure authentication and role-based access control
+
+Overall, RestBoo provides a scalable and structured solution for modern restaurant booking management, combining usability for customers with operational control for businesses.
+
+![alt text](./docs/images/home.png)
+
+---
+
+## How to start
 ### Prerequisites
-- Ensure that Docker and Docker Compose are installed on your system.
-### Running the Application
+- Ensure that Docker engine alongside with Docker Desktop app are installed on your system;
+- `docker compose` must be available.
 
-Make sure your current npm version is `10.8.2` and node version is `22.8.0`
-To run the application you need to create:
+### Run application
 
-- `.env`: for local running with `npm run start`
-- `.env.dev`: for running application in docker in development mode with `npm run docker:dev` or `docker compose --env-file .env.development --profile dev up`
-- `.env.test`: to run the application in a test mode `npm run docker:test` or `docker compose --env-file .env.test --profile test up`
+Following steps describe how to run the application in **dev** mode on local machine
 
-**NOTE**: there is a `.env.template` file which can be used to run application in docker in development mode. In spite of that some variables are unavailable, those are initialized with `null`
+Feel free to copy-paste following commands.
 
-Use the following npm scripts to start the application in various environments (or use docker commands directly):
+**1. Clone GitHub repo:**
 
-- `npm run docker:dev`: Starts the application in Docker using the `dev` profile with the `.env.dev` environment file.
-- `npm run docker:test`: Starts the application in Docker using the `test` profile with the `.env.test` environment file.
-- `npm run local:docker:dev`: Starts the application in Docker using the `localDev` profile with the `.env.local.dev` environment file. To run the backend execute `npm run local:dev`.
-- `npm run local:docker:test`: Starts the application in Docker using the `localTest` profile with the `.env.local.test` environment file. To run the backend execute `npm run local:test`.
+```terminaloutput
+git clone https://github.com/kot-1999/RestB_BE.git
+```
 
-Ensure the corresponding environment files are properly configured before running these commands.
+**2. Enter the directory:**
 
-### Docker Compose Profiles
+```terminaloutput
+cd RestB_BE
+```
 
-This project utilizes Docker Compose profiles to manage different service configurations based on the environment. Profiles allow for selective activation of services, enabling a tailored setup for development, testing, and local development scenarios.
+**3. Create `.env.dev` file:**
 
-- `dev`: Activates services required for development and runs backend app.
-- `test`: Activates services required for testing and run tests.
-- `localDev`: Activates services for local development.
-- `localTest`: Activates services for local testing.
+```terminaloutput
+cat <<EOF > .env.dev
+NODE_ENV=dev
+PORT=3000
 
-### Running frontend
+ENCRYPTION_KEY=someKey
+COOKIE_SECRET_KEY=someSalt
 
-To run the frontend clone RestB_FE repo inside you backend https://github.com/kot-1999/RestB_FE
+JWT_SECRET=jwt_secret
+JWT_EXPIRES_IN=1h
 
-If frontend build is available backend app will automatically serve it
+MYSQL_URL=mysql://admin:mysql@dev_mysql:3306/development
+MYSQL_PORT=3306
+MYSQL_USER=admin
+MYSQL_PASSWORD=mysql
+MYSQL_DB=development
 
-If it's not available run `npm run build:frontend`
+EMAIL_HOST=mailhog
+EMAIL_SMTP_PORT=1025
+EMAIL_HTTP_PORT=8025
+EMAIL_USER=admin
+EMAIL_PASSWORD=mailhog
+EMAIL_FROM_ADDRESS=app@dev.com
 
-In case you use docker -dev profile build will happen automatically
+REDIS_PORT=6379
+REDIS_HOST=redis
+REDIS_PASSWORD=redisDevPass
+REDIS_MAX_MEMORY=256
 
-### Accessing the API
-Access swagger API documentation on `{host}/api/docs`
+S3_ACCESS_KEY_ID=admin
+S3_SECRET_ACCESS_KEY=admin123
+S3_REGION=eu-west-2
+S3_ENDPOINT=http://rustfs_dev:9000
+S3_PORT=9000
 
-Or run script `npm run apidoc` which will create API documentation in `./dist/apiDoc`
+ALLOW_CONFIG_MUTATIONS=true
+EOF
+```
 
-## Features
+> 📝 Given environmental file profides config for docker containers.
+> It doesn't carry any secret variables or keys.
+
+**4. When all preparations are done run the application in one of two ways:**
+```terminaloutput
+## Using npm
+npm run docker:dev
+
+## Directly via docker compose
+docker compose  --env-file .env.dev --profile dev up
+```
+
+When the application is up and running you can open the app on localhost http://localhost:3000
+
+
+> 📝 Starting time varies from one machine to another.
+> Running the project might take from several seconds up to several minutes.  
+
+### Test data
+
+The application automatically seeds the database with a large set of demo data when running in the development environment.
+
+This is handled via the `seed.ts` script and is executed as part of the initial setup process.
+
+The database is populated with realistic sample data to simulate a production-like environment, including.
+
+- **Users:** `user1@gmail.com` → `user300@gmail.com`
+- **Admins:** `admin1@gmail.com` → `admin300@gmail.com`
+- **Employees:** `employee1-1@gmail.com` → `employee300-1@gmail.com`
+
+All seeded user accounts share a common development password for convenience:
+
+- **Password:** `test123`
+
+Email addresses are generated dynamically during the seeding process.
+
+> ⚠️ This data is intended for development and testing purposes only and should not be used in production environments.
+
+---
+
+## Useful links
+
+Once the application is up and running, the following services will be available:
+
+- **http://localhost:3000**  
+  Main application entry point (backend API and frontend access)
+
+- **http://localhost:3000/info**  
+  Backend welcome/info page
+
+- **http://localhost:3000/api/docs**  
+  API documentation (Swagger UI)
+
+- **http://localhost:8025**  
+  Mailhog interface for viewing emails sent by the application
+
+---
+
+## Project Structure
+This project follows a layered, feature-based backend architecture with clear separation between B2C and B2B domains and strong service abstraction.
+```
+RestB_BE/
+│
+├── .husky/           # Pre commit script
+│   ├── pre-commit
+│
+├── .github/          # CI/CD workflows
+│   ├── workflows/ci.yml
+│
+├── config/           # Environment configs for the backend (dev/test)
+│   ├── dev.ts
+│   ├── test.ts
+│
+├── src/
+│   ├── index.ts      # Application entry point
+│   ├── app.ts        # Express app setup
+│   │
+│   ├── controllers/  # HTTP layer (request handling)
+│   │
+│   ├── routes/       # API routing layer
+│   │
+│   ├── types/        # TypeScript definitions & extensions
+│   │
+│   ├── services/     # Business logic + external integrations
+│   │   ├── Jwt.ts               # JWT creation, verification, and token lifecycle management
+│   │   ├── Redis.ts             # Redis client setup and caching/session utilities
+│   │   ├── Prisma.ts            # Prisma client initialization and database connection handling
+│   │   ├── Passport.ts          # Authentication strategies and Passport.js configuration
+│   │   ├── Sentry.ts            # Error tracking and monitoring setup (Sentry integration)
+│   │   ├── Logger.ts            # Centralized logging service for application events and errors
+│   │   ├── Email.ts             # Email sending logic (SMTP integration, template usage)
+│   │   ├── AwsS3.ts             # File upload and storage service (S3-compatible API)
+│   │   ├── Encryption.ts        # Data encryption and hashing utilities (e.g., passwords, secrets)
+│   │   ├── OpenStreetMapService.ts  # Geolocation and address-related operations via OSM APIs
+│   │   │
+│   │   ├── emailTemplates/      # EJS templates for transactional emails
+│   │       ├── bookingUpdated.ejs   # Template for booking update notifications
+│   │       ├── registration.ejs     # Template for user registration emails
+│   │       ├── forgotPassword.ejs   # Template for password reset emails
+│   │       ├── employeeInvite.ejs   # Template for employee invitation emails
+│   │
+│   ├── database/
+│   │   ├── queries/              # Query layer (DB abstraction)
+│   │
+│   ├── middlewares/              # Express middlewares
+│   │   ├── authorizationMiddleware.ts    # Verifies user authentication (e.g., JWT/session) and attaches user context
+│   │   ├── permissionMiddleware.ts       # Enforces role-based or resource-based access control
+│   │   ├── validationMiddleware.ts       # Validates incoming requests against schemas (e.g., Joi) and rejects invalid data
+│   │   ├── errorMiddleware.ts            # Global error handler that formats and sends consistent error responses
+│   │
+│   ├── utils/                    # Helpers & shared utilities
+│       ├── enums.ts
+│       ├── Constants.ts
+│       ├── helpers.ts
+│       ├── IError.ts
+│   
+│
+├── prisma/                       # Database schema (Prisma)
+│   ├── schema.prisma
+│
+├── scripts/                      # Seeders, assets, utilities
+│   ├── seed.ts                   # Populates the database with initial or test data
+│   ├── apiDoc.ts                 # Generates API documentation (e.g., Swagger/OpenAPI)
+│
+├── tests/                        # Unit & integration tests
+│
+├── docker-compose.yml            # Defines full local development environment (app, DB, Redis, etc.)
+├── docker-compose.base.yml       # Base/shared Docker configuration used across environments
+├── .gitignore                    # Specifies files and folders ignored by Git
+├── eslint.config.js              # ESLint configuration for code linting rules
+├── tsconfig.json                 # Main TypeScript configuration
+├── tsconfig.eslint.json          # TypeScript config used specifically for ESLint
+├── package.json                  # Project metadata, dependencies, and npm scripts
+├── package-lock.json             # Locked dependency versions for consistent installs
+├── .mocharc.js                   # Mocha test runner configuration
+```
+
+---
+
+## Backend and DevOps features
+
 - **Full Dockerization:** The entire application is containerized using Docker, allowing for seamless setup and deployment. With Docker, you can run the project without worrying about environment configurations.
 - **Express with TypeScript:** Combines the flexibility of Express.js with the type safety of TypeScript, enhancing code quality and developer experience.
 - **Authentication:**
@@ -67,7 +255,7 @@ Or run script `npm run apidoc` which will create API documentation in `./dist/ap
     - **AES Encryption:** Protects sensitive data which are sent via HTTP TCP connection by encrypting it using the AES algorithm.
     - **SHA256 Hashing:** Ensures data integrity and security through the SHA256 hashing algorithm.
     - **Rate Limiting with Redis**: Limits the number of incoming requests. Use Redis as storage
-    - **Content Security Policy (CSP) with Helmet**:  A strict Content Security Policy is set using helmet to prevent malicious content from being loaded (Prevents XSS attacks for example). Allows only trusted sources for scripts, styles, fonts, and images.
+    - **Content Security Policy (CSP) with Helmet**:  A strict Content Security Policy is set using helmet to prevent malicious content from being loaded (Prevents XSS attacks for example).
 - **Centralized Error Handling:** Implements a centralized mechanism to handle errors consistently across the application.
 - **Testing with Mocha and Chai:** Sets up testing frameworks Mocha and Chai for writing and running unit and integration tests. Tests can also be executed within Docker containers for consistency.
 - **Input Validation with Joi:** Uses Joi for validating request inputs, ensuring data integrity and reliability. Additionally, leverages @goodrequest/joi-type-extract to extract TypeScript types from Joi schemas.
@@ -85,31 +273,22 @@ Or run script `npm run apidoc` which will create API documentation in `./dist/ap
     - Error Tracking: Automatically captures and reports unhandled exceptions and errors.
     - SentryErrorTransport: Supports manual error reporting with contextual information depending on `winston` settings.
 - **GitHub Actions:**  Are used for  continuous integration. The CI pipeline automatically runs tests when changes are pushed or pull requests are created.
-## Scripts
 
-- `prestart`: Generates the Prisma client before starting the app.
-- `start`: Runs the app in development mode with nodemon for live reloading.
-- `test`: Runs tests using Mocha with TypeScript and environment variables.
-- `docker:dev`: Starts the app in a Docker container for development as well with nodemon for live reloading using the .env.development file.
-- `docker:test`: Runs tests inside a Docker container using the .env.test file.
-- `docker:prod`: Starts the app in production mode using the .env.production file.
-- `db:pull`: Updates the Prisma schema to match the database schema.
-- `db:push`: Updates the database to match the Prisma schema.
-- `db:seed`: Reserved for database seeding (currently empty).
-- `db:validate`: Validates the Prisma schema for errors.
-- `lint`: Runs ESLint to analyze code for potential issues.
-- `lint:fix`: Runs ESLint and fixes auto-fixable issues.
+---
+
+## Team
+- **Oleksandr Kashytskyi** — [sashakashytskyy@gmail.com](mailto:sashakashytskyy@gmail.com)  
+  Idea creator, backend developer, system architect, database designer
+
+- **Stephen Lyne** — [slyne234@gmail.com](mailto:slyne234@gmail.com)  
+  Frontend developer, UI/UX designer
+
+---
+
+## Gallery
+
+---
 
 ## License
 This project is licensed under the Apache-2.0 License.
-
-The Apache-2.0 License is a permissive open-source software license that allows users to freely use, modify, and distribute the licensed software under the following conditions:
-
-### Key Features:
-1. **Permissive Use:** Users can use the software for any purpose, including commercial use.
-2. **Modification:** Users can modify the source code and create derivative works.
-3. **Redistribution:** Allows redistribution of the original or modified software under the same license.
-4. **Attribution:** Requires that the original author(s) and license terms are acknowledged in redistributed versions.
-5. **No Warranty:** The software is provided "as-is," with no warranties or liability for the authors.
-6. **Patent Protection:** Includes an express grant of patent rights from contributors to protect users from patent lawsuits.
 
