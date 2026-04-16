@@ -77,7 +77,18 @@ export class RestaurantController extends AbstractController {
                     .items(JoiCommon.object.restaurant.keys({
                         autoApprovedBookingsNum: Joi.number().integer()
                             .required(),
-                        address: JoiCommon.object.address.required()
+                        address: JoiCommon.object.address.required(),
+                        staff: Joi.array().items(Joi.object({
+                            admin: Joi.object({
+                                id: JoiCommon.string.id,
+                                firstName: JoiCommon.string.name,
+                                lastName: JoiCommon.string.name,
+                                email: JoiCommon.string.email,
+                                avatarURL: Joi.string().uri()
+                                    .optional(),
+                                phone: Joi.string().optional()
+                            })
+                        }))
                     }))
                     .min(0)
                     .required(),
@@ -272,11 +283,35 @@ export class RestaurantController extends AbstractController {
                 })
             }
 
+            restaurant = await prisma.restaurant.findByID(restaurant.id, {
+                id: true,
+                name: true,
+                description: true,
+                bannerURL: true,
+                photosURL: true,
+                timeFrom: true,
+                timeTo: true,
+                categories: true,
+                autoApprovedBookingsNum: true,
+                address: {
+                    select: {
+                        building: true,
+                        street: true,
+                        city: true,
+                        postcode: true,
+                        country: true,
+                        latitude: true,
+                        longitude: true
+                    }
+                }
+            })
+
             return res.status(200).json({
                 restaurant: restaurant,
                 message: body.restaurantID ? 'Restaurant was updated successfully' : 'Restaurant was created successfully.'
             })
         } catch (err) {
+            console.log(err)
             return next(err)
         }
     }

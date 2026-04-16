@@ -79,12 +79,15 @@ describe('PUT ' + endpoint(':restaurantID'), () => {
                     country: 'United Kingdom'
                 }
             })
+        console.log(res.body)
         expect(res.statusCode).to.equal(200)
         expect(res.type).to.eq('application/json')
 
         expect(await prisma.restaurant.count()).to.eq(restaurantsCount + 1)
 
         const validationResult = AdminRestaurantController.schemas.response.putRestaurant.validate(res.body)
+        console.log(validationResult.error)
+
         expect(validationResult.error).to.eq(undefined)
 
         restaurantID = res.body.restaurant.id
