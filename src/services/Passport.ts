@@ -5,6 +5,7 @@ import passport from 'passport'
 import { Profile, Strategy as GoogleStrategy, VerifyCallback } from 'passport-google-oauth20'
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt'
 
+import logger from './Logger';
 import prisma from './Prisma'
 import { IConfig } from '../types/config'
 import { JwtAudience, PassportStrategy } from '../utils/enums'
@@ -24,14 +25,18 @@ class PassportSetup {
         this.jwtConfig = jwtConfig
         this.passportConfig = passportConfig
 
-        passport.use(PassportStrategy.google, new GoogleStrategy(
-            {
-                clientID: this.googleStrategyConfig.clientID,
-                clientSecret: this.googleStrategyConfig.clientSecret,
-                callbackURL: this.googleStrategyConfig.callbackURL
-            },
-            this.googleStrategy
-        ))
+        if (this.googleStrategyConfig) {
+            passport.use(PassportStrategy.google, new GoogleStrategy(
+                {
+                    clientID: this.googleStrategyConfig.clientID,
+                    clientSecret: this.googleStrategyConfig.clientSecret,
+                    callbackURL: this.googleStrategyConfig.callbackURL
+                },
+                this.googleStrategy
+            ))
+        } else {
+            logger.warn('Google strategy config not provided')
+        }
 
         passport.use(PassportStrategy.jwtB2c, new JwtStrategy(
             {
