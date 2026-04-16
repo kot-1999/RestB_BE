@@ -26,7 +26,7 @@ const options: IConfig = {
         },
 
         forcePathStyle: true,
-        requestChecksumCalculation: 'DISABLED'
+        requestChecksumCalculation: 'WHEN_REQUIRED'
     },
     cookieSession: {
         name: 'session',
@@ -42,11 +42,11 @@ const options: IConfig = {
     database: {
         dbURL: process.env.MYSQL_URL as string
     },
-    googleStrategy: {
+    googleStrategy: process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET ? {
         clientID: process.env.GOOGLE_CLIENT_ID as string,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
         callbackURL: '/api/b2c/v1/authorization/google/redirect'
-    },
+    } : null,
     passport: {
         jwtFromCookie: ExtractJwt.fromExtractors([
             (req: Request) => {
