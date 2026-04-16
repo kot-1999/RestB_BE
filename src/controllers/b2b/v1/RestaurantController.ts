@@ -311,7 +311,6 @@ export class RestaurantController extends AbstractController {
                 message: body.restaurantID ? 'Restaurant was updated successfully' : 'Restaurant was created successfully.'
             })
         } catch (err) {
-            console.log(err)
             return next(err)
         }
     }
