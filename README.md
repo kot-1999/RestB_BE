@@ -12,7 +12,12 @@
 - [Useful links](#useful-links)
 - [Project Structure](#project-structure)
 - [Backend and DevOps features](#backend-and-devops-features)
-- [Application overview](#application-overview)
+- [Application Overview](#application-overview)
+  - [Application From User Perspective](#43-application-from-user-perspective)
+  - [Application From Admin Perspective](#44-application-from-admin-perspective)
+  - [Application From Employee Perspective](#45-application-from-employee-perspective)
+  - [Authentication Flows](#authentication-flows)
+  - [Email Notifications](#email-notifications)
 - [Team](#team)
 - [License](#license)
 
@@ -272,7 +277,14 @@ RestB_BE/
     - Error Tracking: Automatically captures and reports unhandled exceptions and errors.
     - SentryErrorTransport: Supports manual error reporting with contextual information depending on `winston` settings.
 - **GitHub Actions:**  Are used for  continuous integration. The CI pipeline automatically runs tests when changes are pushed or pull requests are created.
+- **File Storage (AWS S3 / S3-Compatible):**
+  - Uses S3-compatible storage for uploading and managing files such as images and assets.
+  - Supports scalable and persistent media storage for restaurants and user content.
 
+- **Geolocation (OpenStreetMap Integration):**
+  - Integrates OpenStreetMap services for address lookup and geocoding.
+  - Converts addresses into geographic coordinates (latitude/longitude).
+  - Enables location-based restaurant features such as mapping and distance & radius calculations.
 ---
 
 ## Application Overview
