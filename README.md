@@ -275,41 +275,50 @@ RestB_BE/
 
 ---
 
-## Application overview
+## Application Overview
 
+### Authentication Flows
 
-###  Variety of authorization forms
+The application supports multiple authorization flows tailored for different user roles and scenarios.
 
-The application contains variety of authorization flows:
+<div style="display:flex; flex-wrap:wrap; gap:16px;">
 
+<div style="text-align:center;">
+  <a href="./docs/images/auth/login.png" target="_blank">
+    <img src="./docs/images/auth/login.png" alt="User login form" width="160"/>
+  </a>
+  <p><strong>Login</strong><br/>Standard user authentication with email and password.</p>
+</div>
 
-![alt text](./docs/images/auth/login.png)
-User login form
+<div style="text-align:center;">
+  <a href="./docs/images/auth/register-partner.png" target="_blank">
+    <img src="./docs/images/auth/register-partner.png" alt="Admin registration" width="160"/>
+  </a>
+  <p><strong>Admin Registration</strong><br/>Partner (admin) account creation with extended permissions.</p>
+</div>
 
-![alt text](./docs/images/auth/register-partner.png)
-Admin (partner) registration
+<div style="text-align:center;">
+  <a href="./docs/images/auth/registerNewEmployee.png" target="_blank">
+    <img src="./docs/images/auth/registerNewEmployee.png" alt="Employee registration" width="160"/>
+  </a>
+  <p><strong>Employee Registration</strong><br/>Onboarding flow for employees invited by admins.</p>
+</div>
 
-![alt text](./docs/images/auth/registerNewEmployee.png)
-Employee registration
+<div style="text-align:center;">
+  <a href="./docs/images/auth/forgot-password.png" target="_blank">
+    <img src="./docs/images/auth/forgot-password.png" alt="Forgot password" width="160"/>
+  </a>
+  <p><strong>Forgot Password</strong><br/>Allows users to request a password reset via email.</p>
+</div>
 
-![alt text](./docs/images/auth/forgot-password.png)
-Forgot password
+<div style="text-align:center;">
+  <a href="./docs/images/auth/reset-password.png" target="_blank">
+    <img src="./docs/images/auth/reset-password.png" alt="Reset password" width="160"/>
+  </a>
+  <p><strong>Reset Password</strong><br/>Secure form to set a new password using a reset token.</p>
+</div>
 
-![alt text](./docs/images/auth/reset-password.png)
-Reset
-
-### Variety of email notifications
-![alt text](./docs/images/email/emailReset.png)
-Password reset link
-
-![alt text](./docs/images/email/emailBookingApproved.png)
-User notification on booking approval
-
-![alt text](./docs/images/email/emailInvitation.png)
-Employee invitation
-
-![alt text](./docs/images/email/emailNewBooking.png)
-Admins and employees notification about new booking
+</div>
 
 
 ## Team
