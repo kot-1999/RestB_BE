@@ -281,26 +281,35 @@ RestB_BE/
 
 The application supports multiple authorization flows tailored for different user roles and scenarios.
 
-
 #### Login
-[![User login form](./docs/images/auth/login.png)](./docs/images/auth/login.png)  
-Standard user authentication with email and password.
+<a href="./docs/images/auth/login.png" target="_blank">
+  <img src="./docs/images/auth/login.png" alt="User login form" width="180"/>
+</a>  
+*Standard user authentication with email and password.*
 
 #### Admin Registration
-[![Admin registration](./docs/images/auth/register-partner.png)](./docs/images/auth/register-partner.png)  
-Partner (admin) account creation with extended permissions.
+<a href="./docs/images/auth/register-partner.png" target="_blank">
+  <img src="./docs/images/auth/register-partner.png" alt="Admin registration" width="180"/>
+</a>  
+*Partner (admin) account creation with extended permissions.*
 
 #### Employee Registration
-[![Employee registration](./docs/images/auth/registerNewEmployee.png)](./docs/images/auth/registerNewEmployee.png)  
-Onboarding flow for employees invited by admins.
+<a href="./docs/images/auth/registerNewEmployee.png" target="_blank">
+  <img src="./docs/images/auth/registerNewEmployee.png" alt="Employee registration" width="180"/>
+</a>  
+*Onboarding flow for employees invited by admins.*
 
 #### Forgot Password
-[![Forgot password](./docs/images/auth/forgot-password.png)](./docs/images/auth/forgot-password.png)  
-Allows users to request a password reset via email.
+<a href="./docs/images/auth/forgot-password.png" target="_blank">
+  <img src="./docs/images/auth/forgot-password.png" alt="Forgot password" width="180"/>
+</a>  
+*Allows users to request a password reset via email.*
 
 #### Reset Password
-[![Reset password](./docs/images/auth/reset-password.png)](./docs/images/auth/reset-password.png)  
-Secure form to set a new password using a reset token.
+<a href="./docs/images/auth/reset-password.png" target="_blank">
+  <img src="./docs/images/auth/reset-password.png" alt="Reset password" width="180"/>
+</a>  
+*Secure form to set a new password using a reset token.*
 
 ---
 
@@ -309,20 +318,28 @@ Secure form to set a new password using a reset token.
 The system sends automated email notifications for key user actions and events.
 
 #### Password Reset Email
-[![Password reset email](./docs/images/email/emailReset.png)](./docs/images/email/emailReset.png)  
-Contains a secure link for resetting the user's password.
+<a href="./docs/images/email/emailReset.png" target="_blank">
+  <img src="./docs/images/email/emailReset.png" alt="Password reset email" width="320"/>
+</a>  
+*Contains a secure link for resetting the user's password.*
 
 #### Booking Approved
-[![Booking approved email](./docs/images/email/emailBookingApproved.png)](./docs/images/email/emailBookingApproved.png)  
-Notifies users when their booking request is confirmed.
+<a href="./docs/images/email/emailBookingApproved.png" target="_blank">
+  <img src="./docs/images/email/emailBookingApproved.png" alt="Booking approved email" width="320"/>
+</a>  
+*Notifies users when their booking request is confirmed.*
 
 #### Employee Invitation
-[![Employee invitation email](./docs/images/email/emailInvitation.png)](./docs/images/email/emailInvitation.png)  
-Invitation email allowing new employees to join the platform.
+<a href="./docs/images/email/emailInvitation.png" target="_blank">
+  <img src="./docs/images/email/emailInvitation.png" alt="Employee invitation email" width="320"/>
+</a>  
+*Invitation email allowing new employees to join the platform.*
 
 #### New Booking Notification
-[![New booking notification email](./docs/images/email/emailNewBooking.png)](./docs/images/email/emailNewBooking.png)  
-Alerts admins and employees about newly created bookings.
+<a href="./docs/images/email/emailNewBooking.png" target="_blank">
+  <img src="./docs/images/email/emailNewBooking.png" alt="New booking notification email" width="320"/>
+</a>  
+*Alerts admins and employees about newly created bookings.*
 
 ---
 
