@@ -265,7 +265,8 @@ export class BookingController extends AbstractController {
                                 firstName: true,
                                 lastName: true,
                                 email: true,
-                                avatarURL: true
+                                avatarURL: true,
+                                phone: true
                             }
                         }
                     }
