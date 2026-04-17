@@ -281,6 +281,7 @@ RestB_BE/
 
 The application supports multiple authorization flows tailored for different user roles and scenarios.
 
+
 #### Login
 [![User login form](./docs/images/auth/login.png)](./docs/images/auth/login.png)  
 Standard user authentication with email and password.
