@@ -14,11 +14,30 @@ import { EmailDataType } from '../types/types'
 import { EmailType } from '../utils/enums'
 import { IError } from '../utils/IError'
 
+/**
+ * @class EmailService
+ * @description Service responsible for building and sending transactional emails.
+ * Supports multiple email types using EJS templates and Nodemailer.
+ *
+ * @param {IConfig['email']} config - Email configuration (SMTP host, port, credentials, etc.)
+ *
+ * @property {nodemailer.Transporter} transporter - Nodemailer transporter instance
+ * @property {IConfig['email']} config - Email configuration object
+ * @property {compiledFunction} htmlToTextCompiler - Utility to convert HTML to plain text
+ *
+ * @method sendEmail Sends an email based on provided type and data
+ */
 class EmailService {
     private transporter: nodemailer.Transporter
     private config: IConfig['email']
     private htmlToTextCompiler: compiledFunction
 
+    /**
+     * @method initTransporter
+     * @description Initializes the Nodemailer transporter with SMTP configuration
+     * @private
+     * @returns {void}
+     */
     private initTransporter(): void {
         this.transporter = nodemailer.createTransport({
             host: this.config.host,
@@ -33,6 +52,10 @@ class EmailService {
         })
     }
 
+    /**
+     * @constructor
+     * @param {IConfig['email']} config - Email service configuration
+     */
     constructor(config: IConfig['email']) {
         this.config = config
         this.initTransporter()
@@ -42,7 +65,14 @@ class EmailService {
             logger.warn('Email service is running in unsecured mode')
         }
     }
-     
+
+    /**
+     * @method buildRegistered
+     * @description Builds email content for user registration (welcome email)
+     *
+     * @param {EmailDataType<EmailType.registered>} data - Email data payload
+     * @returns {Promise<Mail.Options & { html: string }>}
+     */
     private async buildRegistered(data: EmailDataType<EmailType.registered>): Promise<Mail.Options & { html: string }> {
         const templatePath = path.join(__dirname, 'emailTemplates', 'registration.ejs')
         const templateData = {
@@ -62,7 +92,13 @@ class EmailService {
 
         return mailOptions
     }
-
+    /**
+     * @method buildForgotPassword
+     * @description Builds email content for password reset requests
+     *
+     * @param {EmailDataType<EmailType.forgotPassword>} data - Email data payload
+     * @returns {Promise<Mail.Options & { html: string }>}
+     */
     private async buildForgotPassword(data: EmailDataType<EmailType.forgotPassword>)
         : Promise<Mail.Options & { html: string }> {
         const templatePath = path.join(__dirname, 'emailTemplates', 'forgotPassword.ejs')
@@ -82,7 +118,13 @@ class EmailService {
 
         return mailOptions 
     }
-
+    /**
+     * @method buildEmployeeInvite
+     * @description Builds email content for inviting an employee to a restaurant
+     *
+     * @param {EmailDataType<EmailType.employeeInvite>} data - Email data payload
+     * @returns {Promise<Mail.Options & { html: string }>}
+     */
     private async buildEmployeeInvite(data: EmailDataType<EmailType.employeeInvite>)
         : Promise<Mail.Options & { html: string }> {
         const templatePath = path.join(__dirname, 'emailTemplates', 'employeeInvite.ejs')
@@ -106,7 +148,13 @@ class EmailService {
 
         return mailOptions
     }
-
+    /**
+     * @method bookingUpdate
+     * @description Builds email content for booking status updates
+     *
+     * @param {EmailDataType<EmailType.bookingUpdated>} data - Email data payload
+     * @returns {Promise<Mail.Options & { html: string }>}
+     */
     private async bookingUpdate(data: EmailDataType<EmailType.bookingUpdated>)
         : Promise<Mail.Options & { html: string }> {
         const templatePath = path.join(__dirname, 'emailTemplates', 'bookingUpdated.ejs')
@@ -135,6 +183,18 @@ class EmailService {
         return mailOptions
     }
 
+    /**
+     * @method sendEmail
+     * @description Sends an email based on the provided email type and data
+     *
+     * @template T extends EmailType
+     * @param {T} emailType - Type of email to send
+     * @param {EmailDataType<T>} data - Email payload specific to the type
+     *
+     * @returns {Promise<void>}
+     *
+     * @throws {IError} If email type is unknown
+     */
     public async sendEmail<T extends EmailType>(
         emailType: T,
         data: EmailDataType<T>

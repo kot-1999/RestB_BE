@@ -9,6 +9,10 @@ import DashboardQueries from '../database/queries/DashboardQueries'
 import RestaurantQueries from '../database/queries/RestaurantQueries'
 import UserQueries from '../database/queries/UserQueries'
 
+/**
+ * @interface Queries
+ * @description Collection of query classes used to extend Prisma models
+ */
 interface Queries {
     user: UserQueries,
     admin: AdminQueries,
@@ -19,8 +23,25 @@ interface Queries {
     address: AddressQueries
 }
 
+/**
+ * @class PrismaService
+ * @description Wrapper around PrismaClient that:
+ * - Initializes Prisma with logging
+ * - Attaches custom query methods via $extends
+ * - Provides a centralized Prisma instance
+ *
+ * @property client - Prisma client instance (extended with custom queries)
+ *
+ * @method attachQueries Extends Prisma models with custom query methods
+ * @method getPrismaClient Returns the current Prisma client instance
+ */
 class PrismaService {
     private client: any
+
+    /**
+     * @constructor
+     * @description Initializes Prisma client with logging and event listeners
+     */
     constructor() {
         this.client = new PrismaClient({
             log: [{
@@ -50,6 +71,15 @@ class PrismaService {
         logger.info('Prisma client was created')
     }
 
+    /**
+     * @method attachQueries
+     * @description Extends Prisma models with custom query methods using $extends.
+     * NOTE: Must be called after $on, since extended client does not support $on/$use.
+     *
+     * @param {Queries} queries - Object containing query class instances
+     *
+     * @returns {void}
+     */
     public attachQueries (queries: Queries) {
         // NOTE: $extends client method should be used after $on
         // as extended client doesnt support $on and $use
@@ -109,6 +139,12 @@ class PrismaService {
     //     this.client.address = queries.address
     }
 
+    /**
+     * @method getPrismaClient
+     * @description Returns the current Prisma client instance
+     *
+     * @returns {any} Prisma client (possibly extended)
+     */
     public getPrismaClient() {
         return this.client
     }
