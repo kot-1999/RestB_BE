@@ -1,7 +1,7 @@
-# RestBoo
-Restaurant booking app
+# RestBoo - Backend
 
-
+- Frontend repository: [https://github.com/kot-1999/RestB_FE](https://github.com/kot-1999/RestB_FE)
+- Backend template: [https://github.com/kot-1999/BE-express](https://github.com/kot-1999/BE-express)
 ## Content
 
 - [About RestBoo](#about-restboo)
