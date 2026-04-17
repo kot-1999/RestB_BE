@@ -17,10 +17,35 @@ interface NominatimPlace {
     address: Record<string, string>;
 }
 
+/**
+ * @class OpenStreetMapService
+ * @description Service for interacting with OpenStreetMap Nominatim API.
+ * Provides methods for searching locations by query string or structured address.
+ *
+ * @property {string} BASE_URL - Base URL for Nominatim search endpoint
+ *
+ * @method search Performs a free-text location search
+ * @method searchAddress Performs a structured address search
+ */
 export class OpenStreetMapService {
+    /**
+     * @property BASE_URL
+     * @description Base endpoint for OpenStreetMap Nominatim API
+     * @private
+     */
     private static BASE_URL
         = 'https://nominatim.openstreetmap.org/search';
 
+    /**
+     * @method search
+     * @description Performs a location search using a free-text query
+     *
+     * @param {string} search - Search query (e.g., address, place name)
+     *
+     * @returns {Promise<NominatimPlace | null>} First matching result or null if none found
+     *
+     * @throws {IError} If request fails
+     */
     static async search(search: string) {
         const url
             = `${this.BASE_URL}?`
@@ -51,6 +76,17 @@ export class OpenStreetMapService {
         return data[0]
     }
 
+    /**
+     * @method searchAddress
+     * @description Performs a structured address lookup using individual address fields
+     *
+     * @param {Pick<Address, 'country' | 'street' | 'building' | 'postcode' | 'city'>} address
+     * Structured address object
+     *
+     * @returns {Promise<NominatimPlace | null>} First matching result or null if none found
+     *
+     * @throws {IError} If request fails
+     */
     static async searchAddress(address: Pick<Address, 'country' | 'street' | 'building' | 'postcode' | 'city'>) {
         const params = new URLSearchParams({
             format: 'json',
