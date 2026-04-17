@@ -81,7 +81,12 @@ const options: IConfig = {
                 styleSrc: ["'self'", 'fonts.googleapis.com', "'unsafe-inline'"],
                 fontSrc: ["'self'", 'fonts.gstatic.com'],
                 imgSrc: ["'self'", '*'],
-                connectSrc: ["'self'", '*']
+                connectSrc: ["'self'", '*'],
+                frameSrc: [
+                    "'self'",
+                    'https://www.google.com',
+                    'https://maps.google.com'
+                ]
             }
         }
     },
