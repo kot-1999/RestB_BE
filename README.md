@@ -1,7 +1,7 @@
-# RestBoo
-Restaurant booking app
+# RestBoo - Backend
 
-
+- Frontend repository: [https://github.com/kot-1999/RestB_FE](https://github.com/kot-1999/RestB_FE)
+- Backend template: [https://github.com/kot-1999/BE-express](https://github.com/kot-1999/BE-express)
 ## Content
 
 - [About RestBoo](#about-restboo)
@@ -12,8 +12,13 @@ Restaurant booking app
 - [Useful links](#useful-links)
 - [Project Structure](#project-structure)
 - [Backend and DevOps features](#backend-and-devops-features)
+- [Application Overview](#application-overview)
+  - [Application From User Perspective](#43-application-from-user-perspective)
+  - [Application From Admin Perspective](#44-application-from-admin-perspective)
+  - [Application From Employee Perspective](#45-application-from-employee-perspective)
+  - [Authentication Flows](#authentication-flows)
+  - [Email Notifications](#email-notifications)
 - [Team](#team)
-- [Gallery](#gallery)
 - [License](#license)
 
 ---
@@ -240,7 +245,6 @@ RestB_BE/
 ```
 
 ---
-
 ## Backend and DevOps features
 
 - **Full Dockerization:** The entire application is containerized using Docker, allowing for seamless setup and deployment. With Docker, you can run the project without worrying about environment configurations.
@@ -273,8 +277,222 @@ RestB_BE/
     - Error Tracking: Automatically captures and reports unhandled exceptions and errors.
     - SentryErrorTransport: Supports manual error reporting with contextual information depending on `winston` settings.
 - **GitHub Actions:**  Are used for  continuous integration. The CI pipeline automatically runs tests when changes are pushed or pull requests are created.
+- **File Storage (AWS S3 / S3-Compatible):**
+  - Uses S3-compatible storage for uploading and managing files such as images and assets.
+  - Supports scalable and persistent media storage for restaurants and user content.
+
+- **Geolocation (OpenStreetMap Integration):**
+  - Integrates OpenStreetMap services for address lookup and geocoding.
+  - Converts addresses into geographic coordinates (latitude/longitude).
+  - Enables location-based restaurant features such as mapping and distance & radius calculations.
+---
+
+## Application Overview
+
+
+### Application From User Perspective
+
+From a user’s perspective, the application provides a simple and intuitive way to discover restaurants and manage bookings.
+
+Users can browse available restaurants, view detailed information such as location, categories, and other relevant details, and select a restaurant that suits their preferences.
+
+Once a restaurant is selected, users can create a booking by choosing a suitable date and time.
+
+After creating a booking, users can:
+- View their existing reservations
+- Chat with restaurant administration
+- Cancel bookings if needed (only before the scheduled time and date)
 
 ---
+
+#### Home Page
+<a href="./docs/images/home.png" target="_blank">
+  <img src="./docs/images/home.png" alt="Home page" width="320"/>
+</a>  
+
+<sub>Main entry point where users can browse available restaurants.</sub>
+
+#### Home Footer
+<a href="./docs/images/home-footer.png" target="_blank">
+  <img src="./docs/images/home-footer.png" alt="Home footer" width="320"/>
+</a>  
+
+<sub>Footer section containing additional navigation and general information.</sub>
+
+#### Restaurant Details
+<a href="./docs/images/restDetails.png" target="_blank">
+  <img src="./docs/images/restDetails.png" alt="Restaurant details" width="320"/>
+</a>  
+
+<sub>Additional restaurant information including location and extended details.</sub>
+
+#### User Bookings Overview
+<a href="./docs/images/userBookings.png" target="_blank">
+  <img src="./docs/images/userBookings.png" alt="User bookings overview" width="320"/>
+</a>  
+
+<sub>List of all bookings created by the user with status tracking.</sub>
+
+#### User Profile
+<a href="./docs/images/user-profile.png" target="_blank">
+  <img src="./docs/images/user-profile.png" alt="User profile" width="320"/>
+</a>  
+
+<sub>User account page for managing personal information and preferences.</sub>
+
+---
+
+### Application From Admin Perspective
+
+From an administrator’s perspective, the application provides full control over restaurant management and booking operations.
+
+Admins are responsible for managing core business entities within the system. They can create, update, and delete restaurants, configure availability, and manage associated data such as addresses and brands.
+
+The platform supports multi-restaurant management, allowing admins to oversee multiple locations from a single interface.
+
+In addition to restaurant management, admins can:
+- View and manage all bookings across their restaurants
+- Approve, reject, or update booking details
+- Monitor booking activity and system usage
+- Manage staff by assigning employees to specific restaurants
+
+The system enforces role-based access control, ensuring that only authorized administrators can perform high-level operations.
+
+---
+
+#### Admin Dashboard
+<a href="./docs/images/dashboard.png" target="_blank">
+  <img src="./docs/images/dashboard.png" alt="Admin dashboard" width="320"/>
+</a>  
+
+<sub>Central dashboard providing an overview of restaurants load.</sub>
+
+
+#### Booking Management
+<a href="./docs/images/adminManageBookings.png" target="_blank">
+  <img src="./docs/images/adminManageBookings.png" alt="Admin booking management" width="320"/>
+</a>  
+
+<sub>Admin view of booking restaurant cards with today's summaries such as numbers of expecting guests and pending bookings.</sub>
+
+#### Bookings per Restaurant
+<a href="./docs/images/bookingAdmin.png" target="_blank">
+  <img src="./docs/images/bookingAdmin.png" alt="Bookings per restaurant overview" width="320"/>
+</a>  
+
+<sub>Overview of bookings grouped by restaurant.</sub>
+
+#### Restaurants Overview
+<a href="./docs/images/restPage.png" target="_blank">
+  <img src="./docs/images/restPage.png" alt="Restaurants overview" width="320"/>
+</a>  
+
+<sub>List of all managed restaurants with options to edit or remove them.</sub>
+
+#### Restaurant Create / Edit
+<a href="./docs/images/restmanage.png" target="_blank">
+  <img src="./docs/images/restmanage.png" alt="Restaurant create or edit" width="320"/>
+</a>  
+
+<sub>Interface for creating or updating restaurant details and configuration.</sub>
+
+---
+
+### Application From Employee Perspective
+
+From an employee’s perspective, the application focuses on booking management within a specific restaurant.
+
+Employees are assigned to one restaurant and have limited access. Their primary responsibility is to manage bookings and ensure smooth day-to-day operations.
+
+Employees can:
+- View bookings for their assigned restaurant
+- Update booking statuses (e.g., confirm, modify, or cancel reservations)
+- Handle customer requests related to bookings
+
+Unlike administrators, employees do not have permission to:
+- Create, update, or delete restaurants
+- Manage brands or system-wide configurations
+- Assign or manage other staff members
+
+This restricted access ensures a clear separation of responsibilities and prevents unauthorized modifications to critical business data.
+
+---
+
+### Authentication Flows
+
+The application supports multiple authorization flows tailored for different user roles and scenarios.
+
+#### Login
+<a href="./docs/images/auth/login.png" target="_blank">
+  <img src="./docs/images/auth/login.png" alt="User login form" width="180"/>
+</a>  
+
+<sub>Standard user authentication with email and password.</sub>
+
+#### Admin Registration
+<a href="./docs/images/auth/register-partner.png" target="_blank">
+  <img src="./docs/images/auth/register-partner.png" alt="Admin registration" width="180"/>
+</a>  
+
+<sub>Partner (admin) account creation with extended permissions.</sub>
+
+#### Employee Registration
+<a href="./docs/images/auth/registerNewEmployee.png" target="_blank">
+  <img src="./docs/images/auth/registerNewEmployee.png" alt="Employee registration" width="180"/>
+</a>  
+
+<sub>Onboarding flow for employees invited by admins.</sub>
+
+#### Forgot Password
+<a href="./docs/images/auth/forgot-password.png" target="_blank">
+  <img src="./docs/images/auth/forgot-password.png" alt="Forgot password" width="180"/>
+</a> 
+
+<sub>Allows users to request a password reset via email.</sub>
+
+#### Reset Password
+<a href="./docs/images/auth/reset-password.png" target="_blank">
+  <img src="./docs/images/auth/reset-password.png" alt="Reset password" width="180"/>
+</a>  
+
+<sub>Secure form to set a new password using a reset token.</sub>
+
+---
+
+### Email Notifications
+
+The system sends automated email notifications for key user actions and events.
+
+#### Password Reset Email
+<a href="./docs/images/email/emailReset.png" target="_blank">
+  <img src="./docs/images/email/emailReset.png" alt="Password reset email" width="320"/>
+</a>  
+
+<sub>Contains a secure link for resetting the user's password.</sub>
+
+#### Booking Approved
+<a href="./docs/images/email/emailBookingApproved.png" target="_blank">
+  <img src="./docs/images/email/emailBookingApproved.png" alt="Booking approved email" width="320"/>
+</a> 
+
+<sub>Notifies users when their booking request is confirmed.</sub>
+
+#### Employee Invitation
+<a href="./docs/images/email/emailInvitation.png" target="_blank">
+  <img src="./docs/images/email/emailInvitation.png" alt="Employee invitation email" width="320"/>
+</a>  
+
+<sub>Invitation email allowing new employees to join the platform.</sub>
+
+#### New Booking Notification
+<a href="./docs/images/email/emailNewBooking.png" target="_blank">
+  <img src="./docs/images/email/emailNewBooking.png" alt="New booking notification email" width="320"/>
+</a>  
+
+<sub>Alerts admins and employees about newly created bookings.</sub>
+
+---
+
 
 ## Team
 - **Oleksandr Kashytskyi** — [sashakashytskyy@gmail.com](mailto:sashakashytskyy@gmail.com)  
@@ -282,10 +500,9 @@ RestB_BE/
 
 - **Stephen Lyne** — [slyne234@gmail.com](mailto:slyne234@gmail.com)  
   Frontend developer, UI/UX designer
-
 ---
 
-## Gallery
+
 
 ---
 
