@@ -11,11 +11,36 @@ import { IConfig } from '../types/config'
 import { JwtAudience, PassportStrategy } from '../utils/enums'
 import { IError } from '../utils/IError'
 
+/**
+ * @class PassportSetup
+ * @description Configures and initializes Passport strategies for authentication.
+ * Supports Google OAuth, multiple JWT strategies (B2C, B2B, forgot password, invites),
+ * and session serialization/deserialization.
+ *
+ * @param {IConfig['googleStrategy']} googleStrategyConfig - Google OAuth configuration
+ * @param {IConfig['jwt']} jwtConfig - JWT configuration (secret, algorithm, etc.)
+ * @param {IConfig['passport']} passportConfig - Passport-related configuration (extractors, etc.)
+ *
+ * @method googleStrategy Handles Google OAuth authentication
+ * @method b2cJwtStrategy Handles JWT authentication for users (B2C)
+ * @method b2cJwtForgotPasswordStrategy Handles JWT for B2C password reset
+ * @method b2bJwtStrategy Handles JWT authentication for admins (B2B)
+ * @method b2bJwtForgotPasswordStrategy Handles JWT for B2B password reset
+ * @method inviteEmployee Handles JWT for employee invitation flow
+ * @method serializeUser Serializes user/admin into session
+ * @method deserializeUser Deserializes user/admin from session
+ */
 class PassportSetup {
     private googleStrategyConfig: IConfig['googleStrategy']
     private jwtConfig: IConfig['jwt']
     private passportConfig: IConfig['passport']
 
+    /**
+     * @constructor
+     * @param {IConfig['googleStrategy']} googleStrategyConfig
+     * @param {IConfig['jwt']} jwtConfig
+     * @param {IConfig['passport']} passportConfig
+     */
     constructor(
         googleStrategyConfig: IConfig['googleStrategy'],
         jwtConfig: IConfig['jwt'],
@@ -86,9 +111,18 @@ class PassportSetup {
     }
 
     /**
-     * - Save user to DB if such doesn't exist
-     * - Update user's googleProfileID if such doesn't exist
-     * */
+     * @method googleStrategy
+     * @description Handles Google OAuth authentication:
+     * - Finds or creates user in database
+     * - Updates googleProfileID if missing
+     *
+     * @param {string} accessToken
+     * @param {string} refreshToken
+     * @param {Profile} profile - Google profile data
+     * @param {VerifyCallback} done - Passport callback
+     *
+     * @returns {Promise<void>}
+     */
     private async googleStrategy(
         accessToken: string,
         refreshToken: string,
@@ -143,6 +177,10 @@ class PassportSetup {
         }
     }
 
+    /**
+     * @method b2cJwtForgotPasswordStrategy
+     * @description Validates JWT for B2C password reset flow
+     */
     private async b2cJwtStrategy(payload: JwtPayload, done: VerifyCallback) {
         try {
             if (payload.aud !== JwtAudience.b2c) {
@@ -162,6 +200,10 @@ class PassportSetup {
         }
     }
 
+    /**
+     * @method b2bJwtForgotPasswordStrategy
+     * @description Validates JWT for B2B password reset flow
+     */
     private async b2cJwtForgotPasswordStrategy(payload: JwtPayload, done: VerifyCallback) {
         try {
             if (payload.aud !== JwtAudience.b2cForgotPassword) {
@@ -184,6 +226,10 @@ class PassportSetup {
         }
     }
 
+    /**
+     * @method b2bJwtStrategy
+     * @description Validates JWT for admin (B2B) authentication
+     */
     private async b2bJwtStrategy(payload: JwtPayload, done: VerifyCallback) {
         try {
             if (payload.aud !== JwtAudience.b2b) {
@@ -203,6 +249,10 @@ class PassportSetup {
         }
     }
 
+    /**
+     * @method b2bJwtForgotPasswordStrategy
+     * @description Validates JWT for B2B password reset flow
+     */
     private async b2bJwtForgotPasswordStrategy(payload: JwtPayload, done: VerifyCallback) {
         try {
             if (payload.aud !== JwtAudience.b2bForgotPassword) {
@@ -225,6 +275,10 @@ class PassportSetup {
         }
     }
 
+    /**
+     * @method inviteEmployee
+     * @description Validates JWT for employee invitation flow
+     */
     private async inviteEmployee(payload: JwtPayload, done: VerifyCallback) {
         try {
             if (payload.aud !== JwtAudience.inviteEmployee) {
@@ -240,6 +294,10 @@ class PassportSetup {
         }
     }
 
+    /**
+     * @method serializeUser
+     * @description Serializes user/admin into session
+     */
     private serializeUser(
         user: User | Admin,
         done: (
@@ -254,6 +312,10 @@ class PassportSetup {
         })
     }
 
+    /**
+     * @method deserializeUser
+     * @description Deserializes session entity back into user/admin
+     */
     private async deserializeUser(
         entity: { id: string, type: 'user' | 'admin' },
         done: (err: Error | null, user: User | Admin | null) => void
