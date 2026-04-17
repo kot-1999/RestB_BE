@@ -12,8 +12,8 @@
 - [Useful links](#useful-links)
 - [Project Structure](#project-structure)
 - [Backend and DevOps features](#backend-and-devops-features)
+- [Application overview](#application-overview)
 - [Team](#team)
-- [Gallery](#gallery)
 - [License](#license)
 
 ---
@@ -240,7 +240,6 @@ RestB_BE/
 ```
 
 ---
-
 ## Backend and DevOps features
 
 - **Full Dockerization:** The entire application is containerized using Docker, allowing for seamless setup and deployment. With Docker, you can run the project without worrying about environment configurations.
@@ -276,16 +275,52 @@ RestB_BE/
 
 ---
 
+## Application overview
+
+
+###  Variety of authorization forms
+
+The application contains variety of authorization flows:
+
+
+![alt text](./docs/images/auth/login.png)
+User login form
+
+![alt text](./docs/images/auth/register-partner.png)
+Admin (partner) registration
+
+![alt text](./docs/images/auth/registerNewEmployee.png)
+Employee registration
+
+![alt text](./docs/images/auth/forgot-password.png)
+Forgot password
+
+![alt text](./docs/images/auth/reset-password.png)
+Reset
+
+### Variety of email notifications
+![alt text](./docs/images/email/emailReset.png)
+Password reset link
+
+![alt text](./docs/images/email/emailBookingApproved.png)
+User notification on booking approval
+
+![alt text](./docs/images/email/emailInvitation.png)
+Employee invitation
+
+![alt text](./docs/images/email/emailNewBooking.png)
+Admins and employees notification about new booking
+
+
 ## Team
 - **Oleksandr Kashytskyi** — [sashakashytskyy@gmail.com](mailto:sashakashytskyy@gmail.com)  
   Idea creator, backend developer, system architect, database designer
 
 - **Stephen Lyne** — [slyne234@gmail.com](mailto:slyne234@gmail.com)  
   Frontend developer, UI/UX designer
-
 ---
 
-## Gallery
+
 
 ---
 
