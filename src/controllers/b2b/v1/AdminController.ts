@@ -1,4 +1,5 @@
-import { AdminRole } from '@prisma/client'
+import { AdminRole, BookingStatus } from '@prisma/client'
+import dayjs from 'dayjs';
 import { Response, NextFunction, AuthAdminRequest } from 'express'
 import Joi from 'joi'
 
@@ -145,8 +146,64 @@ export class AdminController extends AbstractController {
         try {
             const { user } = req
 
-            await prisma.admin.softDelete(user.id)
+            const adminRestaurants = await prisma.restaurant.findMany({
+                where: {
+                    brandID: user.brandID
+                },
+                select: {
+                    id: true
+                }
+            })
+            await prisma.$transaction(async (tx: any) => {
+                // Delete admin
+                const now = dayjs().toISOString()
 
+                await tx.admin.softDelete(user.id)
+
+                if (user.role === AdminRole.Admin) {
+                    await tx.admin.updateMany({
+                        where: {
+                            brandID: user.brandID
+                        },
+                        data: {
+                            deletedAt: now
+                        }
+                    })
+                    // Cancel upcoming bookings
+                    await tx.booking.updateMany({
+                        where: {
+                            AND: [
+                                {
+                                    restaurantID: {
+                                        in: adminRestaurants.map((restaurant: {
+                                            id: string
+                                        }) => restaurant.id)
+                                    }
+                                },
+                                { bookingTime: { gte: dayjs().toISOString() } }
+                            ]
+                        },
+                        data: {
+                            status: BookingStatus.Cancelled
+                        }
+                    })
+
+                    // Delete restaurants
+                    await tx.restaurant.updateMany({
+                        where: {
+                            brandID: user.brandID
+                        },
+                        data: {
+                            deletedAt: now
+                        }
+                    })
+
+                    // Delete brand
+                    await tx.brand.updateOne(user.brandID, {
+                        deletedAt: now
+                    })
+                }
+            });
             return res.status(200).json({
                 admin: {
                     id: user.id

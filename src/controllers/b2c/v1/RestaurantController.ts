@@ -154,7 +154,13 @@ export class RestaurantController extends AbstractController {
         try {
             const { query } = req
 
-            const where: { AND: Prisma.RestaurantWhereInput[] } = { AND: [] }
+            const where: { AND: Prisma.RestaurantWhereInput[] } = {
+                AND: [
+                    {
+                        deletedAt: null
+                    }
+                ] 
+            }
             const skip = (query.page - 1) * query.limit;
 
             // Geo Search

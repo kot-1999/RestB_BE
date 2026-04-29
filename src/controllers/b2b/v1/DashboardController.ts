@@ -148,9 +148,14 @@ export class DashboardController extends AbstractController {
                         bannerURL: true
                     },
                     where: {
-                        id: {
-                            in: restaurantIDs
-                        }
+                        AND: [
+                            {
+                                id: {
+                                    in: restaurantIDs
+                                }
+                            },
+                            { deletedAt: null }
+                        ]
                     }
                 }) as Promise<{ id: string, name: string, bannerURL: string}[]>
             ])

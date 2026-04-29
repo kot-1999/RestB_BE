@@ -58,7 +58,7 @@ export default function adminRouter() {
                 schema: { "$ref": "#/definitions/b2bV1DeleteUserRes" },
             }
         */
-        '/:adminID',
+        '/',
         validationMiddleware(AdminController.schemas.request.deleteAdmin),
         authorizationMiddleware([PassportStrategy.jwtB2b]),
         adminController.deleteAdmin
