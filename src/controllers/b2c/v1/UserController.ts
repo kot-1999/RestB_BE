@@ -1,3 +1,4 @@
+import { BookingStatus } from '@prisma/client';
 import { Response, NextFunction, AuthUserRequest } from 'express'
 import Joi from 'joi'
 
@@ -5,6 +6,7 @@ import prisma from '../../../services/Prisma'
 import { AbstractController } from '../../../types/AbstractController'
 import { JoiCommon } from '../../../types/JoiCommon'
 import { IError } from '../../../utils/IError'
+import dayjs from "dayjs";
 
 export class UsersController extends AbstractController {
     private static readonly userSchema = Joi.object({
@@ -128,7 +130,20 @@ export class UsersController extends AbstractController {
         try {
             const { user } = req
 
-            await prisma.user.softDelete(user.id)
+            await prisma.$transaction(async (tx: any) => {
+                await tx.user.softDelete(user.id);
+                await tx.booking.updateMany({
+                    where: {
+                        AND: [
+                            { userID: user.id },
+                            { bookingTime: { gte: dayjs().toISOString() } }
+                        ]
+                    },
+                    data: {
+                        status: BookingStatus.Cancelled
+                    }
+                });
+            });
 
             return res.status(200).json({
                 user: {
