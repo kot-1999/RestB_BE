@@ -48,6 +48,7 @@ export class BrandController extends AbstractController {
     ) {
         try {
             const { user, params, body } = req
+            
             const brand = await prisma.brand.findByID(params.brandID, {
                 id: true,
                 name: true,
@@ -62,7 +63,7 @@ export class BrandController extends AbstractController {
                 throw new IError(403, 'Not a brand owner')
             }
 
-            await prisma.brand.updateOne(params.brandID, {
+            prisma.brand.updateOne({ brandID: params.brandID }, {
                 name: body.name ?? brand.name,
                 logoURL: body.logoURL ?? brand.logoURL
             })
