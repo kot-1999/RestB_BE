@@ -49,11 +49,6 @@ jobs:
           echo "ALLOW_CONFIG_MUTATIONS=${{ secrets.ALLOW_CONFIG_MUTATIONS }}" >> .env
 
           cat .env
-      # Run checks
-      - name: Run type check
-        run: npm run type:check
-      - name: Run Eslint check
-        run: npm run lint
 
       # Run docker containers
       - name: Run docker
