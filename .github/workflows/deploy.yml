@@ -3,9 +3,6 @@ on:
   push:
     branches:
       - 'main'
-  pull_request: # Runs on all PRs before merging
-    branches:
-      - 'main'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -13,6 +10,8 @@ jobs:
 
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: Create .env
         run: |
           touch .env

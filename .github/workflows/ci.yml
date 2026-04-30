@@ -18,6 +18,8 @@ jobs:
       # Clone repository into the GitHub Actions runner
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          node-version: '22.8.0'
       # Create .env file with all needed variables
       - name: Create .env
         run: |
