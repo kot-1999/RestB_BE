@@ -30,7 +30,7 @@ const GEO_BOX = {
     maxLng: 0.7
 };
 
-const GRAIN = 300
+const GRAIN = 100
 
 const restaurantImagesDir = path.join(__dirname, 'restaurantPictures')
 const menuImagesDir = path.join(__dirname, 'menuPictures')
