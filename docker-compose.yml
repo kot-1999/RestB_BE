@@ -6,7 +6,6 @@ services:
     container_name: dev_app
     profiles:
       - dev
-      - uat
     env_file:
       - .env.dev
     depends_on:
@@ -14,6 +13,26 @@ services:
       - redis
       - dev_mysql
       - rustfs_dev
+    command: >
+      sh -c '
+        npm install --legacy-peer-deps &&
+        npm run build:frontend &&
+        npm run start;
+      '
+
+  uat_app:
+    extends:
+      file: ./docker-compose.base.yml
+      service: app
+    container_name: uat_app
+    profiles:
+      - uat
+    env_file:
+      - .env.dev
+    depends_on:
+      - mailhog
+      - redis
+      - dev_mysql
     command: >
       sh -c '
         npm install --legacy-peer-deps &&
