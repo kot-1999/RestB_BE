@@ -5,7 +5,7 @@ on:
       - 'main'
   pull_request: # Runs on all PRs before merging
     branches:
-      - '**'
+      - 'main'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
