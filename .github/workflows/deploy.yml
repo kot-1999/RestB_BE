@@ -52,4 +52,4 @@ jobs:
 
       # Run docker containers
       - name: Run docker
-        run: npm run docker:dev
+        run: docker compose  --env-file .env --profile dev up
