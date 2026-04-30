@@ -132,19 +132,22 @@ export class RestaurantController extends AbstractController {
             const { query, user } = req
 
             const skip = (query.page - 1) * query.limit;
-            let where: Prisma.RestaurantWhereInput = {
-                brandID: user.brandID
+            const where: Prisma.RestaurantWhereInput & { AND: any[]} = {
+                AND: [{
+                    deletedAt: null
+                }, {
+                    brandID: user.brandID
+                }]
             }
             
             if (user.role === AdminRole.Employee) {
-                where = {
-                    ...where,
+                where.AND.push({
                     staff: {
                         some: {
                             adminID: user.id
                         }
                     }
-                }
+                })
             }
 
             const [count, brand, restaurants] = await Promise.all([

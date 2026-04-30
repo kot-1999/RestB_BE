@@ -63,7 +63,7 @@ export class BrandController extends AbstractController {
                 throw new IError(403, 'Not a brand owner')
             }
 
-            prisma.brand.updateOne({ brandID: params.brandID }, {
+            await prisma.brand.updateOne(params.brandID, {
                 name: body.name ?? brand.name,
                 logoURL: body.logoURL ?? brand.logoURL
             })
