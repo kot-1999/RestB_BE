@@ -15,40 +15,40 @@ jobs:
       - name: Create .env.dev
         run: |
           touch .env.dev
-          echo "NODE_ENV=${{ vars.NODE_ENV }}" >> .env
-          echo "PORT=${{ vars.PORT }}" >> .env
-          echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> .env
-          echo "COOKIE_SECRET_KEY=${{ secrets.COOKIE_SECRET_KEY }}" >> .env
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-          echo "JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}" >> .env
-          echo "MYSQL_URL=${{ secrets.MYSQL_URL }}" >> .env
-          echo "MYSQL_PORT=${{ secrets.MYSQL_PORT }}" >> .env
-          echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> .env
-          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
+          echo "NODE_ENV=${{ vars.NODE_ENV }}" >> .env.dev
+          echo "PORT=${{ vars.PORT }}" >> .env.dev
+          echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> .env.dev
+          echo "COOKIE_SECRET_KEY=${{ secrets.COOKIE_SECRET_KEY }}" >> .env.dev
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env.dev
+          echo "JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}" >> .env.dev
+          echo "MYSQL_URL=${{ secrets.MYSQL_URL }}" >> .env.dev
+          echo "MYSQL_PORT=${{ secrets.MYSQL_PORT }}" >> .env.dev
+          echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> .env.dev
+          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env.dev
           echo "MYSQL_DB=${{ secrets.MYSQL_DB }}" >> .env
-          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
-          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
-          echo "EMAIL_HOST=${{ secrets.EMAIL_HOST }}" >> .env
-          echo "EMAIL_SMTP_PORT=${{ secrets.EMAIL_SMTP_PORT }}" >> .env
-          echo "EMAIL_HTTP_PORT=${{ secrets.EMAIL_HTTP_PORT }}" >> .env
-          echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> .env
-          echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> .env
-          echo "EMAIL_FROM_ADDRESS=${{ secrets.EMAIL_FROM_ADDRESS }}" >> .env
-          echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> .env
-          echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
-          echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> .env
-          echo "REDIS_MAX_MEMORY=${{ secrets.REDIS_MAX_MEMORY }}" >> .env
-          echo "SENTRY_DNS=${{ secrets.SENTRY_DNS }}" >> .env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env.dev
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env.dev
+          echo "EMAIL_HOST=${{ secrets.EMAIL_HOST }}" >> .env.dev
+          echo "EMAIL_SMTP_PORT=${{ secrets.EMAIL_SMTP_PORT }}" >> .env.dev
+          echo "EMAIL_HTTP_PORT=${{ secrets.EMAIL_HTTP_PORT }}" >> .env.dev
+          echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> .env.dev
+          echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> .env.dev
+          echo "EMAIL_FROM_ADDRESS=${{ secrets.EMAIL_FROM_ADDRESS }}" >> .env.dev
+          echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> .env.dev
+          echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env.dev
+          echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> .env.dev
+          echo "REDIS_MAX_MEMORY=${{ secrets.REDIS_MAX_MEMORY }}" >> .env.dev
+          echo "SENTRY_DNS=${{ secrets.SENTRY_DNS }}" >> .env.dev
 
-          echo "S3_ACCESS_KEY_ID=${{ secrets.S3_ACCESS_KEY_ID }}" >> .env
-          echo "S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }}" >> .env
-          echo "S3_REGION=${{ secrets.S3_REGION }}" >> .env
-          echo "S3_ENDPOINT=${{ secrets.S3_ENDPOINT }}" >> .env
-          echo "S3_PORT=${{ secrets.S3_PORT }}" >> .env
-          echo "S3_INTERFACE_PORT=${{ secrets.S3_INTERFACE_PORT }}" >> .env
-          echo "ALLOW_CONFIG_MUTATIONS=${{ secrets.ALLOW_CONFIG_MUTATIONS }}" >> .env
+          echo "S3_ACCESS_KEY_ID=${{ secrets.S3_ACCESS_KEY_ID }}" >> .env.dev
+          echo "S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }}" >> .env.dev
+          echo "S3_REGION=${{ secrets.S3_REGION }}" >> .env.dev
+          echo "S3_ENDPOINT=${{ secrets.S3_ENDPOINT }}" >> .env.dev
+          echo "S3_PORT=${{ secrets.S3_PORT }}" >> .env.dev
+          echo "S3_INTERFACE_PORT=${{ secrets.S3_INTERFACE_PORT }}" >> .env.dev
+          echo "ALLOW_CONFIG_MUTATIONS=${{ secrets.ALLOW_CONFIG_MUTATIONS }}" >> .env.dev
 
-          cat .env
+          cat .env.dev
 
       # Run docker containers
       - name: Run docker
