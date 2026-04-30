@@ -113,7 +113,6 @@ class AwsS3 {
             Bucket: this.bucketName,
             Key: key,
             ContentType: contentType,
-            ACL: 'public-read'  // make the object publicly readable
         })
 
         const uploadUrl = await getSignedUrl(this.s3ForPresign, command)
@@ -162,7 +161,6 @@ class AwsS3 {
             Key: key,
             Body: fileBuffer,
             ContentType: this.getContentType(filename),
-            ACL: 'public-read'
         }))
 
         return this.getPublicUrl(key)
