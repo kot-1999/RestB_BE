@@ -39,7 +39,7 @@ class AwsS3 {
      * @param {IConfig['s3']} s3Config - S3 configuration (region, endpoint, credentials)
      */
 
-    private bucketName = 'rest-images'
+    private bucketName = 'rest-images-test-uat-bucket-temp'
     private s3Config
     
     constructor(s3Config: IConfig['s3']) {
