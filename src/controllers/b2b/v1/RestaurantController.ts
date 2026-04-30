@@ -1,4 +1,4 @@
-import { AdminRole, Prisma, RestaurantCategories } from '@prisma/client'
+import { AdminRole, BookingStatus, Prisma, RestaurantCategories } from '@prisma/client'
 import dayjs from 'dayjs'
 import { Response, NextFunction, AuthAdminRequest } from 'express'
 import Joi from 'joi'
@@ -20,6 +20,11 @@ export class RestaurantController extends AbstractController {
                     limit: Joi.number().positive()
                         .default(20)
                 }).required()
+            }),
+            deleteRestaurant: JoiCommon.object.request.keys({
+                params: Joi.object({
+                    restaurantID: JoiCommon.string.id
+                })
             }),
             putRestaurant: JoiCommon.object.request.keys({
                 body: Joi.object({
@@ -101,6 +106,12 @@ export class RestaurantController extends AbstractController {
                         .required(),
                     address: JoiCommon.object.address.required()
                 }),
+                message: Joi.string().required()
+            }).required(),
+            deleteRestaurant: Joi.object({
+                restaurant: Joi.object({
+                    id: JoiCommon.string.id
+                }).required(),
                 message: Joi.string().required()
             }).required()
         }
@@ -205,6 +216,80 @@ export class RestaurantController extends AbstractController {
         }
     }
 
+    private DeleteRestaurantReqType: Joi.extractType<typeof RestaurantController.schemas.request.deleteRestaurant>
+    private DeleteRestaurantResType: Joi.extractType<typeof RestaurantController.schemas.response.deleteRestaurant>
+    public async deleteRestaurant(
+        req: AuthAdminRequest & typeof this.DeleteRestaurantReqType,
+        res: Response<typeof this.DeleteRestaurantResType>,
+        next: NextFunction
+    ) {
+        try {
+            const { params, user } = req
+            const [restaurant, restaurantStaff] = await Promise.all([
+                prisma.restaurant.findByID(params.restaurantID, {
+                    id: true,
+                    brandID: true 
+                }),
+                prisma.restaurantStaff.findMany({
+                    where: {
+                        restaurantID: params.restaurantID
+                    }
+                })
+            ])
+            if (!restaurant) {
+                throw new IError(404, 'Restaurant not found')
+            }
+
+            if (user.brandID !== restaurant.brandID) {
+                throw new IError(403, 'Access forbidden')
+            }
+            
+            const now = dayjs().toISOString()
+
+            await prisma.$transaction(async (tx: any) => {
+                if (restaurantStaff.length > 0) {
+                    await Promise.all([tx.admin.updateMany({
+                        where: {
+                            id: {
+                                in: restaurantStaff.map((staff: { adminID: string }) => staff.adminID)
+                            }
+                        },
+                        data: {
+                            deletedAt: now
+                        }
+                    }),
+                    
+                    tx.restaurant.updateOne(params.restaurantID, {
+                        deletedAt: now
+                    }),
+
+                    tx.booking.updateMany({
+                        where: {
+                            AND: [
+                                {
+                                    restaurantID: params.restaurantID
+                                },
+                                { bookingTime: { gte: now } }
+                            ]
+                        },
+                        data: {
+                            status: BookingStatus.Cancelled
+                        }
+                    }) ])
+                }
+            })
+            
+            return res.status(200).json({
+                restaurant: {
+                    id: params.restaurantID
+                },
+                message: 'Restaurant was deleted successfully'
+            })
+        } catch (err) {
+            return next(err)
+        }
+    }
+    
     private PutRestaurantReqType: Joi.extractType<typeof RestaurantController.schemas.request.putRestaurant>
     private PutRestaurantResType: Joi.extractType<typeof RestaurantController.schemas.response.putRestaurant>
     public async putRestaurant(

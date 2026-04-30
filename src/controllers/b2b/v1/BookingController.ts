@@ -370,7 +370,7 @@ export class BookingController extends AbstractController {
             let where = {}
 
             if (user.role === AdminRole.Admin) {
-                where = { brandID: user.brandID }
+                where = { AND: [{ brandID: user.brandID }, { deletedAt: null }] }
             } else {
                 const restaurantStaff = await prisma.restaurantStaff.findFirst({
                     where: {

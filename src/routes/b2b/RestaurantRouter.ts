@@ -58,5 +58,27 @@ export default function restaurantRouter() {
         restaurantController.putRestaurant
     )
 
+    router.delete(
+        /*
+            #swagger.tags = ['b2b-v1-Restaurant']
+            #swagger.description = 'Delete a restaurant.',
+            #swagger.security = [{
+                "bearerAuth": []
+            }]
+            #swagger.parameters['body'] = {
+                in: 'body',
+                schema: { $ref: '#/definitions/b2bV1DeleteRestaurantReqBody' }
+            }
+            #swagger.responses[200] = {
+                schema: { "$ref": "#/definitions/b2bV1DeleteRestaurantRes" },
+            }
+        */
+        '/:restaurantID',
+        authorizationMiddleware([PassportStrategy.jwtB2b]),
+        permissionMiddleware([AdminRole.Admin]),
+        validationMiddleware(RestaurantController.schemas.request.deleteRestaurant),
+        restaurantController.deleteRestaurant
+    )
+
     return router
 }
