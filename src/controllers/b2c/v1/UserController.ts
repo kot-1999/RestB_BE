@@ -1,4 +1,5 @@
 import { BookingStatus } from '@prisma/client';
+import dayjs from 'dayjs';
 import { Response, NextFunction, AuthUserRequest } from 'express'
 import Joi from 'joi'
 
@@ -6,7 +7,6 @@ import prisma from '../../../services/Prisma'
 import { AbstractController } from '../../../types/AbstractController'
 import { JoiCommon } from '../../../types/JoiCommon'
 import { IError } from '../../../utils/IError'
-import dayjs from "dayjs";
 
 export class UsersController extends AbstractController {
     private static readonly userSchema = Joi.object({
