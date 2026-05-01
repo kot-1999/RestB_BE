@@ -112,7 +112,7 @@ class AwsS3 {
         const command = new PutObjectCommand({
             Bucket: this.bucketName,
             Key: key,
-            ContentType: contentType,
+            ContentType: contentType
         })
 
         const uploadUrl = await getSignedUrl(this.s3ForPresign, command)
@@ -160,7 +160,7 @@ class AwsS3 {
             Bucket: this.bucketName,
             Key: key,
             Body: fileBuffer,
-            ContentType: this.getContentType(filename),
+            ContentType: this.getContentType(filename)
         }))
 
         return this.getPublicUrl(key)
