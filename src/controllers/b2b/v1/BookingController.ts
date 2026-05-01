@@ -374,10 +374,9 @@ export class BookingController extends AbstractController {
             } else {
                 const restaurantStaff = await prisma.restaurantStaff.findFirst({
                     where: {
-                        AND: [{ adminID: user.id }, { deletedAt: null }]
+                        AND: [{ adminID: user.id }]
                     }
                 })
-
                 if (restaurantStaff) {
                     where = {
                         AND: [{ id: restaurantStaff.restaurantID }, { deletedAt: null }]

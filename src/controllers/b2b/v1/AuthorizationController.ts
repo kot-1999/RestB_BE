@@ -407,8 +407,8 @@ export class AuthorizationController extends AbstractController {
                     id: true,
                     brandID: true
                 }),
-                prisma.admin.findOne(null, {
-                    email: { equals: user.email }
+                prisma.admin.findFirst({
+                    where: { email: user.email }
                 })
             ])
             if (admin) {
@@ -424,7 +424,7 @@ export class AuthorizationController extends AbstractController {
                 email: user.email,
                 brand: {
                     connect: {
-                        id: '41cca44c-9d0c-4009-b682-6fdca32501ec'
+                        id: restaurant.brandID
                     }
                 },
                 emailVerified: false,

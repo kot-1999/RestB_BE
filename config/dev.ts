@@ -14,7 +14,7 @@ const options: IConfig = {
         name: 'RestBoo',
         port: process.env.PORT as string,
         env: process.env.NODE_ENV as NodeEnv,
-        frontendUrl: process.env.FRONTEND_URL ?? 'http://localhost:3055'
+        frontendUrl: process.env.FRONTEND_URL ?? 'http://localhost:3000'
     },
     cookieSession: {
         name: 'session',
